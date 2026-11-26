@@ -91,6 +91,20 @@ details.inv p{margin:8px 0 0;font-size:.9rem}
 .invin .invt{font-weight:600;font-family:var(--f-head)}
 .invin img{width:100%;height:auto;border-radius:10px;margin-top:8px;display:block}
 .invin p{margin:8px 0 0;font-size:.9rem}
+.txtpanel{grid-column:2;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
+.txtpanel .tmeta{font-size:.8rem;color:var(--muted)}
+.txtpanel .tmeta b{color:var(--ink);font-weight:600}
+.txtpanel pre{margin:0;white-space:pre-wrap;word-wrap:break-word;font:inherit;font-size:.95rem;background:var(--bg);border-radius:8px;padding:10px}
+.tbtns{display:flex;flex-wrap:wrap;gap:8px}
+.tbtns button{font:inherit;font-size:.85rem;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:99px;padding:7px 14px;cursor:pointer}
+.tbtns button.ok{background:var(--accent);border-color:var(--accent);color:var(--card)}
+.tbtns button.no{color:var(--warn)}
+.tst{font-size:.85rem;font-weight:600;color:var(--accent)}
+.tst.no{color:var(--warn)}
+.txtpanel textarea{font:inherit;font-size:.9rem;width:100%;box-sizing:border-box;min-height:60px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);color:var(--ink)}
+.notebtn.txtbtn.espera{color:var(--warn)}
+.textos{font-size:.85rem;font-weight:600;color:var(--warn)}
+.textos a{color:inherit}
 @media (prefers-reduced-motion: reduce){.fill{transition:none}}
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -106,6 +120,7 @@ body{margin:0}
     <p class="sub">Marca lo hecho y deja notas: se guarda igual en el teléfono y en la computadora, y tu asistente lo lee. Las mesas: <a href="mesas/">en 3D</a> · <a href="mesas-plano/">el plano</a>. <a href="paginas/">Todas tus páginas</a>.</p>
     <div class="track" aria-hidden="true"><div class="fill" id="fill"></div></div>
     <div class="count" id="count">Cargando…</div>
+    <div class="textos" id="textos" hidden></div>
     <div class="status" id="status" role="status"></div>
   </header>
 
@@ -234,8 +249,18 @@ function taskLi(task) {
       panel.hidden = !panel.hidden; vb.setAttribute("aria-expanded", String(!panel.hidden));
       vb.textContent = (panel.hidden ? "Ver: " : "Cerrar: ") + x.t;
     });
-    li.append(cb, tt, vb, panel, shown, btn, box);
-  } else li.append(cb, tt, shown, btn, box);
+    li.append(cb, tt, vb, panel);
+  } else li.append(cb, tt);
+  if (task.texto) {
+    // El texto que otra persona va a leer, completo aquí, con sus botones (es el mismo de la página de aprobación).
+    const tb = document.createElement("button"); tb.type = "button"; tb.className = "notebtn ver txtbtn"; tb.dataset.card = task.texto;
+    tb.textContent = "Texto: cargando…"; tb.setAttribute("aria-expanded", "false");
+    const tp = document.createElement("div"); tp.className = "txtpanel"; tp.hidden = true; tp.dataset.card = task.texto; tp.id = "txt-" + task.id;
+    tb.setAttribute("aria-controls", tp.id);
+    tb.addEventListener("click", () => { tp.hidden = !tp.hidden; tp.dataset.tocado = "1"; tb.setAttribute("aria-expanded", String(!tp.hidden)); pintarTextos(); });
+    li.append(tb, tp);
+  }
+  li.append(shown, btn, box);
   allIds.push(task.id);
   return li;
 }
@@ -287,6 +312,95 @@ function render() {
     let timer = null; ta.addEventListener("input", () => { clearTimeout(timer); timer = setTimeout(() => save(q.id, { n: ta.value }), 900); });
     li.appendChild(ta); qs.appendChild(li);
   });
+}
+
+// Textos para otras personas: las tarjetas de la pestaña "asistente" de la página de aprobación
+// (tarjetas/asistente.json). Un clic aquí escribe la misma decisión que un clic allá.
+let CARDS = {}; const clics = {};
+const hhmm = d => d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+const corto = s => String(s || "").split(" (")[0];
+const ESTADOS = { esperando: "espera tu clic", aprobado: "aprobado", enviado: "enviado", tirado: "tirado", en_pausa: "en pausa", cambio_pedido: "pediste un cambio" };
+async function cargarTextos() {
+  try {
+    const r = await gh("tarjetas/asistente.json", { headers: { Accept: "application/vnd.github.raw+json" } });
+    if (!r.ok) return;
+    const d = await r.json(); const n = {};
+    (d.tarjetas || []).forEach(c => { n[c.id] = c; });
+    CARDS = n; pintarTextos();
+  } catch (_) {}
+}
+function estadoDe(c) { const l = clics[c.id + "/" + c.v]; return l ? "clic" : (c.estado || "esperando"); }
+function pintarTextos() {
+  document.querySelectorAll(".txtpanel[data-card]").forEach(tp => {
+    const c = CARDS[tp.dataset.card]; const tb = tp.previousElementSibling;
+    if (!c) { tb.textContent = "Texto: todavía no está listo"; tb.classList.remove("espera"); tp.hidden = true; return; }
+    const l = clics[c.id + "/" + c.v]; const e = estadoDe(c);
+    const est = l ? ({ guardando: "guardando tu clic…", hecho: ({ aprobar: "aprobado", cambiar: "pediste un cambio", tirar: "tirado" })[l.d] + " " + (l.h || ""), fallo: "no se guardó tu clic" })[l.e] : (ESTADOS[e] || e);
+    tb.textContent = (tp.hidden ? "Ver el texto para " : "Cerrar el texto para ") + corto(c.para) + ": " + est;
+    tb.classList.toggle("espera", e === "esperando");
+    if (e === "esperando" && !tp.dataset.tocado) { tp.hidden = false; tb.textContent = "Cerrar el texto para " + corto(c.para) + ": " + est; }
+    const llave = [c.id, c.v, e, c.nota_estado || "", l ? l.e + (l.d || "") : ""].join("|");
+    if (tp.dataset.llave === llave) return;
+    const escribiendo = tp.querySelector("textarea"); const borrador = escribiendo ? escribiendo.value : "";
+    tp.dataset.llave = llave; tp.textContent = "";
+    const meta = document.createElement("div"); meta.className = "tmeta";
+    [["Para", c.para], ["Dónde", c.donde], ["Cuándo", c.cuando]].forEach(([k, v]) => { if (!v) return; const p = document.createElement("div"); const b = document.createElement("b"); b.textContent = k + ": "; p.append(b, String(v)); meta.appendChild(p); });
+    const pre = document.createElement("pre"); pre.textContent = c.texto || "";
+    const bs = document.createElement("div"); bs.className = "tbtns";
+    const cp = document.createElement("button"); cp.type = "button"; cp.textContent = "Copiar el texto";
+    cp.addEventListener("click", async () => {
+      try { await navigator.clipboard.writeText(c.texto || ""); cp.textContent = "Copiado"; }
+      catch (_) { const s = getSelection(); const rg = document.createRange(); rg.selectNodeContents(pre); s.removeAllRanges(); s.addRange(rg); cp.textContent = "Seleccionado: cópialo"; }
+      setTimeout(() => { cp.textContent = "Copiar el texto"; }, 2500);
+    });
+    bs.appendChild(cp);
+    const st = document.createElement("div"); st.className = "tst";
+    if (l) { st.textContent = l.e === "fallo" ? "No se guardó tu clic (" + l.m + "). Toca otra vez." : (l.e === "guardando" ? "Guardando tu clic…" : est.charAt(0).toUpperCase() + est.slice(1) + ". La terminal lo toma."); st.classList.toggle("no", l.e === "fallo"); }
+    else if (e !== "esperando") { st.textContent = c.nota_estado || est; st.classList.toggle("no", e === "tirado"); }
+    if (e === "esperando" || (l && l.e === "fallo")) {
+      const ok = document.createElement("button"); ok.type = "button"; ok.className = "ok"; ok.textContent = "Aprobar";
+      ok.addEventListener("click", () => decidir(c, "aprobar"));
+      const ca = document.createElement("button"); ca.type = "button"; ca.textContent = "Cambiar";
+      const no = document.createElement("button"); no.type = "button"; no.className = "no"; no.textContent = "Tirar";
+      no.addEventListener("click", () => decidir(c, "tirar"));
+      bs.append(ok, ca, no);
+      const cam = document.createElement("div"); cam.hidden = !borrador; cam.className = "tbtns";
+      const ta = document.createElement("textarea"); ta.placeholder = "Qué hay que cambiar"; ta.value = borrador;
+      const mc = document.createElement("button"); mc.type = "button"; mc.textContent = "Mandar el cambio";
+      mc.addEventListener("click", () => { if (ta.value.trim()) decidir(c, "cambiar", ta.value.trim()); });
+      cam.append(ta, mc);
+      ca.addEventListener("click", () => { cam.hidden = !cam.hidden; if (!cam.hidden) ta.focus(); });
+      tp.append(meta, pre, bs, cam, st);
+    } else tp.append(meta, pre, bs, st);
+  });
+  const esp = Object.values(CARDS).filter(c => estadoDe(c) === "esperando");
+  const t = $("#textos"); t.hidden = !esp.length; t.textContent = "";
+  if (esp.length) {
+    t.append("Textos esperando tu clic: " + esp.length + " (");
+    esp.forEach((c, i) => {
+      const tp = document.querySelector('.txtpanel[data-card="' + CSS.escape(c.id) + '"]');
+      const a = document.createElement("a");
+      a.textContent = corto(c.para);
+      if (tp) { a.href = "#" + tp.id; a.addEventListener("click", ev => { ev.preventDefault(); tp.hidden = false; pintarTextos(); tp.scrollIntoView({ block: "center" }); }); }
+      else a.href = "../aprobar/";
+      if (i) t.append(", "); t.appendChild(a);
+    });
+    t.append(")");
+  }
+}
+async function decidir(c, d, com) {
+  const k = c.id + "/" + c.v; const ahora = new Date();
+  const obj = { id: c.id, v: c.v, decision: d, comentario: com || "", hora: ahora.toISOString(), pestana: "asistente" };
+  clics[k] = { e: "guardando", d }; pintarTextos();
+  try {
+    const r = await gh("decisiones/asistente/" + c.id + ".v" + c.v + "." + ahora.getTime() + ".json", {
+      method: "PUT", headers: { "Content-Type": "application/json", Accept: "application/vnd.github+json" },
+      body: JSON.stringify({ message: "clic " + d + " " + c.id, content: b64(JSON.stringify(obj, null, 1)) })
+    });
+    if (!r.ok) throw new Error("GitHub " + r.status);
+    clics[k] = { e: "hecho", d, h: hhmm(ahora) };
+  } catch (e) { clics[k] = { e: "fallo", d, m: e.message }; }
+  pintarTextos();
 }
 
 // Las imágenes viven en el repo privado: se bajan una sola vez cada una, cuando algo las abre.
@@ -394,7 +508,9 @@ $("#goToday").addEventListener("click", e => {
     ({ PLAN, LATER, QS, INV } = data); FIJO = data.FIJO || FIJO; DINERO = data.DINERO || DINERO;
     render(); paint();
     await cargarMarcas();
+    cargarTextos();
     setInterval(() => { if (!escribiendo && !pendientes.size && document.visibilityState === "visible") cargarMarcas().catch(() => {}); }, 30000);
+    setInterval(() => { if (document.visibilityState === "visible" && !document.querySelector(".txtpanel textarea:focus")) cargarTextos(); }, 30000);
   } catch (e) {
     setStatus(e.message === "llave" ? "La llave de este navegador no sirve o venció." : "No pude leer el plan: " + e.message, true);
   }
