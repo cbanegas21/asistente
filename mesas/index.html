@@ -1,0 +1,1672 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+</head>
+<body>
+<title>Mesas en 3D</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Saira+Condensed:wght@600;700&display=swap">
+<style>
+:root {
+  --bg: #f3f0e8; --surface: #fffdf7; --surface-2: #e9e3d6; --ink: #15130e; --muted: #4c473d; --line: #cbc2ae;
+  --accent: #0a5a86; --accent-ink: #ffffff; --warn: #a3241a; --warn-bg: #fbe8e3; --ok: #1b6a3a;
+  --scene: #e4ded0; --grid: #b9b09b; --hi: #d96200; --dim: #c0261b; --glue: #f2c200; --screw: #2f5874;
+  --pin-bg: rgba(255, 253, 247, 0.94); --sub-bg: rgba(21, 19, 14, 0.78); --sub-ink: #fffdf7;
+  --font-display: "Saira Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12110d; --surface: #1b1a15; --surface-2: #27241d; --ink: #f2ede2; --muted: #bdb4a2; --line: #3d382e;
+    --accent: #6cc2f2; --accent-ink: #08151e; --warn: #ff8b7b; --warn-bg: #3a1914; --ok: #72d79b;
+    --scene: #1d1b16; --grid: #4a4436; --hi: #ff9d45; --dim: #ff6b5c; --glue: #ffd23a; --screw: #9fc8ea;
+    --pin-bg: rgba(27, 26, 21, 0.94); --sub-bg: rgba(0, 0, 0, 0.72); --sub-ink: #f2ede2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12110d; --surface: #1b1a15; --surface-2: #27241d; --ink: #f2ede2; --muted: #bdb4a2; --line: #3d382e;
+  --accent: #6cc2f2; --accent-ink: #08151e; --warn: #ff8b7b; --warn-bg: #3a1914; --ok: #72d79b;
+  --scene: #1d1b16; --grid: #4a4436; --hi: #ff9d45; --dim: #ff6b5c; --glue: #ffd23a; --screw: #9fc8ea;
+  --pin-bg: rgba(27, 26, 21, 0.94); --sub-bg: rgba(0, 0, 0, 0.72); --sub-ink: #f2ede2;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-top: 12px; padding-bottom: 56px;
+  overflow-x: hidden;
+}
+.wrap { max-width: 920px; margin: 0 auto; display: grid; gap: 18px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.06; text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(2rem, 8vw, 3rem); margin: 2px 0 6px; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.25rem; margin-top: 14px; }
+p { margin: 8px 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.lead { margin: 0; max-width: 68ch; }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.intro { display: grid; grid-template-columns: minmax(0, 1fr) 150px; gap: 12px; align-items: center; }
+.intro .lead { font-size: 1rem; }
+.intro figure { margin: 0; }
+.intro img { width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--line); }
+.intro figcaption { font-size: 0.75rem; color: var(--muted); line-height: 1.3; margin-top: 3px; }
+@media (max-width: 520px) { .intro { grid-template-columns: minmax(0, 1fr) 96px; gap: 10px; } .intro h1 { font-size: 1.9rem; margin: 0 0 4px; } .intro .lead { font-size: 0.92rem; line-height: 1.4; } .intro figcaption { display: none; } }
+
+/* El visor: ocupa todo el ancho en el teléfono */
+.player { display: grid; gap: 8px; }
+@media (max-width: 640px) {
+  .player { margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+  .player .transport, .player .steps { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .viewer { border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
+}
+.viewer { position: relative; height: 60vh; height: 60svh; min-height: 300px; max-height: 680px; background: var(--scene); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.viewer canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.pin { position: absolute; left: 0; top: 0; max-width: 62%; font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; line-height: 1.15;
+  color: var(--ink); background: var(--pin-bg); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 5px; padding: 2px 7px; white-space: normal; will-change: transform, opacity; }
+.pin.dim { border-left-color: var(--dim); }
+.pin.dim b { color: var(--dim); }
+.pin.glue { border-left-color: var(--glue); }
+.pin.screw { border-left-color: var(--screw); }
+.pin.warn { border-left-color: var(--warn); }
+.pin.big { font-size: 1.15rem; }
+.ovtop { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; gap: 6px; pointer-events: none; }
+.ovtop span { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; background: var(--pin-bg); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 1px 8px; max-width: 100%; }
+.sub { position: absolute; left: 8px; right: 8px; bottom: 8px; text-align: center; pointer-events: none; }
+.sub span { display: inline-block; background: var(--sub-bg); color: var(--sub-ink); font-size: 0.95rem; line-height: 1.3; border-radius: 6px; padding: 4px 10px; max-width: 100%; }
+.sub span:empty { display: none; }
+.fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+[hidden] { display: none !important; }
+
+.transport { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr) auto; gap: 6px; align-items: center; }
+.transport button, .steps button {
+  font: inherit; font-family: var(--font-display); font-weight: 700; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.transport button { padding: 7px 10px; font-size: 1rem; min-height: 40px; }
+.transport button.play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); min-width: 104px; }
+.transport input[type="range"] { width: 100%; min-width: 0; accent-color: var(--accent); }
+.transport .clock { font-size: 0.8rem; color: var(--muted); white-space: nowrap; }
+@media (max-width: 420px) {
+  .transport { grid-template-columns: 1fr auto 1fr; }
+  .transport input[type="range"] { grid-column: 1 / 3; }
+  .transport .clock { grid-column: 3; text-align: right; }
+}
+.steps { display: grid; gap: 4px; }
+.steps .row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+.steps .ch { font-family: var(--font-mono); font-size: 0.7rem; color: var(--muted); width: 100%; margin-top: 2px; }
+.steps button { min-width: 38px; height: 36px; padding: 0 6px; font-size: 0.98rem; }
+.steps button[aria-current="step"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.steps button.m2 { min-width: 64px; }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.card .chap { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); }
+.card h2 { margin: 4px 0 6px; }
+.vid { background: var(--surface-2); border-radius: 8px; padding: 8px 10px; font-size: 0.95rem; }
+.vid b { font-family: var(--font-display); }
+dl.kv { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 6px 12px; margin: 10px 0; }
+dl.kv dt { font-family: var(--font-display); font-weight: 700; color: var(--muted); }
+dl.kv dd { margin: 0; }
+@media (max-width: 480px) { dl.kv { grid-template-columns: minmax(0, 1fr); gap: 0; } dl.kv dd { margin-bottom: 8px; } }
+.how { padding-left: 1.3em; margin: 8px 0; }
+.how li { margin: 5px 0; }
+.ojo { border-left: 4px solid var(--warn); background: var(--warn-bg); border-radius: 0 8px 8px 0; padding: 8px 10px; }
+.ojo b { color: var(--warn); }
+.note { font-size: 0.9rem; color: var(--muted); }
+.shots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 10px; margin-top: 10px; }
+.shots figure { margin: 0; }
+.shots img { width: 100%; height: auto; display: block; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); }
+.shots figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 3px; }
+.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+table.wide { min-width: 560px; }
+th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 0.75rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+td.n { font-family: var(--font-mono); white-space: nowrap; }
+td a { font-size: 0.8rem; }
+ul.plain { padding-left: 1.2em; margin: 8px 0; }
+ul.plain li { margin: 5px 0; }
+footer { font-size: 0.85rem; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; } }
+</style>
+
+<div class="wrap">
+<header class="intro">
+  <div>
+    <div class="eyebrow">Mesas de Cotoni · animación de los 25 pasos</div>
+    <h1>Las mesas en 3D</h1>
+    <p class="lead">El video de Lenny Montivero con tus medidas: tapa de pino de 80 cm y 3.2 de grueso, 60 de alto, patas a 15°. Reproducir pasa solo por los pasos; en pausa giras la mesa con el dedo.</p>
+  </div>
+  <figure><img src="frames/f_10m10s.jpg" alt="Las 2 mesas terminadas del video" width="800" height="450"><figcaption>10:10 Las mesas del video (60 x 42, melamina). Las tuyas: 80 x 60, pino.</figcaption></figure>
+</header>
+
+<section class="player" aria-label="Animación">
+  <div class="viewer" id="viewer" aria-label="Modelo 3D de la mesa armándose paso a paso">
+    <div class="labels" id="labels"></div>
+    <div class="ovtop"><span id="ovStep"></span></div>
+    <div class="sub"><span id="sub"></span></div>
+    <div class="fallback" id="fallback" hidden>No se pudo abrir el 3D en este navegador. Abajo está el texto de cada paso con sus fotos del video.</div>
+  </div>
+  <div class="transport">
+    <button type="button" id="bPrev" aria-label="Paso anterior">Anterior</button>
+    <button type="button" id="bPlay" class="play" aria-pressed="false">Reproducir</button>
+    <button type="button" id="bNext" aria-label="Paso siguiente">Siguiente</button>
+    <input type="range" id="scrub" min="0" max="1000" value="0" aria-label="Avance dentro del paso">
+    <span class="clock num" id="clock"></span>
+  </div>
+  <nav class="steps" id="steps" aria-label="Pasos"></nav>
+</section>
+
+<article class="card" id="card" aria-live="polite"></article>
+
+<section class="card" id="mesa2">
+  <h2>Mesa 2: patas rectas con cruz</h2>
+  <p>No sale en el video. Sale de la guía del 3 nov, con los tornillos cambiados a lo que hay en La Mundial. La animación es el botón <b>M2</b> de la barra de pasos.</p>
+  <div class="tw"><table><thead><tr><th>Pieza</th><th>Cuántas</th><th>Medida</th><th>Madera</th><th>Puntas</th></tr></thead><tbody>
+    <tr><td>Tablas de la tapa</td><td class="n">6</td><td class="n">91 cm</td><td>1 1/2 x 6</td><td>Rectas</td></tr>
+    <tr><td>Patas</td><td class="n">4</td><td class="n">49.8 cm</td><td>2x4</td><td>Rectas, a 90°</td></tr>
+    <tr><td>Cruz de arriba</td><td class="n">2</td><td class="n">70 cm</td><td>2x3</td><td>Rectas</td></tr>
+    <tr><td>Cruz baja</td><td class="n">2</td><td class="n">53.5 cm</td><td>2x4 que sobra, rebajado a 7 cm de alto con la circular</td><td>Rectas</td></tr>
+  </tbody></table></div>
+  <ul class="plain">
+    <li>Tapa: pasos 2 a 5 y 16 a 19, iguales. Medias maderas iguales a los pasos 7, 8 y 12.</li>
+    <li>Patas a la cruz de arriba: cruz de cabeza, raya a <b>3.75 cm</b> de cada punta para la cara de afuera de la pata, cola y 2 tornillos de 5 x 70 mm por pata desde la cara que va contra la tapa (caja de 10 mm a 3.5 cm). Cada pata a 90° en los 2 sentidos.</li>
+    <li>Cruz baja: cara de abajo a <b>8 cm</b> del piso. Cola en las puntas, 1 tornillo de 5 x 70 mm por punta desde la cara de afuera de la pata (caja de 10 mm a 1 cm) y espiga de 10 x 40 con cola. Son 4 tacos a la vista.</li>
+    <li>La tapa queda <b>5 cm</b> afuera de las puntas de la cruz de arriba.</li>
+  </ul>
+</section>
+
+<section class="card" id="compras">
+  <h2>Lo que falta comprar</h2>
+  <p class="note">Cruzado con lo que ya compraste (facturas de Larach del 5 y 13 nov y de La Mundial del 13 y 14 nov). Precios de la página de La Mundial el 24 nov a la 1:45 pm, con ISV. La página dice "disponible", pero no dice en qué tienda.</p>
+  <div class="tw"><table class="wide"><thead><tr><th>Qué</th><th>Para qué</th><th>Precio</th><th>Link</th></tr></thead><tbody>
+    <tr><td>Escuadra para carpintero 7" Wadfow WSR1107 (aluminio, triangular, con escala de grados y pivote)</td><td>En lugar de la falsa escuadra: es la escuadra que usa Lenny para marcar los 15° y sirve de guía para la circular</td><td class="n">L61</td><td><a href="https://lamundial.com/shop/142963-escuadra-para-carpintero-7-wadfow-wsr1107-15098" target="_blank" rel="noopener">https://lamundial.com/shop/142963-escuadra-para-carpintero-7-wadfow-wsr1107-15098</a></td></tr>
+    <tr><td>Tornillo para madera 5 x 70 mm, 100 piezas, Wadfow S5943</td><td>Patas a las cruces (unas 28 en las 2 mesas)</td><td class="n">L65</td><td><a href="https://lamundial.com/shop/143871-tornillo-para-madera-5x70mm-100pc-wadfow-s5943-16360" target="_blank" rel="noopener">https://lamundial.com/shop/143871-tornillo-para-madera-5x70mm-100pc-wadfow-s5943-16360</a></td></tr>
+    <tr><td>Lija para madera 80 Fandeli D081, 4 pliegos (L10 c/u)</td><td>Aplanar las tapas y el canto del círculo (no tienes 80)</td><td class="n">L40</td><td><a href="https://lamundial.com/shop/46130-lija-para-madera-yeso-d081-80-fandeli-0060-19263" target="_blank" rel="noopener">https://lamundial.com/shop/46130-lija-para-madera-yeso-d081-80-fandeli-0060-19263</a></td></tr>
+    <tr><td>Masking 3/4" x 30 yd Abro</td><td>Banderitas de profundidad en las brocas y proteger</td><td class="n">L18</td><td><a href="https://lamundial.com/shop/75333-masking-3-4-x30yd-auto-verde-abro-21337" target="_blank" rel="noopener">https://lamundial.com/shop/75333-masking-3-4-x30yd-auto-verde-abro-21337</a></td></tr>
+    <tr><td><b>Total de lo que hace falta</b></td><td></td><td class="n"><b>L184</b></td><td></td></tr>
+  </tbody></table></div>
+  <ul class="plain">
+    <li><b>Falsa escuadra:</b> La Mundial no tiene. En Larach no se pudo buscar (su buscador pide una sesión). La única confirmada el 24 nov es la <b>Truper EFT-8 en Fierros, L135</b>, "Disponible Online", unos 2 días de entrega: <a href="https://fierros.com/productos/escuadra-carpintero-truper-eft-8-para-angulo-14382" target="_blank" rel="noopener">https://fierros.com/productos/escuadra-carpintero-truper-eft-8-para-angulo-14382</a>. Con la escuadra de grados de L61 te basta para estas mesas.</li>
+    <li><b>Sin precio:</b> una tira de plywood o MDF de 6 mm de unos 10 x 60 cm para el compás del router. La Mundial solo vende la lámina entera (MDF de 6 mm, L485). Pide un retazo en una maderería.</li>
+  </ul>
+  <h3>Opcional</h3>
+  <div class="tw"><table class="wide"><thead><tr><th>Qué</th><th>Cuándo</th><th>Precio</th><th>Link</th></tr></thead><tbody>
+    <tr><td>Pistola Wadfow WGA1506, 600 cc, boquilla 1.4 mm</td><td>Solo si no tienes pistola (la lista dice "Después")</td><td class="n">L399</td><td><a href="https://lamundial.com/shop/134084-pistola-para-pintar-de-aire-600cc-wadfow-wga1506-15783" target="_blank" rel="noopener">https://lamundial.com/shop/134084-pistola-para-pintar-de-aire-600cc-wadfow-wga1506-15783</a></td></tr>
+    <tr><td>Tercer cuarto de barniz Sherwin-Williams</td><td>Si barnizas con pistola</td><td class="n">L342</td><td><a href="https://lamundial.com/shop/2973-barniz-brillante-para-mueble-1-4-galon-sherwin-williams-6482" target="_blank" rel="noopener">https://lamundial.com/shop/2973-barniz-brillante-para-mueble-1-4-galon-sherwin-williams-6482</a></td></tr>
+    <tr><td>Thinner para laca Sherwin-Williams 1.1 L</td><td>Solo si quieres el tinte más claro</td><td class="n">L81</td><td><a href="https://lamundial.com/shop/44893-thinner-laca-bote-plastico-1-1-litros-sherwin-williams-r7k128-transparente-7397" target="_blank" rel="noopener">https://lamundial.com/shop/44893-thinner-laca-bote-plastico-1-1-litros-sherwin-williams-r7k128-transparente-7397</a></td></tr>
+    <tr><td>Tornillo 5 x 80 mm, 80 piezas</td><td>Solo para la Variante V</td><td class="n">L72</td><td><a href="https://lamundial.com/shop/144134-tornillo-para-madera-5x80mm-80pc-wxs5t44-16361" target="_blank" rel="noopener">https://lamundial.com/shop/144134-tornillo-para-madera-5x80mm-80pc-wxs5t44-16361</a></td></tr>
+  </tbody></table></div>
+  <p>Con la pistola, el tercer barniz y el thinner: L184 + L822 = <b>L1,006</b>.</p>
+</section>
+
+<footer>
+  <p>Medidas, tornillos, brocas y tiempos: la guía del 24 nov (mesas/guia_video_cuadro_por_cuadro_24nov.md). Todo supone el 2x4 cepillado a 4.5 x 9, el 2x3 a 4.5 x 7 y la tapa a 3.2: si después de cepillar miden otra cosa, la guía dice cómo recalcular. En la animación, lo que se ve más grande de lo real para que se note (la capa que quita el cepillo, los escalones de la tapa, la cola y las líneas de lápiz) no está a escala; las piezas sí.</p>
+  <p>Video: <a href="https://www.youtube.com/watch?v=RvbpWrZUBT4" target="_blank" rel="noopener">https://www.youtube.com/watch?v=RvbpWrZUBT4</a> ("MESA RATONA ESTILO NORDICO", Lenny Montivero). Los tiempos del barniz son de la ficha de Minwax (no se encontró la del Sher-Wood); las 24 horas del Comejenol son un cálculo, la ficha no lo dice.</p>
+</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+"use strict";
+/* Texto de cada paso: copiado de mesas/guia_video_cuadro_por_cuadro_24nov.md. No agregar medidas que no estén en la guía. */
+var CHAPS = { A: "A. Antes de cortar", B: "B. La tapa", C: "C. La base", D: "D. El círculo y el canto", E: "E. Unir y tapar", F: "F. El acabado", M: "Mesa 2" };
+var TXT = [
+  { c: "A", t: "Medir la humedad y escoger las piezas", vid: "No sale en el video (guía del 3 nov).",
+    rows: [["Herramienta", "Medidor de humedad, en modo pino"], ["Medidas", "De 10 a 13% en todas, sin más de 2 puntos de diferencia entre ellas. El 14 nov marcaron 13%."]],
+    how: ["Mide cada pieza en 3 puntos, con las puntas metidas a lo ancho de la veta.", "Sigue si todas marcan de 10 a 13% y no hay más de 2 puntos de diferencia entre ellas.", "Escoge las 4 tablas más bonitas de 1 1/2 x 6 para las tapas. En la base, nudos lejos de las medias maderas y de las puntas de las patas."],
+    ojo: "Cepillar y pegar madera arriba de 14%: la tapa se abre en las juntas cuando seca.", shots: [] },
+  { c: "A", t: "Cepillar con el cepillo eléctrico", vid: "<b>Video 0:20:</b> \"ayer las repasé un poquito para que queden un poquito más limpias\". No muestra cómo.",
+    rows: [["Herramienta", "Tu cepillo eléctrico"], ["Medidas", "Profundidad: 0.5 mm para acabar, 1 mm como máximo para quitar (desconéctalo para ajustar). Grueso de la tapa: 3.2 cm, las 12 tablas iguales. Bases: 2x4 a 4.5 x 9 y 2x3 a 4.5 x 7, o a lo que dé parejo. Anota las medidas reales."], ["Seguridad", "Lentes y mascarilla; espera que la cuchilla pare antes de bajarlo; apóyalo en su pie."]],
+    how: ["Primero una cara: raya la cara con lápiz en zigzag, cepilla los puntos altos hasta que las rayas se borren parejo y revisa con una regla o con el canto de un sargento.", "Al empezar cada pasada, el peso va en la zapata de adelante; al terminar, en la de atrás. Así no se comen las puntas.", "Si la madera se astilla, cepilla en el otro sentido de la veta.", "Cantos para pegar la tapa: junta 2 tablas cara con cara, como un libro cerrado, prénsalas parejas y cepilla los 2 cantos a la vez. Si el cepillo queda un poco chueco, al abrirlas los ángulos se compensan y la junta cierra. Revisa a contraluz: sin rendijas.", "Grueso: marca una línea a 3.2 cm alrededor de cada tabla (o al grueso de la más delgada) y cepilla hasta la línea."],
+    ojo: "Cepillar la madera días antes de pegar. Cepilla y pega el mismo día o al siguiente.",
+    shots: [["f_00m22s.jpg", "0:22 Las piezas ya repasadas, en la ingletadora. El cepillado no sale."]] },
+  { c: "B", t: "Cortar y acomodar las 6 tablas", vid: "No sale en el video: su tapa es de melamina comprada.",
+    rows: [["Herramienta", "Circular y escuadra"], ["Medidas", "6 tablas de 91 cm por mesa (3 salen de cada tabla de 10 pies). Corte recto."]],
+    how: ["Corta recto con la circular guiada con la escuadra.", "Alterna los anillos de la punta: una con la curva hacia arriba y la siguiente hacia abajo.", "Dibuja un triángulo de lápiz sobre las 6 para no perder el orden."],
+    ojo: "Poner todas con los anillos igual: la tapa se arquea.", shots: [] },
+  { c: "B", t: "Pegar la tapa", vid: "No sale en el video.",
+    rows: [["Herramienta", "Brocha de 1.5\", tus 4 sargentos Truper de 120 y 2 listones rectos con masking"], ["Cola", "Capa delgada y pareja en los 2 cantos de cada junta (5 juntas). Nada en las caras."], ["Medidas", "Sargentos alternados, 2 abajo y 2 arriba, a 10, 33.7, 57.3 y 81 cm de una punta."], ["Espera", "De 30 a 60 minutos apretada; nada de esfuerzo en 24 horas. Raspa la cola gomosa a los 20 a 45 minutos."]],
+    how: ["Cola en los 2 cantos de cada junta, con la brocha.", "Sargentos alternados 2 abajo y 2 arriba. Encima, 2 listones rectos de través con masking para que no se peguen, prensados, para que quede plana.", "Aprieta parejo hasta que salga una línea de gotitas.", "Con 4 sargentos pegas una tapa, la sueltas a la hora y pegas la otra."],
+    ojo: "Apretar de más (saca toda la cola y la junta queda débil) o dejar un escalón entre tablas.", shots: [] },
+  { c: "B", t: "Aplanar la tapa (24 horas después)", vid: "No sale en el video.",
+    rows: [["Herramienta", "Cepillo eléctrico, lijadora orbital y una regla"], ["Lija", "80 y luego 120"]],
+    how: ["Cepillo eléctrico en diagonal a las tablas, después a lo largo, quitando solo los escalones.", "Termina con la lijadora orbital: lija 80 y luego 120."],
+    ojo: "Cepillar en un solo lugar y hacer un hundido. Revisa con la regla en cruz.", shots: [] },
+  { c: "C", t: "Cortar las piezas a lo largo", vid: "<b>Video 0:20 a 0:50:</b> marca con la escuadra rápida de grados (la negra triangular) y corta en la ingletadora (0:27, 0:40).",
+    rows: [["Herramienta", "Circular guiada con la escuadra rápida, o ingletadora si tienes"], ["Medidas", "Cruz del piso: 2 de 2x3 a 73.8 cm, puntas rectas por ahora. Cruz de arriba: 2 de 2x3 a 74 cm. Patas: 4 de 2x4 a unos 48 cm (el largo final sale en el paso 10)."]],
+    how: ["Mide, marca con la escuadra y corta recto.", "Primero el encastre (pasos 7 y 8) y después los ángulos (pasos 9 y 10)."],
+    ojo: "Cortar las puntas a 15° antes de la media madera. Lenny hace primero el encastre y después los ángulos.",
+    shots: [["f_00m27s.jpg", "0:27 La pieza en la ingletadora."], ["f_00m40s.jpg", "0:40 Corta en la ingletadora."]] },
+  { c: "C", t: "Marcar las medias maderas", vid: "<b>Video 0:50 a 1:47:</b> \"marcar el centro, que en este caso son 24.6\" (su brazo mide 49.2) y \"esto mide 4.2, así que serían 2.1 para cada lado\". Cruza una pieza sobre la otra para marcar el ancho (1:22).",
+    rows: [["Medidas", "Centro a 36.9 cm en la cruz del piso y a 37.0 en la de arriba. A cada lado, la mitad del ancho real de la pieza: 2.25 cm si mide 4.5. Hondo: la mitad del alto, 3.5 cm."]],
+    how: ["Marca el centro.", "Pon la otra pieza encima, cruzada, y marca el ancho contra ella.", "Marca el hondo de 3.5 en los 2 costados."],
+    ojo: "Marcar el ancho con la cinta. Pon la otra pieza encima y marca contra ella: el ancho real manda.",
+    shots: [["f_01m07s.jpg", "1:07 Marca con la escuadra triangular."], ["f_01m22s.jpg", "1:22 Marca el ancho con lápiz."]] },
+  { c: "C", t: "Cortar las medias maderas", vid: "<b>Video 1:47 a 2:25:</b> sierra de mesa con la hoja a media altura, pasada tras pasada.",
+    rows: [["Herramienta", "Circular con la profundidad en 3.5 cm (pruébala en un retazo) y formón de 7/8\""], ["Broca o fresa", "Otra forma de limpiar el fondo: el router con la broca recta de 12 mm a 3.5 cm"]],
+    how: ["Prensa las 2 piezas de una cruz lado a lado y córtalas juntas.", "Primero las 2 rayas de los lados, por dentro de la raya.", "Después cortes cada 5 mm en medio.", "Rompe los pedacitos con el formón y deja el fondo plano con el formón de 7/8\".", "Prueba: tiene que entrar apretada con la mano. Floja, la cola no la salva."],
+    ojo: "Un hueco más hondo que el otro: la cruz no queda pareja y la mesa cojea.",
+    shots: [["f_02m10s.jpg", "2:10 Lenny usa la sierra de mesa, pasada tras pasada."]] },
+  { c: "C", t: "Puntas a 15° de la cruz del piso", vid: "<b>Video 2:25 a 3:22:</b> \"un corte de ángulo de 15 grados... tengan cuidado porque son diferentes... de la punta que va a dar el piso hacia adentro\".",
+    rows: [["Herramienta", "Circular apoyada en la escuadra rápida puesta en 15° (o ingletadora en 15°)"], ["Medidas", "En el costado de cada punta, raya desde la esquina del piso hacia adentro: arriba se corre 1.88 cm. Queda 73.8 abajo y 70.0 arriba."]],
+    how: ["Arma la cruz en seco y escribe PISO en la cara de abajo de las 2 piezas.", "En el costado de cada punta, raya desde la esquina del piso hacia adentro.", "Acuesta la pieza sobre el costado rayado, raya hacia arriba y corta."],
+    ojo: "El que avisa Lenny: en una pieza el hueco está en la cara de arriba y en la otra en la de PISO. Por eso no se cortan igual: la punta larga siempre va en la cara de PISO.",
+    shots: [["f_02m32s.jpg", "2:32 La cruz armada en seco, antes de cortar los ángulos."], ["f_03m05s.jpg", "3:05 La cruz del piso."]] },
+  { c: "C", t: "Las 4 patas a 15°, paralelas", vid: "<b>Video 3:22 a 4:05:</b> \"cortar las patas también con un ángulo de 15 grados, que queden de manera paralela el corte, este para adentro y este para allá... poner un tope así las cuatro patas salen iguales\".",
+    rows: [["Herramienta", "Circular con la escuadra rápida en 15° como guía, o ingletadora en 15° con un taco de tope prensado, como Lenny"], ["Medidas", "2x4 acostado sobre la cara de 9 cm. Primera punta a 15° (la raya se corre 2.41 cm de un canto al otro). 44.3 cm por un canto largo y la segunda punta paralela a la primera. Cada pata se come 46.7 cm de pieza."]],
+    how: ["Corta la primera punta a 15°.", "Mide 44.3 cm por un canto largo y corta la segunda punta paralela a la primera.", "Corta la primera pata, revísala, y úsala de plantilla para rayar las otras 3."],
+    ojo: "Cortar la segunda punta al revés y sacar un trapecio en vez de un paralelogramo: la pata no se para.",
+    shots: [["f_03m25s.jpg", "3:25 Las piezas de las patas."], ["f_03m43s.jpg", "3:43 Corta las patas en la ingletadora."]] },
+  { c: "C", t: "La cruz de arriba", vid: "<b>Video 4:05 a 4:28:</b> \"corté estas tablitas de 18 mm de espesor, le hice media tabla también, estas tienen 55 cm... solamente las voy a pegar con cola\".",
+    rows: [["Medidas", "2x3 de 74 cm con la misma media madera de los pasos 7 y 8: centro a 37.0 cm, 3.5 de hondo. Puntas rectas."]],
+    how: ["Marca y corta la media madera igual que en los pasos 7 y 8.", "Las puntas quedan rectas."],
+    ojo: "La del video es de tablitas de 18 mm solo con cola. La tuya es de 2x3 con cola y tornillos: tiene que cargar una tapa de pino pesada.",
+    shots: [["f_04m10s.jpg", "4:10 Las tablitas de la cruz de arriba del video (18 mm). La tuya es de 2x3."]] },
+  { c: "C", t: "Pegar y atornillar las 2 cruces", vid: "<b>Video 4:28 a 5:09:</b> \"al que va por el piso le voy a hacer dos perforaciones para dos tornillos... por más que esté bastante bien ajustadito, para que no se vaya a querer salir\".",
+    rows: [["Cola", "En el fondo y los 2 costados del hueco, en las 2 piezas."], ["Tornillo", "2 por cruce, de los 40 mm que tienes (3.5 o 4 x 40), en diagonal dentro del cuadrito de 4.5 x 4.5, a 1.2 cm de las esquinas. En la cruz del piso, desde la cara de PISO; en la de arriba, desde la cara que va contra la tapa."], ["Broca", "Caja de 10 mm a 1.5 cm de hondo, paso de 4 mm en la pieza de abajo y guía de 3 mm en la otra: el tornillo entra 2 cm."], ["Espera", "Apriétalo 30 minutos con una prensa chica."]],
+    how: ["Cola en el fondo y los 2 costados del hueco, en las 2 piezas.", "Encaja y revisa los 4 ángulos a 90° con la escuadra.", "Caja, paso y guía, y los 2 tornillos en diagonal.", "Prensa chica 30 minutos."],
+    ojo: "Los 2 tornillos en línea con la veta: rajan la pieza.",
+    shots: [["f_04m37s.jpg", "4:37 Perfora la cruz del piso para 2 tornillos."], ["f_04m52s.jpg", "4:52 Junta la cruz."]] },
+  { c: "C", t: "Perforar y avellanar", vid: "<b>Video 5:13 a 5:56:</b> 2 hoyos abajo en cada pata y \"vamos a avellanar los huecos un poquito; si no tienen mecha avellanadora pueden usar una mecha del 8... para después poner un taruguito y que no se vea el tornillo\".",
+    rows: [["Broca", "Guía de 3 mm; caja de 10 mm a 3.5 cm de hondo (banderita de masking); paso de 5 mm. En la punta de cada pata, guía de 3 mm x 4 cm."], ["Medidas", "Huella de la pata en la cruz del piso: desde la punta (a 35 cm del centro) hasta 9.3 cm hacia adentro. Puntos en el centro del ancho, a 2.5 y a 6.5 cm de la punta de arriba. Cruz de arriba: a 16.0 y a 20.3 cm de cada punta (dentro de la huella de la pata, que empieza a 13.5)."]],
+    how: ["Los hoyos van en los brazos, no en las patas. Marca los 2 puntos en la huella de cada brazo.", "Guía de 3 mm de arriba abajo en esos puntos.", "Voltea la cruz: desde la cara de PISO, caja de 10 mm a 3.5 cm de hondo (banderita de masking) y después paso de 5 mm hasta salir arriba.", "Cruz de arriba: lo mismo pero desde la cara que va contra la tapa, a 16.0 y a 20.3 cm de cada punta.", "Puntas de las patas: presenta cada pata en su lugar, marca con un clavo por el hoyo de 5 mm, y después haz la guía de 3 mm x 4 cm en la punta de la pata, con la pata prensada parada. La broca de 3 mm no alcanza a pasar todo el brazo."],
+    ojo: "Caja de menos: la cabeza queda afuera en la cruz de arriba y la tapa no asienta.",
+    shots: [["f_05m25s.jpg", "5:25 Lenny perfora la pata."], ["f_05m41s.jpg", "5:41 Avellana el hoyo."]] },
+  { c: "C", t: "Patas a la cruz del piso", vid: "<b>Video 5:56 a 6:47:</b> \"unos tornillos de dos pulgadas y media, así queda bastante bien agarrado... fíjense que queden bien a 90 grados y que los encastren lo mejor posible\".",
+    rows: [["Cola", "En la punta de abajo de la pata (2 manos) y en su huella."], ["Tornillo", "2 de 5 x 70 mm por pata, desde abajo: entran 3.5 cm en la pata."], ["Revisa", "Con la escuadra rápida, cada pata a 15°; con la escuadra normal, la pata a 90° vista de frente; y que las 4 se inclinen igual."]],
+    how: ["Cola en la punta de abajo de la pata (2 manos) y en su huella.", "Para la pata en la punta del brazo, inclinada hacia adentro, con su cara de afuera siguiendo la punta inclinada del brazo.", "Atornilla desde abajo con 2 tornillos de 5 x 70 mm.", "Variante V (idéntica al video): la pata llega al piso y la punta del brazo choca contra su cara de adentro. Cambian las medidas y los tornillos (5 x 80 mm, hoyos horizontales y 8 tacos a la vista). No la recomiendo: está completa en la guía."],
+    ojo: "La pata girada: la cara de 9 cm va en la dirección del brazo y la inclinación hacia el centro.",
+    shots: [["f_06m00s.jpg", "6:00 En el video, la punta del brazo choca contra la pata. En la tuya, la pata se para encima del brazo."], ["f_06m38s.jpg", "6:38 Revisa los 90 grados con la escuadra."], ["f_06m12s.jpg", "6:12 Así lo hace Lenny: taladra la pata desde su cara de afuera (Variante V)."]] },
+  { c: "C", t: "Cruz de arriba sobre las patas", vid: "<b>Video 6:47 a 7:51:</b> \"esto tiene 55 cm de largo y de acá afuera me da 38, 38 y medio; habría que restar la diferencia y eso me da que hay que dejar de acá afuera 8.2... la parte de afuera iría de esta raya para adentro\".",
+    rows: [["Medidas", "Mide de afuera a afuera entre las puntas de arriba de 2 patas opuestas: debería dar 47.1 cm. La raya va a (74 menos tu medida) entre 2, desde cada punta: con 47.1, a 13.5 cm."], ["Cola", "En la punta de arriba de cada pata (2 manos)."], ["Tornillo", "2 de 5 x 70 mm por pata, con la cara de los hoyos hacia arriba."]],
+    how: ["Mide de afuera a afuera arriba y saca la raya.", "Cola en la punta de arriba de cada pata (2 manos) y pon la cruz con la cara de los hoyos hacia arriba.", "2 tornillos de 5 x 70 mm por pata.", "Revisa: las 2 diagonales de pata a pata iguales y que la base no cojee en el piso."],
+    ojo: "Confiar en el 13.5 sin medir: si una pata quedó un poco más abierta, la cruz sale torcida.",
+    shots: [["f_07m05s.jpg", "7:05 La cruz de arriba junto a la base."], ["f_07m30s.jpg", "7:30 Presenta la cruz de arriba sobre las patas."], ["f_07m43s.jpg", "7:43 La base armada."]] },
+  { c: "D", t: "Marcar el centro", vid: "<b>Video 7:51 a 8:35:</b> \"corté un cuadro de 66\" (para un círculo de 60) y tira las 2 diagonales.",
+    rows: [["Medidas", "El tablero pegado mide unos 91 x 84 a 87 cm. Círculo con un listón: clavo en el centro y lápiz a 40 cm."]],
+    how: ["Las diagonales de un rectángulo también se cruzan en el centro.", "Hazlo en la cara de abajo, que es donde queda el hoyo del pivote.", "Dibuja el círculo con un listón: clavo en el centro y lápiz a 40 cm."],
+    ojo: "", shots: [["f_08m23s.jpg", "8:23 Tira las diagonales con una regla larga."]] },
+  { c: "D", t: "Cortar el círculo", vid: "<b>Video 8:35 a 9:05:</b> \"vamos a tener que hacer un hueco y vamos a poner un palito\" (el pivote) y corta con el router montado en un brazo largo con varios hoyos.",
+    rows: [["Herramienta", "Caladora; router Stanley ST55 con un compás: tira de plywood o MDF de 6 mm de unos 10 x 60 cm atornillada a la base en lugar de la base de plástico"], ["Broca o fresa", "La recta de 12 mm del juego Wadfow SR014, en pasadas de 3 mm de hondo. Para terminar, la de corte al ras de 12.7 mm con balero."], ["Medidas", "Caladora de 3 a 5 mm afuera de la línea. Hoyo del pivote a 40.0 cm del filo de la broca más cercano al centro, no del centro de la broca. Pivote: broca o clavo de 3 mm en un hoyo de 1 cm de hondo."]],
+    how: ["Caladora de 3 a 5 mm afuera de la línea, con la cara bonita hacia abajo: la caladora astilla la cara de arriba del corte.", "Compás del router: la tira atornillada a la base (usa la base de plantilla para los tornillos).", "Pivote: una broca o clavo de 3 mm en un hoyo de 1 cm de hondo en el centro de la cara de abajo. Que no traspase.", "Broca recta de 12 mm, pasadas de 3 mm de hondo, vuelta completa en cada una. Con el router encima, gira en contra de las agujas del reloj.", "La broca no alcanza los 3.2 cm (mide su largo de corte). Corta hasta donde llegue, voltea la tapa y termina con la broca de corte al ras de 12.7 mm con balero: el balero corre sobre la parte que ya quedó perfecta."],
+    ojo: "Medir el radio al centro de la broca (sale 6 mm más chica), bajar más de 3 mm por pasada (quema y jala) o un hoyo de pivote que traspasa la tapa.",
+    shots: [["f_08m37s.jpg", "8:37 El hoyo del centro para el palito (pivote)."], ["f_08m46s.jpg", "8:46 El router en un brazo largo con varios hoyos."]] },
+  { c: "D", t: "Redondear el canto", vid: "No sale en el video: él pinta el canto de la melamina (9:48).",
+    rows: [["Broca o fresa", "La \"de esquina R-6.3 mm\" del juego SR014 (es redondeo de 1/4\"), con balero, en el canto de arriba"]],
+    how: ["Primero una pasada baja y luego la completa, en contra de las agujas del reloj.", "El canto de abajo, solo lija 120 para quitar el filo."],
+    ojo: "Un canto con bultos: el balero los copia. Lija el canto antes.", shots: [] },
+  { c: "E", t: "Perforar la tapa y atornillarla", vid: "<b>Video 9:05 a 9:39:</b> tapa boca abajo, base de cabeza encima, y tornillos por la cruz de arriba hacia la tapa.",
+    rows: [["Tornillo", "2 de 40 mm por brazo (8 por mesa), a 5 cm de la punta y a 28 cm de la punta (lejos de las patas y del cruce)."], ["Broca", "En la cruz: caja de 10 mm a 5.2 cm de hondo desde abajo y paso de 4 a 5 mm. En el brazo que cruza las tablas de la tapa, el paso es una ranura de 1 cm a lo largo del brazo (2 hoyos juntos), para que la tapa se mueva con la humedad. En la tapa: guía de 3 mm con banderita a 2.0 cm. Así el tornillo entra 2.2 cm y deja 1 cm sin tocar."], ["Cola", "Sin cola (a lo sumo un punto en el centro del cruce)."], ["Medidas", "Base centrada: 3.0 cm de cada punta de la cruz al canto."], ["Cuándo", "Perfora todo antes del acabado y atornilla al final, cuando la tapa y la base ya tengan su barniz."]],
+    how: ["Tapa boca abajo sobre una cobija; base de cabeza, centrada.", "Caja y paso en la cruz; ranura en el brazo que cruza las tablas.", "Guía de 3 mm en la tapa con banderita a 2.0 cm.", "Los tornillos se ponen al final, después del barniz."],
+    ojo: "Traspasar la tapa con la guía o pegar toda la cruz a la tapa: la tapa se raja.",
+    shots: [["f_09m07s.jpg", "9:07 Tapa boca abajo y la base de cabeza encima."], ["f_09m31s.jpg", "9:31 Atornilla por la cruz hacia la tapa."]] },
+  { c: "E", t: "Tapar los tornillos", vid: "<b>Video 9:39 a 10:01:</b> \"nos faltaría tapar los tornillitos\".",
+    rows: [["Tacos", "Espigas de 10 x 40 mm (las 20 de Larach)"]],
+    how: ["Mesa 1: todos los tornillos quedan escondidos (debajo de la cruz del piso y debajo de la tapa): no lleva tacos.", "Los tacos van en la mesa 2 y en la Variante V: cola en el hoyo, espiga a golpecitos, a la hora la cortas a ras con un serrucho fino o el formón y lijas."],
+    ojo: "", shots: [["f_09m46s.jpg", "9:46 La mesa del video volteada; falta tapar los tornillos."]] },
+  { c: "F", t: "Lijar", vid: "No sale en el video. Todo el acabado se hace con la base y la tapa separadas, ya perforadas, y se atornillan al final.",
+    rows: [["Lija", "120 y luego 150 en todo, a favor de la veta. La 80 solo donde haya marcas o cola."]],
+    how: ["Lija 120 y luego 150 en todo, a favor de la veta.", "Revisa las juntas con una lámpara de lado: la cola que quede no agarra tinte.", "Aspira y pasa un trapo apenas húmedo de diluyente mineral.", "Antes que todo, prueba del acabado en 2 retazos del mismo pino: Comejenol en la mitad, al día siguiente tinte en todo y 2 manos de barniz. Te dice si el Comejenol cambia el color del tinte, cuánto tarda de verdad cada mano en tu casa y si te gusta el color."],
+    ojo: "", shots: [] },
+  { c: "F", t: "Comejenol (contra el comején)", vid: "No sale en el video.",
+    rows: [["Dónde", "La base completa, la cara de abajo de la tapa y el canto. No en la cara de arriba, donde se come."], ["Cómo", "Ficha de Fester: \"se aplica sin dilución, tal como viene, con brocha de pelo... procurando saturación en la madera\". Una mano bien cargada; 2 en las puntas de las patas que tocan el piso, porque chupan más."], ["Espera", "La ficha no lo dice. Yo dejaría 24 horas, hasta que no huela a solvente y no se sienta aceitoso. Pruébalo antes en un retazo."], ["Seguridad", "Ficha: \"No usar en recintos cerrados o con poca ventilación\" y \"usar mascarilla para vapores orgánicos\", guantes y lentes."]],
+    how: ["Rinde de 14 a 20 m² por galón, o sea de 3.5 a 5 m² tu cuarto; las 2 mesas tienen unos 3.6 m²: alcanza justo. Si falta, termina con el preservante Sherwin-Williams.", "Con uno basta: usa el Comejenol, porque su ficha dice que \"se usa como primario o base para recubrimiento de acabado\". El galón de Sherwin queda de sobra.", "Con brocha, no con pistola."],
+    ojo: "No en la cara de arriba de la tapa.", shots: [] },
+  { c: "F", t: "Tinte KAT Miel", vid: "No sale en el video.",
+    rows: [["Producto", "\"TINTE KAT-MD317 LTR. MIEL\" (Larach 22020168, Tinte Protecto Madetec, color miel)"], ["Cómo", "Con trapo de algodón, a favor de la veta, parejo, y quita el sobrante antes de que seque."], ["Espera", "La ficha (Pintuco, misma línea Madetec) da secado al tacto de 20 a 30 minutos y 1 hora para su sellador. Tu barniz es de otra marca: espera 2 a 3 horas."]],
+    how: ["Una mano; una segunda a la hora si lo quieres más oscuro.", "No se lija entre manos de tinte.", "Con trapo, no con pistola."],
+    ojo: "Diluir solo si lo quieres más claro, con thinner para laca, no con el diluyente mineral. Pruébalo en retazo.", shots: [] },
+  { c: "F", t: "Barniz brillante (brocha o pistola)", vid: "No sale en el video.",
+    rows: [["Producto", "Barniz Brillante para Muebles Sherwin-Williams Sher-Wood, poliuretano, base solvente, 2 cuartos"], ["Manos", "4 en la cara de arriba de la tapa; 3 en el canto, la cara de abajo y la base. Si falta tiempo, 3 en todo."], ["Entre manos", "Minwax: \"Let dry 3-4 hours. Lightly sand entire surface with 220 grit\". Lija suave con tu 240 y quita el polvo con un trapo apenas húmedo de diluyente mineral. Si al lijar sale polvito blanco, ya; si se hace bolitas o se pega, espera."], ["Seguridad", "Máscara para vapores orgánicos, lentes, aire libre a la sombra y sin viento, nada de llama cerca. Los trapos con barniz, en un balde con agua."]],
+    how: ["Con brocha: manos delgadas, sin diluir, con tu brocha de 3\", sin volver a pasar por donde ya está secando. Revuelve, nunca agites la lata.", "Con pistola: diluye un 10% con diluyente mineral (15% si sale con gotas o cáscara de naranja), boquilla de 1.3 a 1.5 mm, empieza en 30 psi y sube a 35 o 40 si no atomiza fino. Cuela el barniz con una media de nylon. A 15 o 20 cm, cada pasada encima de la mitad de la anterior. Con pistola compra un tercer cuarto.", "La dilución y la presión salen de foros y de la ficha de la pistola Wadfow, no del fabricante del barniz."],
+    ojo: "No encontré la ficha del Sher-Wood: los tiempos son de Minwax. Lee la etiqueta de la lata; si dice otra cosa, manda la lata.", shots: [] },
+  { c: "F", t: "Atornillar, uso y curado", vid: "No sale en el video.",
+    rows: [["Atornillar", "Con el barniz ya puesto, los 8 tornillos de 40 mm del paso 19, sobre una cobija."], ["Uso", "Minwax: \"After final coat, allow 24 hours before light use\"."], ["Curado", "Completo en unos 30 días (guía del 3 nov): portavasos el primer mes y nada de manteles húmedos encima."]],
+    how: ["Tapa boca abajo, base de cabeza, tornillos por los hoyos que ya hiciste.", "Voltea la mesa con cuidado."],
+    ojo: "", shots: [] },
+  { c: "M", t: "Mesa 2: patas rectas con cruz", vid: "No sale en el video. Sale de la guía del 3 nov, con los tornillos de La Mundial.",
+    rows: [["Piezas", "4 patas de 2x4 de 49.8 cm, puntas rectas. Cruz de arriba: 2 de 2x3 de 70 cm. Cruz baja: 2 de 53.5 cm del 2x4 que sobra, rebajado a 7 cm de alto."], ["Tornillo", "Patas a la cruz de arriba: 2 de 5 x 70 mm por pata desde la cara que va contra la tapa (caja de 10 mm a 3.5 cm). Cruz baja: 1 de 5 x 70 mm por punta desde la cara de afuera de la pata (caja de 10 mm a 1 cm)."], ["Tacos", "Espiga de 10 x 40 con cola en los 4 hoyos de la cruz baja: 4 tacos a la vista."], ["Medidas", "Cara de afuera de la pata a 3.75 cm de cada punta de la cruz de arriba. Cara de abajo de la cruz baja a 8 cm del piso. La tapa queda 5 cm afuera de las puntas de la cruz de arriba."]],
+    how: ["Tapa: pasos 2 a 5 y 16 a 19, iguales.", "Medias maderas iguales a los pasos 7, 8 y 12.", "Cruz de arriba de cabeza, raya a 3.75 cm de cada punta, cola y tornillos. Cada pata a 90° en los 2 sentidos.", "Cruz baja con cola en las puntas, tornillo y espiga.", "El acabado, igual que la mesa 1 (pasos 21 a 25)."],
+    ojo: "", shots: [] }
+];
+
+/* ================= Motor ================= */
+var DEG = Math.PI / 180, T15 = Math.tan(15 * DEG), C15 = Math.cos(15 * DEG);
+/* Mesa 1 (guía del 24 nov): tapa 3.2, cruz de arriba 7 (49.8 a 56.8), patas de 7 a 49.8, cruz del piso 73.8 abajo y 70.0 arriba */
+var M1 = { TT: 3.2, AH: 7, AW: 4.5, yTC: 49.8, rBot: 36.9, rTop: 35, topL: 74, legW: 9 / C15 };
+function legOut(y) { return M1.rBot - y * T15; }               // cara de afuera de la pata (sigue la punta inclinada del brazo)
+var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+function clamp01(x) { return x < 0 ? 0 : x > 1 ? 1 : x; }
+function E(t, a, b) { var k = clamp01((t - a) / (b - a)); return k * k * (3 - 2 * k); }
+function Lin(t, a, b) { return clamp01((t - a) / (b - a)); }
+function lerp(a, b, k) { return a + (b - a) * k; }
+function lerp3(a, b, k) { return [lerp(a[0], b[0], k), lerp(a[1], b[1], k), lerp(a[2], b[2], k)]; }
+function tok(n) { return (getComputedStyle(document.documentElement).getPropertyValue(n) || "").trim() || "#888888"; }
+function seeded(seed) { var s = (seed * 9301 + 49297) % 233280; return function () { s = (s * 9301 + 49297) % 233280; return s / 233280; }; }
+
+var viewer = document.getElementById("viewer"), labelsEl = document.getElementById("labels");
+var hasGL = typeof THREE !== "undefined";
+var renderer = null, scene, camera, stepGroup, grid, bench;
+var MAT = {}, FIN = {};
+
+function initGL() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.localClippingEnabled = true;
+  viewer.insertBefore(renderer.domElement, viewer.firstChild);
+  scene = new THREE.Scene(); scene.background = new THREE.Color(tok("--scene"));
+  camera = new THREE.PerspectiveCamera(38, 1, 0.5, 4000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8576, 0.62));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.62); sun.position.set(-90, 240, 140); scene.add(sun);
+  var fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(170, 60, -110); scene.add(fill);
+  var low = new THREE.DirectionalLight(0xffffff, 0.18); low.position.set(40, -120, 60); scene.add(low);
+  grid = new THREE.GridHelper(800, 80, new THREE.Color(tok("--grid")), new THREE.Color(tok("--grid"))); scene.add(grid);
+  stepGroup = new THREE.Group(); scene.add(stepGroup);
+  buildMats();
+  bench = new THREE.Group();
+  var top = boxM(210, 5, 90, MAT.bench); top.position.y = -2.5; bench.add(top);
+  [[-98, -38], [-98, 38], [98, -38], [98, 38]].forEach(function (p) { var l = boxM(6, 75, 6, MAT.bench); l.position.set(p[0], -42.5, p[1]); bench.add(l); });
+  scene.add(bench);
+}
+
+/* ---------- Madera: textura con veta, UV en cm a lo largo de la pieza ---------- */
+function grainCanvas(seed, tone, line) {
+  var c = document.createElement("canvas"); c.width = 256; c.height = 256;
+  var g = c.getContext("2d"), rnd = seeded(seed);
+  g.fillStyle = tone; g.fillRect(0, 0, 256, 256);
+  for (var i = 0; i < 48; i++) {
+    var p = rnd() * 256, amp = 2 + rnd() * 6, ph = rnd() * 6;
+    g.strokeStyle = "rgba(" + line + "," + (0.08 + rnd() * 0.2).toFixed(3) + ")"; g.lineWidth = 0.6 + rnd() * 2.2; g.beginPath();
+    for (var k = 0; k <= 256; k += 8) { var off = Math.sin(k / 40 + ph) * amp; if (k === 0) g.moveTo(k, p + off); else g.lineTo(k, p + off); }
+    g.stroke();
+  }
+  var t = new THREE.CanvasTexture(c); t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(1 / 30, 1 / 30); return t;
+}
+function buildMats() {
+  function std(o) { return new THREE.MeshStandardMaterial(o); }
+  var texP = grainCanvas(11, "#e2c18e", "120,72,30"), texP2 = grainCanvas(23, "#dcb47e", "120,72,30");
+  var texC = grainCanvas(11, "#c69a5c", "92,55,20"), texM = grainCanvas(11, "#c38f4a", "92,52,16");
+  MAT.pino = std({ map: texP, roughness: 0.8 });
+  MAT.pino2 = std({ map: texP2, roughness: 0.8 });
+  MAT.bench = std({ color: 0x8d7a5c, roughness: 0.9 });
+  MAT.glue = std({ color: new THREE.Color(tok("--glue")), roughness: 0.25, emissive: 0x3a2c00 });
+  MAT.steel = std({ color: 0xa8b0b5, metalness: 0.6, roughness: 0.32 });
+  MAT.tool = std({ color: 0xe0661f, roughness: 0.5 });
+  MAT.tool2 = std({ color: 0x2f7d6a, roughness: 0.5 });
+  MAT.dark = std({ color: 0x2a2d30, roughness: 0.6 });
+  MAT.hole = new THREE.MeshBasicMaterial({ color: 0x15110c });
+  MAT.pencil = new THREE.MeshBasicMaterial({ color: 0x2b2b2b });
+  MAT.dim = new THREE.MeshBasicMaterial({ color: new THREE.Color(tok("--dim")) });
+  MAT.hi = std({ color: new THREE.Color(tok("--hi")), roughness: 0.6, transparent: true, opacity: 0.55, depthWrite: false });
+  MAT.mask = std({ color: 0xeadfae, roughness: 0.9 });
+  MAT.blanket = std({ color: 0x55688a, roughness: 1 });
+  MAT.rag = std({ color: 0xf1ece0, roughness: 1 });
+  MAT.screen = new THREE.MeshBasicMaterial({ color: 0x9fd4a8 });
+  MAT.ring = new THREE.MeshBasicMaterial({ color: 0x7a4a1e });
+  MAT.xray = std({ map: texP, roughness: 0.8, transparent: true, opacity: 0.32, depthWrite: false });
+  MAT.dowel = std({ color: 0xd8b47a, roughness: 0.7 });
+  FIN.pino = MAT.pino; FIN.come = std({ map: texC, roughness: 0.42 }); FIN.miel = std({ map: texM, roughness: 0.62 });
+  FIN.coat = [FIN.miel];
+  [0.35, 0.6, 0.85, 1].forEach(function (c, i) {
+    FIN.coat.push(new THREE.MeshPhysicalMaterial({ map: texM, roughness: 0.5 - i * 0.08, clearcoat: c, clearcoatRoughness: 0.12 - i * 0.025 }));
+  });
+}
+function retheme() {
+  if (!renderer) return;
+  scene.background = new THREE.Color(tok("--scene"));
+  var gc = new THREE.Color(tok("--grid")); if (Array.isArray(grid.material)) grid.material.forEach(function (m) { m.color = gc; }); else grid.material.color = gc;
+  MAT.glue.color = new THREE.Color(tok("--glue")); MAT.dim.color = new THREE.Color(tok("--dim")); MAT.hi.color = new THREE.Color(tok("--hi"));
+  dirty = true;
+}
+
+/* ---------- Geometría ---------- */
+function uvAlong(g, ax) {
+  var a = new THREE.Vector3(ax[0], ax[1], ax[2]).normalize();
+  var ref = Math.abs(a.y) < 0.9 ? new THREE.Vector3(0, 1, 0) : new THREE.Vector3(1, 0, 0);
+  var p1 = new THREE.Vector3().crossVectors(a, ref).normalize(), p2 = new THREE.Vector3().crossVectors(a, p1).normalize();
+  var pos = g.attributes.position, uv = new Float32Array(pos.count * 2), v = new THREE.Vector3();
+  for (var i = 0; i < pos.count; i++) { v.fromBufferAttribute(pos, i); uv[i * 2] = v.dot(a); uv[i * 2 + 1] = v.dot(p1) + v.dot(p2); }
+  g.setAttribute("uv", new THREE.BufferAttribute(uv, 2)); return g;
+}
+function shapeOf(pts) { var s = new THREE.Shape(); s.moveTo(pts[0][0], pts[0][1]); for (var i = 1; i < pts.length; i++) s.lineTo(pts[i][0], pts[i][1]); s.closePath(); return s; }
+/* Figura en el plano XY (x a lo largo, y alto), con grueso "d" centrado en z */
+function prismG(pts, d, ax) { var g = new THREE.ExtrudeGeometry(shapeOf(pts), { depth: d, bevelEnabled: false }); g.translate(0, 0, -d / 2); return uvAlong(g, ax || [1, 0, 0]); }
+/* Figura en el plano XZ (puntos [x, z]), de y = 0 a y = th */
+function slabG(pts, th, ax) { var g = new THREE.ExtrudeGeometry(shapeOf(pts.map(function (p) { return [p[0], -p[1]]; })), { depth: th, bevelEnabled: false }); g.rotateX(-Math.PI / 2); return uvAlong(g, ax || [1, 0, 0]); }
+function boxG(w, h, d, ax) { return uvAlong(new THREE.BoxGeometry(w, h, d), ax || [1, 0, 0]); }
+function boxM(w, h, d, mat) { return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); }
+function cylM(r, h, mat, seg) { return new THREE.Mesh(new THREE.CylinderGeometry(r, r, h, seg || 20), mat); }
+function mesh(g, m) { return new THREE.Mesh(g, m); }
+
+/* Piezas de la mesa 1 (marco de la mesa: x hacia afuera por el brazo, y arriba) */
+function floorArmPts(notchTop, angled) {
+  var b = M1.rBot, tp = angled ? M1.rTop : M1.rBot, w = 2.25, d = 3.5, h = 7;
+  return notchTop ? [[-b, 0], [b, 0], [tp, h], [w, h], [w, h - d], [-w, h - d], [-w, h], [-tp, h]]
+                  : [[-b, 0], [-w, 0], [-w, d], [w, d], [w, 0], [b, 0], [tp, h], [-tp, h]];
+}
+function topArmPts(notchTop, y0) {
+  var L = 37, w = 2.25, d = 3.5, h = 7, y = y0 || 0;
+  return notchTop ? [[-L, y], [L, y], [L, y + h], [w, y + h], [w, y + h - d], [-w, y + h - d], [-w, y + h], [-L, y + h]]
+                  : [[-L, y], [-w, y], [-w, y + d], [w, y + d], [w, y], [L, y], [L, y + h], [-L, y + h]];
+}
+function legPts() { var y0 = 7, y1 = M1.yTC; return [[legOut(y0), y0], [legOut(y1), y1], [legOut(y1) - M1.legW, y1], [legOut(y0) - M1.legW, y0]]; }
+var LEGAX = [-Math.sin(15 * DEG), Math.cos(15 * DEG), 0];
+/* Base de la mesa 1 armada. mats: material para todo (o un objeto con fa, fb, legs, ta, tb) */
+function base1(mat, opt) {
+  opt = opt || {};
+  var g = new THREE.Group(), P = { g: g, legs: [] };
+  P.fa = mesh(prismG(floorArmPts(true, true), 4.5), mat); g.add(P.fa);
+  P.fb = mesh(prismG(floorArmPts(false, true), 4.5), mat); P.fb.rotation.y = Math.PI / 2; g.add(P.fb);
+  for (var i = 0; i < 4; i++) { var l = mesh(prismG(legPts(), 4.5, LEGAX), mat); l.rotation.y = i * Math.PI / 2; g.add(l); P.legs.push(l); }
+  if (!opt.noTop) {
+    P.ta = mesh(prismG(topArmPts(true, M1.yTC), 4.5), mat); g.add(P.ta);
+    P.tb = mesh(prismG(topArmPts(false, M1.yTC), 4.5), mat); P.tb.rotation.y = Math.PI / 2; g.add(P.tb);
+  }
+  return P;
+}
+function discG(r, h) { return uvAlong(new THREE.CylinderGeometry(r, r, h, 96, 1), [1, 0, 0]); }
+function table1(mat) { var P = base1(mat); P.disc = mesh(discG(40, 3.2), mat); P.disc.position.y = 56.8 + 1.6; P.g.add(P.disc); return P; }
+
+/* Mesa 2: patas 4.5 (hacia afuera) x 9, a 29 del centro; cruz de arriba 70; cruz baja 53.5 de 8 a 15 */
+function base2(mat) {
+  var g = new THREE.Group(), P = { g: g, legs: [] };
+  for (var i = 0; i < 4; i++) { var l = mesh(boxG(4.5, 49.8, 9, [0, 1, 0]), mat); var a = i * Math.PI / 2; l.position.set(29 * Math.cos(a), 24.9, -29 * Math.sin(a)); l.rotation.y = a; g.add(l); P.legs.push(l); }
+  function arm(L, y0, notchTop) { var w = 2.25, d = 3.5, h = 7, x = L / 2; return notchTop ? [[-x, y0], [x, y0], [x, y0 + h], [w, y0 + h], [w, y0 + h - d], [-w, y0 + h - d], [-w, y0 + h], [-x, y0 + h]] : [[-x, y0], [-w, y0], [-w, y0 + d], [w, y0 + d], [w, y0], [x, y0], [x, y0 + h], [-x, y0 + h]]; }
+  P.ta = mesh(prismG(arm(70, 49.8, true), 4.5), mat); g.add(P.ta);
+  P.tb = mesh(prismG(arm(70, 49.8, false), 4.5), mat); P.tb.rotation.y = Math.PI / 2; g.add(P.tb);
+  P.la = mesh(prismG(arm(53.5, 8, true), 4.5), mat); g.add(P.la);
+  P.lb = mesh(prismG(arm(53.5, 8, false), 4.5), mat); P.lb.rotation.y = Math.PI / 2; g.add(P.lb);
+  return P;
+}
+
+/* ---------- Herramientas ---------- */
+function screw(L, r) {           // punta hacia abajo: cabeza en y = 0, punta en y = -L
+  var g = new THREE.Group(); r = r || 0.25;
+  var sh = new THREE.Mesh(new THREE.CylinderGeometry(r, r * 0.4, L, 8), MAT.steel); sh.position.y = -L / 2; g.add(sh);
+  var hd = new THREE.Mesh(new THREE.CylinderGeometry(r * 2.1, r, r * 1.6, 14), MAT.steel); hd.position.y = -r * 0.8; g.add(hd);
+  var slot = boxM(r * 3.6, 0.08, 0.12, MAT.dark); slot.position.y = 0.02; g.add(slot);
+  return g;
+}
+function drill(bitR, bitLen, flagAt) {   // broca hacia abajo; la punta en y = 0
+  var g = new THREE.Group();
+  var bit = cylM(bitR, bitLen, MAT.steel, 10); bit.position.y = bitLen / 2; g.add(bit);
+  if (flagAt) { var f = boxM(2.2, 1.0, 0.25, MAT.mask); f.position.set(1.1 + bitR, flagAt + 0.5, 0); g.add(f); var fw = cylM(bitR + 0.15, 1.0, MAT.mask, 12); fw.position.y = flagAt + 0.5; g.add(fw); }
+  var chuck = cylM(1.5, 3.2, MAT.dark, 16); chuck.position.y = bitLen + 1.6; g.add(chuck);
+  var body = boxM(6, 16, 7, MAT.tool); body.position.y = bitLen + 11; g.add(body);
+  var grip = boxM(4, 11, 4.5, MAT.dark); grip.position.set(0, bitLen + 13, -7); grip.rotation.x = -0.25; g.add(grip);
+  g.userData.bit = bit; return g;
+}
+function circSaw() {               // hoja en el plano YZ (corta a lo largo de z), base en y = 0
+  var g = new THREE.Group();
+  var plate = boxM(15, 0.5, 28, MAT.steel); plate.position.set(-4, 0.25, 0); g.add(plate);
+  var body = boxM(10, 11, 16, MAT.tool); body.position.set(-9, 6.5, 0); g.add(body);
+  var guard = new THREE.Mesh(new THREE.CylinderGeometry(10.2, 10.2, 2.4, 32, 1, false, 0, Math.PI), MAT.dark); guard.rotation.z = Math.PI / 2; g.add(guard);
+  var blade = cylM(9.2, 0.25, MAT.steel, 40); blade.rotation.z = Math.PI / 2; g.add(blade);
+  var hand = boxM(3, 3, 14, MAT.dark); hand.position.set(-8, 14, -2); g.add(hand);
+  g.userData.blade = blade; g.userData.guard = guard;
+  g.userData.depth = function (d) { blade.position.y = 9.2 - d; guard.position.y = 9.2 - d; };
+  g.userData.depth(3.5); return g;
+}
+function planer() {                // corre a lo largo de z
+  var g = new THREE.Group();
+  var shoe = boxM(9, 1, 28, MAT.steel); shoe.position.y = 0.5; g.add(shoe);
+  var b = boxM(9, 7.5, 24, MAT.tool); b.position.y = 4.8; g.add(b);
+  var h = boxM(3, 4, 12, MAT.dark); h.position.set(0, 10.5, -4); g.add(h);
+  var k = cylM(2.2, 4, MAT.dark, 16); k.position.set(0, 9.5, 10); g.add(k);
+  return g;
+}
+function sander() { var g = new THREE.Group(); var pad = cylM(6.3, 1.4, MAT.dark, 28); pad.position.y = 0.7; g.add(pad); var b = cylM(4.6, 9, MAT.tool2, 24); b.position.y = 6; g.add(b); var h = boxM(3, 3, 9, MAT.dark); h.position.set(0, 9.5, -6); g.add(h); return g; }
+function jigsaw() { var g = new THREE.Group(); var shoe = boxM(7, 0.5, 13, MAT.steel); shoe.position.y = 0.25; g.add(shoe); var b = boxM(6, 11, 16, MAT.tool2); b.position.y = 6; g.add(b); var bl = boxM(0.15, 6, 0.8, MAT.steel); bl.position.set(0, -2.5, 5.5); g.add(bl); g.userData.blade = bl; return g; }
+function router(bitR) {            // base en y = 0, broca baja
+  var g = new THREE.Group();
+  var base = cylM(7, 0.8, MAT.dark, 32); base.position.y = 0.4; g.add(base);
+  var body = cylM(4.6, 14, MAT.tool2, 28); body.position.y = 8; g.add(body);
+  var cap = cylM(4.8, 2, MAT.dark, 28); cap.position.y = 16; g.add(cap);
+  var bit = cylM(bitR || 0.6, 2.6, MAT.steel, 12); bit.position.y = -1.2; g.add(bit);
+  g.userData.bit = bit; return g;
+}
+function clampT(len) {             // sargento: barra a lo largo de z
+  var g = new THREE.Group(); len = len || 120;
+  var bar = boxM(0.9, 2.4, len, MAT.steel); g.add(bar);
+  var fj = boxM(3, 7, 2.2, MAT.dark); fj.position.set(0, 3.4, 0); g.add(fj);
+  var sj = new THREE.Group(); g.add(sj);
+  var sjb = boxM(3, 7, 2.2, MAT.tool); sjb.position.y = 3.4; sj.add(sjb);
+  var hdl = cylM(1.2, 9, MAT.tool, 12); hdl.position.y = -4.5; sj.add(hdl);
+  g.userData.fixed = fj; g.userData.slide = sj; g.userData.bar = bar; g.userData.len = len;
+  g.userData.set = function (zA, zB) { fj.position.z = zA - 1.1; sj.position.z = zB + 1.1; bar.position.z = zA - 1.1 + len / 2 - 3; };
+  return g;
+}
+function chisel() { var g = new THREE.Group(); var bl = boxM(2.2, 0.3, 7, MAT.steel); bl.position.z = 3.5; g.add(bl); var h = cylM(1.1, 10, MAT.tool, 12); h.rotation.x = Math.PI / 2; h.position.z = -5; g.add(h); return g; }
+function pencil() { var g = new THREE.Group(); var b = cylM(0.4, 14, MAT.tool2, 6); b.position.y = 7.6; g.add(b); var tip = new THREE.Mesh(new THREE.ConeGeometry(0.4, 1.2, 6), MAT.bench); tip.rotation.x = Math.PI; tip.position.y = 0.6; g.add(tip); return g; }
+function speedSquare() { var g = new THREE.Group(); var m = mesh(slabG([[0, 0], [18, 0], [0, 18]], 0.4), MAT.dark); g.add(m); var lip = boxM(18, 1.6, 0.8, MAT.dark); lip.position.set(9, -0.6, 0.4); g.add(lip); return g; }
+function meter() { var g = new THREE.Group(); var b = boxM(7, 2.4, 14, MAT.tool); b.position.y = 1.2; g.add(b); var s = boxM(4.6, 0.1, 4, MAT.screen); s.position.set(0, 2.45, -2.5); g.add(s); [-1.2, 1.2].forEach(function (x) { var p = cylM(0.12, 1.4, MAT.steel, 6); p.rotation.x = Math.PI / 2; p.position.set(x, 1, 7.6); g.add(p); }); return g; }
+function brush() { var g = new THREE.Group(); var br = boxM(6, 3, 1.4, MAT.dark); br.position.y = 1.5; g.add(br); var fe = boxM(6.4, 2, 1.6, MAT.steel); fe.position.y = 4; g.add(fe); var hd = boxM(2.4, 14, 1.2, MAT.tool); hd.position.y = 12; g.add(hd); return g; }
+function rag() { var m = boxM(10, 1.6, 8, MAT.rag); m.position.y = 0.8; var g = new THREE.Group(); g.add(m); return g; }
+function hammer() { var g = new THREE.Group(); var h = cylM(0.9, 26, MAT.bench, 10); h.position.y = 13; g.add(h); var hd = boxM(3, 3, 9, MAT.dark); hd.position.y = 27; g.add(hd); return g; }
+function ringM(r, rad, mat, seg) {
+  var pts = []; seg = seg || 160;
+  for (var i = 0; i <= seg; i++) { var a = i / seg * Math.PI * 2; pts.push(new THREE.Vector3(r * Math.cos(a), 0, -r * Math.sin(a))); }
+  var g = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts, false), seg, rad, 5, false);
+  var m = new THREE.Mesh(g, mat); m.userData.count = g.index ? g.index.count : g.attributes.position.count;
+  m.userData.show = function (k) { g.setDrawRange(0, Math.floor(m.userData.count * clamp01(k) / 6) * 6); }; return m;
+}
+/* Raya de lápiz entre 2 puntos (crece con k) */
+function lineM(a, b, mat, r) {
+  var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]);
+  var len = A.distanceTo(B), m = new THREE.Mesh(new THREE.CylinderGeometry(r || 0.09, r || 0.09, 1, 6), mat || MAT.pencil);
+  m.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), B.clone().sub(A).normalize());
+  m.userData.show = function (k) { k = clamp01(k); m.visible = k > 0.001; m.scale.y = Math.max(0.001, len * k); m.position.copy(A).add(B.clone().sub(A).multiplyScalar(k / 2)); };
+  m.userData.show(1); return m;
+}
+
+/* ---------- Capa que cambia de color (acabado): corte con un plano que avanza ---------- */
+function sweep(meshes, mA, mB, axis, from, to) {
+  var ax = new THREE.Vector3(axis[0], axis[1], axis[2]).normalize(), dir = to >= from ? 1 : -1;
+  var pA = new THREE.Plane(ax.clone().multiplyScalar(dir), 0), pB = new THREE.Plane(ax.clone().multiplyScalar(-dir), 0);
+  var a = mA.clone(), b = mB.clone(); a.clippingPlanes = [pA]; b.clippingPlanes = [pB];
+  var clones = [];
+  meshes.forEach(function (o) { o.material = a; var c = new THREE.Mesh(o.geometry, b); c.position.copy(o.position); c.rotation.copy(o.rotation); c.scale.copy(o.scale); o.parent.add(c); clones.push(c); });
+  function set(k) { var lvl = from + (to - from) * clamp01(k); pA.constant = -dir * lvl; pB.constant = dir * lvl; }
+  set(0); stepDisp.push(a, b); return set;
+}
+
+/* ---------- Etiquetas en la escena y cotas ---------- */
+var stepLabels = [], stepUpd = [], stepDisp = [], stepCam = null, stepSubs = [], stepEnv = "bench";
+function addLabel(html, pos, t0, t1, kind) {
+  var el = document.createElement("div"); el.className = "pin" + (kind ? " " + kind : ""); el.innerHTML = html; el.style.opacity = "0";
+  labelsEl.appendChild(el); var L = { el: el, pos: pos, t0: t0, t1: t1, w: 0, h: 0 }; stepLabels.push(L); return L;
+}
+function dim(a, b, txt, t0, t1, lab) {
+  var g = new THREE.Group(); stepGroup.add(g);
+  var rod = lineM(a, b, MAT.dim, 0.16); g.add(rod);
+  var A = new THREE.Vector3(a[0], a[1], a[2]), B = new THREE.Vector3(b[0], b[1], b[2]);
+  [A, B].forEach(function (p) { var s = new THREE.Mesh(new THREE.SphereGeometry(0.45, 10, 8), MAT.dim); s.position.copy(p); g.add(s); });
+  var mid = lab || [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
+  addLabel("<b>" + txt + "</b>", mid, t0, t1, "dim");
+  stepUpd.push(function (t) { var k = E(t, t0, t0 + 0.5) * (t1 >= 999 ? 1 : 1 - E(t, t1 - 0.3, t1)); g.visible = k > 0.01; rod.userData.show(k); });
+  return g;
+}
+
+function placeLabels(t) {
+  var w = viewer.clientWidth, h = viewer.clientHeight, v = new THREE.Vector3(), on = [];
+  stepLabels.forEach(function (L) {
+    var vis = t >= L.t0 && t <= L.t1, op = vis ? Math.min(E(t, L.t0, L.t0 + 0.35), L.t1 >= 999 ? 1 : 1 - E(t, L.t1 - 0.25, L.t1)) : 0;
+    if (op <= 0.01) { if (L.el.style.opacity !== "0") L.el.style.opacity = "0"; return; }
+    var p = typeof L.pos === "function" ? L.pos(t) : L.pos;
+    v.set(p[0], p[1], p[2]).project(camera);
+    if (v.z > 1 || v.z < -1) { L.el.style.opacity = "0"; return; }
+    if (!L.w) { L.w = L.el.offsetWidth; L.h = L.el.offsetHeight; }
+    L._x = Math.max(4, Math.min(w - L.w - 4, (v.x + 1) / 2 * w - L.w / 2));
+    L._y = Math.max(36, Math.min(h - L.h - 46, (1 - v.y) / 2 * h - L.h - 6));
+    L._op = op; on.push(L);
+  });
+  /* que no se encimen: la de más abajo se corre hacia abajo */
+  on.sort(function (a, b) { return a._y - b._y; });
+  for (var pass = 0; pass < 3; pass++) {
+    for (var i = 1; i < on.length; i++) for (var j = 0; j < i; j++) {
+      var A = on[j], B = on[i];
+      if (B._x < A._x + A.w + 4 && A._x < B._x + B.w + 4 && B._y < A._y + A.h + 3 && A._y < B._y + B.h + 3) B._y = A._y + A.h + 3;
+    }
+  }
+  on.forEach(function (L) {
+    L.el.style.transform = "translate(" + L._x.toFixed(1) + "px," + Math.min(L._y, h - L.h - 4).toFixed(1) + "px)";
+    L.el.style.opacity = L._op.toFixed(2);
+  });
+}
+
+/* ---------- Cámara: camino del paso, o giro con el dedo en pausa ---------- */
+var man = null, blend = null, curPos = null, curTgt = null;
+function camPath(t) {
+  var K = stepCam || [[0, [140, 110, 160], [0, 20, 0]]];
+  var a = K[0], b = K[K.length - 1];
+  for (var i = 0; i < K.length - 1; i++) { if (t >= K[i][0] && t <= K[i + 1][0]) { a = K[i]; b = K[i + 1]; break; } }
+  if (t < K[0][0]) { a = b = K[0]; } else if (t > K[K.length - 1][0]) { a = b = K[K.length - 1]; }
+  var k = a === b ? 0 : E(t, a[0], b[0]);
+  var tg = lerp3(a[2], b[2], k), ps = lerp3(a[1], b[1], k);
+  var asp = viewer.clientWidth / Math.max(1, viewer.clientHeight), fit = asp < 1.25 ? Math.pow(Math.min(1.25 / asp, 1.9), 0.6) : 1;
+  return { p: [tg[0] + (ps[0] - tg[0]) * fit, tg[1] + (ps[1] - tg[1]) * fit, tg[2] + (ps[2] - tg[2]) * fit], t: tg };
+}
+function applyCam(t, now) {
+  var c;
+  if (man) {
+    var sp = Math.sin(man.phi);
+    c = { p: [man.t[0] + man.r * sp * Math.sin(man.th), man.t[1] + man.r * Math.cos(man.phi), man.t[2] + man.r * sp * Math.cos(man.th)], t: man.t };
+  } else {
+    c = camPath(t);
+    if (blend) { var k = E(now, blend.start, blend.start + 700); if (k >= 1) blend = null; else { c = { p: lerp3(blend.p, c.p, k), t: lerp3(blend.t, c.t, k) }; dirty = true; } }
+  }
+  camera.position.set(c.p[0], c.p[1], c.p[2]); camera.lookAt(c.t[0], c.t[1], c.t[2]);
+  curPos = c.p; curTgt = c.t;
+}
+function startBlend() { if (curPos) blend = { p: curPos.slice(), t: curTgt.slice(), start: performance.now() }; }
+
+/* ================= Animación de cada paso =================
+   Cada paso: d = duración en segundos; f() arma la escena y registra on(t). Todo depende solo de t (se puede adelantar o regresar). */
+function add(o, parent) { (parent || stepGroup).add(o); return o; }
+function on(fn) { stepUpd.push(fn); }
+function cam(k) { stepCam = k; }
+function subs(l) { stepSubs = l; }
+function env(e) { stepEnv = e; }
+function showIn(o, t, a, b) { o.visible = t >= a && t <= b; }
+function particles(n, mat, size, spawn) {
+  var P = [];
+  for (var i = 0; i < n; i++) { var m = boxM(size, size * 0.4, size * 0.7, mat); add(m); P.push({ m: m, s: spawn(i) }); }
+  on(function (t) {
+    P.forEach(function (o) {
+      var a = t - o.s.t0; o.m.visible = a >= 0 && a <= o.s.life;
+      if (!o.m.visible) return;
+      o.m.position.set(o.s.p[0] + o.s.v[0] * a, o.s.p[1] + o.s.v[1] * a - 30 * a * a, o.s.p[2] + o.s.v[2] * a);
+      o.m.rotation.set(a * 7 + o.s.r, a * 5, a * 3);
+    });
+  });
+}
+function board(L, T, W, mat, ax) { return mesh(boxG(L, T, W, ax || [1, 0, 0]), mat || MAT.pino); }
+var BUILD = [];
+
+/* 1. Medir la humedad */
+BUILD.push({ d: 9, f: function () {
+  env("bench");
+  var plank = add(board(150, 3.8, 14.5)); plank.position.set(0, 1.9, 16);
+  var b24 = add(board(150, 4.5, 9, MAT.pino2)); b24.position.set(0, 2.25, 0);
+  var b23 = add(board(150, 4.5, 7)); b23.position.set(0, 2.25, -12);
+  var outer = add(new THREE.Group()), inner = meter(); inner.rotation.x = Math.PI / 2; outer.add(inner); outer.rotation.y = Math.PI / 2;
+  var pts = [[-50, 1.2], [0, 3.2], [50, 5.2]];
+  on(function (t) {
+    var x = -80, y = 30, k;
+    if (t < 1.2) { k = E(t, 0, 1.2); x = lerp(-80, -50, k); y = lerp(30, 3.8 + 8.0, k); }
+    else {
+      for (var i = 0; i < 3; i++) {
+        var a = pts[i][1];
+        if (t >= a && t < a + 2) {
+          var dn = t - a; x = pts[i][0]; y = 3.8 + 8.0 + (dn < 0.4 ? (1 - E(dn, 0, 0.4)) * 4 : dn > 1.4 ? E(dn, 1.4, 2) * 5 : 0);
+          if (dn > 1.4 && i < 2) x = lerp(pts[i][0], pts[i + 1][0], E(dn, 1.4, 2));
+        }
+      }
+      if (t >= 7.2) { x = 50; y = 3.8 + 8.0 + E(t, 7.2, 8) * 10; }
+    }
+    outer.position.set(x, y, 16);
+  });
+  [1.2, 3.2, 5.2].forEach(function (a, i) { addLabel("<b>13%</b>", function () { return [outer.position.x, outer.position.y + 9, 16]; }, a + 0.35, a + 1.5, "big"); });
+  addLabel("3 puntos por pieza, las puntas a lo ancho de la veta", [0, 6, 24], 0.6, 6.8);
+  addLabel("De 10 a 13% y sin más de 2 puntos de diferencia: sigue", [0, 12, 0], 6.8, 999, "big");
+  addLabel("Arriba de 14%: no cepilles ni pegues", [0, 4, -14], 7.6, 999, "warn");
+  cam([[0, [70, 70, 120], [0, 4, 8]], [3, [40, 45, 85], [0, 6, 14]], [6.6, [60, 55, 95], [0, 6, 10]], [9, [90, 80, 120], [0, 4, 0]]]);
+  subs([[0, "Mide cada pieza en 3 puntos con el medidor en modo pino"], [6.6, "Las 4 tablas más bonitas, para las tapas; en la base, nudos lejos de las uniones"]]);
+} });
+
+/* 2. Cepillar */
+BUILD.push({ d: 11, f: function () {
+  env("bench");
+  var gA = add(new THREE.Group()), gB = add(new THREE.Group());
+  var body = board(14.5, 3.2, 120, MAT.pino, [0, 0, 1]); body.position.y = 1.6; gA.add(body);
+  var layer = board(14.5, 0.3, 120, MAT.pino2, [0, 0, 1]); layer.position.y = 3.35; gA.add(layer);
+  var pl = add(planer());
+  particles(26, MAT.pino2, 0.9, function (i) { var r = seeded(i + 3); return { t0: 1.1 + i * 0.15, p: [7, 4.5, -60 + i * 4.6], v: [14 + r() * 10, 18 + r() * 8, (r() - 0.5) * 8], life: 0.9, r: r() * 3 }; });
+  // fase B: 2 tablas cara con cara, cantos arriba
+  var hingeL = new THREE.Group(), hingeR = new THREE.Group(); gB.add(hingeL); gB.add(hingeR);
+  var bl = board(3.2, 14.5, 100, MAT.pino, [0, 0, 1]); bl.position.set(-1.6, -7.25, 0); hingeL.add(bl);
+  var br = board(3.2, 14.5, 100, MAT.pino2, [0, 0, 1]); br.position.set(1.6, -7.25, 0); hingeR.add(br);
+  var eL = board(3.2, 0.3, 100, MAT.pino2, [0, 0, 1]); eL.position.set(-1.6, 0.15, 0); hingeL.add(eL);
+  var eR = board(3.2, 0.3, 100, MAT.pino2, [0, 0, 1]); eR.position.set(1.6, 0.15, 0); hingeR.add(eR);
+  on(function (t) {
+    gA.visible = t < 6.2; gB.visible = t >= 6.2;
+    var pz;
+    if (t < 6.2) {
+      pz = lerp(-74, 62, E(t, 0.8, 5.2));
+      var ahead = Math.max(0.01, 60 - Math.max(-60, pz)); layer.scale.z = ahead / 120; layer.position.z = 60 - ahead / 2;
+      pl.position.set(0, 3.5, pz); pl.rotation.set(0, 0, 0);
+      pl.visible = t < 5.6;
+    } else {
+      var open = E(t, 9.2, 10.4), down = E(t, 10.2, 11);
+      hingeL.position.set(0, 14.5 - down * 14.5 + open * 0, 0); hingeR.position.copy(hingeL.position);
+      hingeL.rotation.z = -Math.PI / 2 * open; hingeR.rotation.z = Math.PI / 2 * open;
+      pz = lerp(-64, 62, E(t, 6.6, 9));
+      var ah = Math.max(0.01, 50 - Math.max(-50, pz)); [eL, eR].forEach(function (e) { e.scale.z = ah / 100; e.position.z = 50 - ah / 2; e.visible = ah > 0.05; });
+      pl.visible = t < 9.2; pl.position.set(0, 14.8, pz); pl.rotation.set(0, 0, 0);
+    }
+  });
+  addLabel("0.5 mm por pasada; 1 mm como máximo", function () { return [pl.position.x, pl.position.y + 14, pl.position.z]; }, 1, 5.2);
+  addLabel("Al empezar, el peso adelante; al terminar, atrás", [0, 8, -40], 1.4, 4.2);
+  dim([9.5, 0, 60], [9.5, 3.2, 60], "3.2", 4.4, 6.1, [12, 3, 60]);
+  addLabel("Los 2 cantos a la vez, como un libro cerrado", [0, 22, 0], 6.6, 9.2);
+  addLabel("Al abrirlas, la junta cierra: sin rendijas a contraluz", [0, 6, 0], 10.2, 999, "big");
+  cam([[0, [80, 45, 90], [0, 2, 0]], [3, [60, 40, 60], [0, 3, 20]], [5.8, [70, 35, 110], [0, 2, 40]], [6.3, [70, 60, 90], [0, 10, 0]], [9, [55, 50, 70], [0, 12, 10]], [11, [60, 85, 80], [0, 2, 0]]]);
+  subs([[0, "Cepilla hasta la línea de 3.2 cm"], [6.2, "Cantos para pegar: junta 2 tablas cara con cara y cepilla los 2 cantos juntos"], [9.4, "Si el cepillo quedó un poco chueco, al abrirlas los ángulos se compensan"]]);
+} });
+
+/* 3. Cortar y acomodar las 6 tablas */
+BUILD.push({ d: 11, f: function () {
+  env("bench");
+  var gA = add(new THREE.Group()), gB = add(new THREE.Group());
+  var segs = [[-152.5, -61.5], [-61.2, 29.5], [29.8, 120.5], [120.8, 152.5]], S = [];
+  segs.forEach(function (r, i) { var m = board(r[1] - r[0] + (i < 3 ? 0.3 : 0), 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino); m.userData.cx = (r[0] + r[1]) / 2; m.position.set(m.userData.cx, 1.6, 0); gA.add(m); S.push(m); });
+  var cutsX = [-61.35, 29.65, 120.65], lines = cutsX.map(function (x) { var l = lineM([x, 3.25, -7.25], [x, 3.25, 7.25]); gA.add(l); return l; });
+  var saw = add(circSaw()); saw.userData.depth(4);
+  var B = [], arcs = [];
+  for (var i = 0; i < 6; i++) {
+    var b = board(91, 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino); gB.add(b); B.push(b);
+    var up = i % 2 === 0, zc = -36.25 + i * 14.5;
+    [12, 18].forEach(function (r, j) {
+      var peak = j ? 1.6 : 2.6, th = Math.asin(7 / r), pts = [];
+      for (var k = 0; k <= 16; k++) { var a = -th + 2 * th * k / 16, z = r * Math.sin(a), yy = peak - r * (1 - Math.cos(a)); pts.push(new THREE.Vector3(-45.6, up ? yy : 3.2 - yy, z)); }
+      var tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 16, 0.13, 4, false), MAT.ring); tube.userData.zc = zc; gB.add(tube); arcs.push(tube);
+    });
+  }
+  var tri = [lineM([-30, 3.3, 42], [0, 3.3, -42]), lineM([0, 3.3, -42], [30, 3.3, 42]), lineM([30, 3.3, 42], [-30, 3.3, 42])];
+  tri.forEach(function (l) { gB.add(l); });
+  on(function (t) {
+    gA.visible = t < 5.6; gB.visible = t >= 5.4; saw.visible = t > 1.3 && t < 5.2;
+    lines.forEach(function (l, i) { l.userData.show(E(t, 0.4 + i * 0.25, 0.8 + i * 0.25)); });
+    var cutT = [1.5, 2.7, 3.9];
+    S.forEach(function (m, i) { var sep = i < 3 ? E(t, cutT[i] + 0.9, cutT[i] + 1.2) : 0; m.position.z = -sep * 4 * (i + 1) * 0.6; });
+    for (var c = 0; c < 3; c++) { if (t >= cutT[c] - 0.2 && t < cutT[c] + 1.2) { saw.position.set(cutsX[c], 3.2, lerp(-26, 26, E(t, cutT[c], cutT[c] + 1))); } }
+    var g = 6 * (1 - E(t, 5.6, 6.8));
+    B.forEach(function (b, i) { b.position.set(0, 1.6, (i - 2.5) * (14.5 + g)); });
+    arcs.forEach(function (a) { a.position.z = (a.userData.zc / 14.5) * g; });
+    tri.forEach(function (l, i) { l.userData.show(E(t, 8.6 + i * 0.5, 9.1 + i * 0.5)); });
+  });
+  dim([-152.5, 3.4, 10], [-61.5, 3.4, 10], "91", 1.2, 5.2);
+  addLabel("3 tablas de 91 de cada tabla de 10 pies", [-20, 8, -10], 2.4, 5.3);
+  addLabel("Anillos: una con la curva arriba, la siguiente abajo", [-46, 10, 0], 6.6, 8.8, "big");
+  addLabel("Triángulo de lápiz para no perder el orden", [0, 6, 0], 9.2, 999);
+  cam([[0, [-60, 120, 170], [-20, 0, 0]], [4.9, [-10, 110, 150], [20, 0, 0]], [5.8, [-150, 30, 30], [-40, 2, 0]], [8.6, [-130, 22, 18], [-45, 2, 0]], [9.4, [30, 140, 110], [0, 0, 0]], [11, [20, 150, 120], [0, 0, 0]]]);
+  subs([[0, "6 tablas de 91 cm por mesa: corte recto con la circular y la escuadra"], [5.6, "Alterna los anillos de la punta"], [8.6, "Dibuja un triángulo sobre las 6"]]);
+} });
+
+/* 4. Pegar la tapa */
+BUILD.push({ d: 12, f: function () {
+  env("bench");
+  [-23.5, 23.5].forEach(function (x) { var s = add(boxM(6, 6, 96, MAT.bench)); s.position.set(x, 3, 0); });
+  var B = [], G = [], D = [];
+  for (var i = 0; i < 6; i++) { var b = add(board(91, 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino)); B.push(b); }
+  for (var j = 0; j < 5; j++) {
+    var a = add(boxM(91, 2.6, 0.16, MAT.glue)), c = add(boxM(91, 2.6, 0.16, MAT.glue)); G.push([a, c]);
+    var row = add(new THREE.Group()); for (var k = 0; k < 13; k++) { var d = new THREE.Mesh(new THREE.SphereGeometry(0.42, 8, 6), MAT.glue); d.scale.y = 0.55; d.position.x = -42 + k * 7; row.add(d); } D.push(row);
+  }
+  var br = add(brush());
+  var CX = [-35.5, -11.8, 11.8, 35.5], C = CX.map(function (x, i) { var c = add(clampT(120)); c.userData.x = x; c.userData.below = i % 2 === 0; if (!c.userData.below) c.rotation.x = Math.PI; return c; });
+  var bat = [-23.5, 23.5].map(function (x) { var m = add(boxM(3, 2, 100, MAT.mask)); m.userData.x = x; return m; });
+  on(function (t) {
+    var gap = 3 * (1 - E(t, 4, 5.6)), zc = function (i) { return (i - 2.5) * (14.5 + gap); };
+    B.forEach(function (b, i) { b.position.set(0, 7.6, zc(i)); });
+    G.forEach(function (p, j) {
+      var s = E(t, 0.6 + j * 0.62, 1.2 + j * 0.62);
+      p[0].visible = p[1].visible = s > 0.01 && t < 6.2;
+      [p[0], p[1]].forEach(function (m, q) { m.scale.x = Math.max(0.01, s); m.position.set(-45.5 + 45.5 * s, 7.6, q ? zc(j + 1) - 7.25 - 0.08 : zc(j) + 7.25 + 0.08); });
+      var dk = E(t, 8.2 + j * 0.1, 8.8 + j * 0.1); D[j].visible = dk > 0.01; D[j].scale.set(1, dk, dk); D[j].position.set(0, 9.25, zc(j) + 7.25);
+    });
+    var jb = Math.min(4, Math.max(0, Math.floor((t - 0.6) / 0.62))), sb = E(t, 0.6 + jb * 0.62, 1.2 + jb * 0.62);
+    br.visible = t > 0.4 && t < 4; br.position.set(-45.5 + 91 * sb, 9.6, zc(jb) + 7.6); br.rotation.set(0.5, 0, 0);
+    C.forEach(function (c, i) {
+      var k = E(t, 6 + i * 0.25, 7.2 + i * 0.25), close = E(t, 7.6, 8.4), half = 43.5 + 14 * (1 - close);
+      c.userData.set(-half, half);
+      c.position.set(c.userData.x, c.userData.below ? 3.6 - 30 * (1 - k) : 11.6 + 30 * (1 - k), 0); c.visible = k > 0.01;
+    });
+    bat.forEach(function (m) { var k = E(t, 6.4, 7.4); m.visible = k > 0.01; m.position.set(m.userData.x, 10.2 + 20 * (1 - k), 0); });
+  });
+  addLabel("Cola en los 2 cantos de cada junta; nada en las caras", [0, 14, 0], 0.8, 4.4, "glue");
+  addLabel("5 juntas", [-40, 12, -20], 1.6, 4.4);
+  ["10", "33.7", "57.3", "81"].forEach(function (s, i) { addLabel("<b>" + s + "</b>", [CX[i], 16, 52], 8.2, 999, "dim"); });
+  addLabel("cm desde esta punta", [-45.5, 8, 52], 8.4, 999);
+  addLabel("Hasta que salga una línea de gotitas", [10, 14, 0], 8.6, 10.2, "glue");
+  addLabel("30 a 60 min apretada · 24 h sin esfuerzo · raspa la cola a los 20 a 45 min", [0, 26, 0], 10, 999, "big");
+  cam([[0, [-95, 40, 45], [-30, 7, 0]], [3.8, [-80, 45, 60], [0, 7, 0]], [6, [80, 110, 150], [0, 6, 0]], [8.6, [60, 85, 150], [0, 6, 20]], [12, [40, 95, 145], [0, 6, 10]]]);
+  subs([[0, "Capa delgada y pareja con la brocha de 1.5\""], [4, "Junta las tablas"], [6, "4 sargentos de 120 alternados: 2 abajo y 2 arriba; encima 2 listones con masking"]]);
+} });
+
+/* 5. Aplanar la tapa */
+BUILD.push({ d: 10, f: function () {
+  env("bench");
+  var off = [0.28, 0, 0.32, 0.1, 0.26, 0], B = [];
+  for (var i = 0; i < 6; i++) { var b = add(board(91, 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino)); b.position.z = (i - 2.5) * 14.5; B.push(b); }
+  var pl = add(planer()), sd = add(sander()), rule = add(boxM(108, 0.8, 4, MAT.steel));
+  on(function (t) {
+    var flat = E(t, 1, 6);
+    B.forEach(function (b, i) { b.position.y = 1.6 + off[i] * (1 - flat); });
+    var px, pz, yaw;
+    if (t < 3.6) { var k = E(t, 1, 3.5); px = lerp(-50, 50, k); pz = lerp(-42, 42, k); yaw = Math.atan2(100, 84); }
+    else if (t < 4.8) { px = lerp(-55, 55, E(t, 3.6, 4.7)); pz = -18; yaw = Math.PI / 2; }
+    else { px = lerp(-55, 55, E(t, 4.8, 5.9)); pz = 18; yaw = Math.PI / 2; }
+    pl.visible = t > 0.8 && t < 6; pl.position.set(px, 3.6, pz); pl.rotation.y = yaw;
+    sd.visible = t > 6 && t < 8.4; var s = Lin(t, 6, 8.4);
+    sd.position.set(-35 + 70 * s + 6 * Math.cos(t * 9), 3.25, 22 * Math.sin(t * 2.6)); sd.rotation.y = t * 30;
+    rule.visible = t > 8.3; var dg = t < 9.1 ? 1 : -1; rule.rotation.y = -dg * Math.atan2(87, 91); rule.position.set(0, 3.7, 0);
+  });
+  addLabel("En diagonal a las tablas, y después a lo largo", function () { return [pl.position.x, 16, pl.position.z]; }, 1, 5.8);
+  addLabel("Solo se quitan los escalones", [0, 8, -40], 1.8, 5.6);
+  addLabel("Lija 80 y luego 120", function () { return [sd.position.x, 14, sd.position.z]; }, 6.2, 8.4);
+  addLabel("Regla en cruz: sin hundidos", [0, 9, 0], 8.4, 999, "big");
+  cam([[0, [-90, 30, 60], [-30, 2, 0]], [1.6, [-80, 45, 80], [0, 2, 0]], [6, [60, 100, 120], [0, 2, 0]], [10, [30, 140, 110], [0, 0, 0]]]);
+  subs([[0, "24 horas después: los escalones entre tablas se ven a contraluz"], [1, "Cepillo eléctrico en diagonal, después a lo largo"], [6, "Lijadora orbital: lija 80 y luego 120"], [8.3, "Revisa con la regla en cruz"]]);
+} });
+
+/* 6. Cortar las piezas a lo largo */
+BUILD.push({ d: 10, f: function () {
+  env("bench");
+  var gA = add(new THREE.Group()), gB = add(new THREE.Group());
+  var left = board(73.8, 4.5, 7); left.position.set(-75 + 36.9, 2.25, 0); gA.add(left);
+  var right = board(75 - (-1.2) - 0.3, 4.5, 7, MAT.pino2); right.position.set((-0.9 + 75) / 2, 2.25, 0); gA.add(right);
+  var sq = speedSquare(); sq.rotation.y = Math.PI / 2; gA.add(sq);
+  var ln = lineM([-1.2, 4.56, -3.5], [-1.2, 4.56, 3.5]); gA.add(ln);
+  var saw = add(circSaw()); saw.userData.depth(5.5);
+  var rows = [], spec = [[73.8, 7, 4.5, 34, MAT.pino], [73.8, 7, 4.5, 24, MAT.pino2], [74, 7, 4.5, 12, MAT.pino], [74, 7, 4.5, 2, MAT.pino2], [48, 9, 4.5, -11, MAT.pino], [48, 9, 4.5, -22, MAT.pino2], [48, 9, 4.5, -33, MAT.pino], [48, 9, 4.5, -44, MAT.pino2]];
+  spec.forEach(function (s, i) { var m = board(s[0], s[2], s[1], s[4]); m.position.set(s[0] === 48 ? -20 : 0, 2.25, s[3]); gB.add(m); rows.push(m); });
+  on(function (t) {
+    gA.visible = t < 5.4; gB.visible = t >= 5.2;
+    sq.position.set(-1.2, 4.5 + 20 * (1 - E(t, 0.6, 1.4)), -3.5); sq.visible = t > 0.6 && t < 4.8;
+    ln.userData.show(E(t, 1.4, 2.2));
+    saw.visible = t > 2.3 && t < 4.4; saw.position.set(-1.2, 4.5, lerp(-24, 24, E(t, 2.5, 4)));
+    left.position.z = -12 * E(t, 4.1, 4.9);
+    rows.forEach(function (m, i) { var k = E(t, 5.4 + i * 0.35, 5.9 + i * 0.35); m.visible = k > 0.01; m.position.y = 2.25 + 25 * (1 - k); });
+  });
+  dim([-75, 5.2, 5], [-1.2, 5.2, 5], "73.8", 1, 4.6);
+  addLabel("Marca con la escuadra rápida", [-1.2, 12, -6], 0.8, 2.4);
+  addLabel("<b>Cruz del piso:</b> 2 de 2x3 a 73.8, puntas rectas por ahora", [0, 8, 29], 6, 999);
+  addLabel("<b>Cruz de arriba:</b> 2 de 2x3 a 74", [0, 8, 7], 6.8, 999);
+  addLabel("<b>Patas:</b> 4 de 2x4 a unos 48 (el largo final sale en el paso 10)", [-20, 8, -28], 7.6, 999);
+  cam([[0, [40, 60, 90], [-20, 2, 0]], [4.8, [30, 55, 80], [-15, 2, 0]], [5.6, [40, 120, 110], [0, 0, -2]], [10, [30, 125, 100], [-5, 0, -4]]]);
+  subs([[0, "Mide, marca con la escuadra rápida y corta recto"], [5.2, "Primero el encastre y después los ángulos"]]);
+} });
+
+/* 7. Marcar las medias maderas */
+BUILD.push({ d: 9, f: function () {
+  env("bench");
+  var A = add(mesh(prismG([[-36.9, 0], [36.9, 0], [36.9, 7], [-36.9, 7]], 4.5), MAT.pino));
+  var Bg = add(new THREE.Group()); var Bm = mesh(prismG([[-36.9, 0], [36.9, 0], [36.9, 7], [-36.9, 7]], 4.5), MAT.pino2); Bm.rotation.y = Math.PI / 2; Bg.add(Bm);
+  var c0 = add(lineM([0, 7.05, -2.25], [0, 7.05, 2.25]));
+  var w1 = add(lineM([-2.25, 7.05, -2.25], [-2.25, 7.05, 2.25])), w2 = add(lineM([2.25, 7.05, -2.25], [2.25, 7.05, 2.25]));
+  var d1 = add(lineM([-2.25, 7, 2.3], [-2.25, 3.5, 2.3])), d2 = add(lineM([2.25, 7, 2.3], [2.25, 3.5, 2.3])), d3 = add(lineM([-2.25, 3.5, 2.3], [2.25, 3.5, 2.3]));
+  var pen = add(pencil());
+  on(function (t) {
+    c0.userData.show(E(t, 0.6, 1.4));
+    var k = E(t, 2.6, 3.8) * (1 - E(t, 5.2, 6.0)); Bg.visible = k > 0.01; Bg.position.set(0, 7 + 30 * (1 - k), 0);
+    w1.userData.show(E(t, 4, 4.5)); w2.userData.show(E(t, 4.5, 5));
+    d1.userData.show(E(t, 6.1, 6.6)); d2.userData.show(E(t, 6.6, 7.1)); d3.userData.show(E(t, 7.1, 7.6));
+    var px = 0, py = 7, pz = 0;
+    if (t < 1.6) { pz = lerp(-2.25, 2.25, E(t, 0.6, 1.4)); }
+    else if (t < 5.1) { px = t < 4.5 ? -2.25 : 2.25; pz = t < 4.5 ? lerp(-2.25, 2.25, E(t, 4, 4.5)) : lerp(-2.25, 2.25, E(t, 4.5, 5)); }
+    else { pz = 2.3; if (t < 6.6) { px = -2.25; py = lerp(7, 3.5, E(t, 6.1, 6.6)); } else if (t < 7.1) { px = 2.25; py = lerp(7, 3.5, E(t, 6.6, 7.1)); } else { px = lerp(-2.25, 2.25, E(t, 7.1, 7.6)); py = 3.5; } }
+    pen.position.set(px, py, pz); pen.rotation.set(t < 5.1 ? 0.35 : 1.2, 0, 0); pen.visible = t > 0.4 && t < 7.8;
+  });
+  dim([-36.9, 8.4, 3], [0, 8.4, 3], "36.9 al centro (37.0 en la cruz de arriba)", 0.8, 3.4);
+  addLabel("Marca el ancho contra la otra pieza, no con la cinta", [0, 15, -4], 3.4, 5.6);
+  dim([-2.25, 7.8, -3.2], [2.25, 7.8, -3.2], "4.5", 5, 999, [0, 11, -3.2]);
+  dim([3.4, 3.5, 2.6], [3.4, 7, 2.6], "3.5 de hondo", 6.8, 999, [8, 4, 2.6]);
+  addLabel("En los 2 costados", [-6, 1, 3], 7.6, 999);
+  cam([[0, [60, 40, 70], [-12, 5, 0]], [3.2, [30, 40, 50], [0, 6, 0]], [5.4, [18, 24, 34], [0, 6, 0]], [9, [16, 14, 32], [0, 5, 0]]]);
+  subs([[0, "Marca el centro"], [2.6, "Pon la otra pieza encima, cruzada, y marca su ancho"], [6, "Marca el hondo en los 2 costados: la mitad del alto"]]);
+} });
+
+/* 8. Cortar las medias maderas */
+BUILD.push({ d: 12, f: function () {
+  env("bench");
+  [-2.3, 2.3].forEach(function (z, i) { var m = add(mesh(prismG(floorArmPts(true, false), 4.5), i ? MAT.pino2 : MAT.pino)); m.position.z = z; });
+  var N = 9, sl = [], passes = [-2.1, 2.1, -1.75, -1.25, -0.75, -0.25, 0.25, 0.75, 1.25, 1.75], pT = passes.map(function (p, i) { return 1 + i * 0.5; });
+  for (var i = 0; i < N; i++) {
+    var a = -2.25 + i * 0.5, b = a + 0.5, m = add(board(0.5, 3.5, 9.1, i % 2 ? MAT.pino2 : MAT.pino)); m.userData.x = a + 0.25;
+    var ct = 99; passes.forEach(function (p, j) { if (p >= a - 0.01 && p <= b + 0.01) ct = Math.min(ct, pT[j] + 0.25); }); m.userData.ct = ct; sl.push(m);
+  }
+  var saw = add(circSaw()); saw.userData.depth(3.5);
+  var ch = add(chisel());
+  on(function (t) {
+    var cur = -1; for (var j = 0; j < passes.length; j++) if (t >= pT[j] && t < pT[j] + 0.5) cur = j;
+    saw.visible = cur >= 0; if (cur >= 0) saw.position.set(passes[cur], 7, lerp(-22, 22, E(t, pT[cur], pT[cur] + 0.48)));
+    sl.forEach(function (m, i) {
+      var kerf = t >= m.userData.ct ? 0.72 : 1, p0 = 6.4 + i * 0.4, k = E(t, p0, p0 + 0.5);
+      m.scale.set(kerf, 1, 1); m.visible = k < 0.98;
+      m.position.set(m.userData.x + k * 3, 5.25 + k * 7, 0); m.rotation.z = -k * 1.2;
+    });
+    var ci = Math.min(N - 1, Math.max(0, Math.floor((t - 6.4) / 0.4))), cp = ((t - 6.4) % 0.4) / 0.4;
+    ch.visible = t > 6.2 && t < 10.4; ch.position.set(-2.25 + ci * 0.5 - 7, 6 + 2 * Math.sin(cp * Math.PI), 0); ch.rotation.set(0, Math.PI / 2, 0.3);
+  });
+  addLabel("Circular a 3.5 de hondo (pruébala en un retazo)", [0, 18, 0], 0.8, 2.4);
+  addLabel("1: las 2 rayas de los lados, por dentro de la raya", [0, 18, 0], 1.2, 2.2);
+  addLabel("2: cortes cada 5 mm en medio", [0, 18, 0], 2.2, 6);
+  addLabel("3: rompe los pedacitos y deja el fondo plano con el formón de 7/8\"", [-8, 14, 0], 6.4, 10.2);
+  dim([-5, 3.5, 4.7], [-5, 7, 4.7], "3.5", 1, 999, [-9, 4.5, 4.7]);
+  addLabel("Fondo plano. Prueba: entra apretada con la mano", [0, 13, 0], 10.4, 999, "big");
+  cam([[0, [35, 32, 45], [0, 5, 0]], [6, [26, 26, 34], [0, 5, 0]], [10.4, [-22, 22, 30], [0, 4, 0]], [12, [-18, 26, 28], [0, 4, 0]]]);
+  subs([[0, "Prensa las 2 piezas lado a lado y córtalas juntas"], [6.3, "Rompe los pedacitos y deja el fondo plano"], [10.4, "Floja, la cola no la salva"]]);
+} });
+
+/* 9. Puntas a 15° de la cruz del piso */
+BUILD.push({ d: 11, f: function () {
+  env("bench");
+  var cross = add(new THREE.Group()), inner = new THREE.Group(); cross.add(inner); inner.position.y = -3.5; cross.position.y = 3.5;
+  var Ag = new THREE.Group(); inner.add(Ag);
+  var A = mesh(prismG(floorArmPts(true, true), 4.5), MAT.pino); Ag.add(A);
+  function wedge(sx) { var w = mesh(prismG(sx > 0 ? [[35, 7], [36.9, 0], [36.9, 7]] : [[-35, 7], [-36.9, 7], [-36.9, 0]], 4.5), MAT.pino); w.userData.sx = sx; return w; }
+  var wA = [wedge(1), wedge(-1)]; wA.forEach(function (w) { Ag.add(w); });
+  var Bg = new THREE.Group(); inner.add(Bg); Bg.rotation.y = Math.PI / 2;
+  var B = mesh(prismG(floorArmPts(false, true), 4.5), MAT.pino2); Bg.add(B);
+  var wB = [wedge(1), wedge(-1)]; wB.forEach(function (w) { w.material = MAT.pino2; Bg.add(w); });
+  var lnA = lineM([36.9, 0, 2.3], [35, 7, 2.3]); Ag.add(lnA);
+  var others = [lineM([-36.9, 0, 2.3], [-35, 7, 2.3]), lineM([36.9, 0, 2.3], [35, 7, 2.3]), lineM([-36.9, 0, 2.3], [-35, 7, 2.3])];
+  Ag.add(others[0]); Bg.add(others[1]); Bg.add(others[2]);
+  var saw = add(circSaw()); saw.userData.depth(5.6);
+  on(function (t) {
+    cross.rotation.x = Math.PI * E(t, 0.3, 1.3) * (1 - E(t, 2.5, 3.3));
+    lnA.userData.show(E(t, 3.4, 4)); others.forEach(function (l, i) { l.userData.show(E(t, 3.6 + i * 0.2, 4.2 + i * 0.2)); });
+    var liftB = E(t, 4.4, 4.9) * (1 - E(t, 8, 8.5)); Bg.position.y = liftB * 10;
+    var out = E(t, 4.8, 5.6) * (1 - E(t, 7.7, 8.4));
+    Ag.rotation.x = -Math.PI / 2 * out; Ag.position.set(0, 2.25 * out + 9 * Math.sin(Math.PI * out), 28.5 * out);
+    var fall = E(t, 6.6, 7.4); wA[0].position.set(fall * 6, 0, 0); wA[0].scale.setScalar(Math.max(0.001, 1 - fall)); wA[0].visible = fall < 0.99;
+    var fall2 = E(t, 8.2, 9); [wA[1], wB[0], wB[1]].forEach(function (w) { w.position.set(fall2 * 6 * w.userData.sx, 0, 0); w.scale.setScalar(Math.max(0.001, 1 - fall2)); w.visible = fall2 < 0.99; });
+    saw.visible = t > 5.3 && t < 7.1; saw.rotation.y = 15 * DEG;
+    var sv = lerp(-3, 10, E(t, 5.4, 7)); saw.position.set(36.9 - sv * 1.9 / 7.25, 4.5, 28.5 - sv * 7 / 7.25);
+  });
+  addLabel("<b>PISO</b>", [18, 7.6, 0], 1.2, 2.6, "big");
+  addLabel("<b>PISO</b>", [0, 7.6, 18], 1.2, 2.6, "big");
+  addLabel("Escribe PISO en la cara de abajo de las 2 piezas", [0, 14, 0], 0.4, 2.8);
+  dim([35, 7.6, 2.6], [36.9, 7.6, 2.6], "1.88", 4, 4.8, [39, 10, 2.6]);
+  addLabel("Desde la esquina del piso hacia adentro", [37, 3, 6], 3.6, 4.8);
+  addLabel("Acuéstala sobre el costado rayado y corta con la escuadra en 15°", [30, 14, 22], 5, 7.4);
+  addLabel("La punta larga siempre en la cara de PISO", [0, 14, 0], 8.4, 999, "warn");
+  dim([-36.9, 0.3, 8], [36.9, 0.3, 8], "73.8 abajo", 9, 999, [0, 2, 10]);
+  dim([-35, 7.5, -4], [35, 7.5, -4], "70.0 arriba", 9.4, 999, [0, 11, -4]);
+  cam([[0, [80, 90, 110], [0, 3, 0]], [3.2, [60, 40, 70], [25, 3, 0]], [4.6, [55, 18, 32], [36, 3, 2]], [5.4, [80, 58, 80], [33, 2, 24]], [7.6, [80, 58, 80], [33, 2, 24]], [8.6, [80, 90, 110], [0, 3, 0]], [11, [70, 70, 115], [0, 3, 0]]]);
+  subs([[0, "Arma la cruz en seco"], [3.3, "Raya en el costado de cada punta"], [4.8, "Corta con la circular en la escuadra rápida a 15°, o la ingletadora"], [8.2, "Las 4 puntas igual: queda 73.8 abajo y 70.0 arriba"]]);
+} });
+
+/* 10. Las 4 patas a 15°, paralelas */
+BUILD.push({ d: 11, f: function () {
+  env("bench");
+  var P1 = [-23.4, -4.5], P2 = [20.9, -4.5], P3 = [23.31, 4.5], P4 = [-20.99, 4.5];
+  var leg = add(mesh(slabG([P1, P2, P3, P4], 4.5, [1, 0, 0]), MAT.pino));
+  var wL = add(mesh(slabG([[-24, -4.5], P1, P4, [-24, 4.5]], 4.5), MAT.pino2)), wR = add(mesh(slabG([P2, [24, -4.5], [24, 4.5], P3], 4.5), MAT.pino2));
+  var l1 = add(lineM([P1[0], 4.56, P1[1]], [P4[0], 4.56, P4[1]])), l2 = add(lineM([P2[0], 4.56, P2[1]], [P3[0], 4.56, P3[1]]));
+  var saw = add(circSaw()); saw.userData.depth(5.4); saw.rotation.y = 15 * DEG;
+  var dir = [2.41 / 9.317, 9 / 9.317], copies = [];
+  for (var i = 0; i < 3; i++) { var c = add(mesh(slabG([P1, P2, P3, P4], 4.5), i % 2 ? MAT.pino : MAT.pino2)); c.userData.z = -14 - i * 12; copies.push(c); }
+  on(function (t) {
+    l1.userData.show(E(t, 0.4, 1.4)); l2.userData.show(E(t, 4.6, 5.4));
+    var s;
+    if (t < 3.4) { s = lerp(-14, 14, E(t, 1.6, 3.2)); saw.position.set(-22.195 + s * dir[0], 4.5, s * dir[1]); saw.visible = t > 1.4; }
+    else { s = lerp(-14, 14, E(t, 5.6, 7.2)); saw.position.set(22.105 + s * dir[0], 4.5, s * dir[1]); saw.visible = t > 5.4 && t < 7.4; }
+    var a = E(t, 3.0, 3.8); wL.position.x = -6 * a; wL.visible = a < 0.98;
+    var b = E(t, 7.0, 7.8); wR.position.x = 6 * b; wR.visible = b < 0.98;
+    copies.forEach(function (c, i) { var k = E(t, 7.9 + i * 0.4, 8.5 + i * 0.4); c.visible = k > 0.01; c.position.set(0, 20 * (1 - k), c.userData.z); });
+  });
+  dim([P1[0], 4.7, 7], [P4[0], 4.7, 7], "2.41", 0.8, 3.6, [-22, 8, 9]);
+  addLabel("Primera punta a 15°: la raya se corre 2.41 en la cara de 9", [-20, 14, 0], 0.6, 3.4);
+  dim([P1[0], 4.7, -7], [P2[0], 4.7, -7], "44.3 por el canto largo", 3.6, 999, [0, 6, -8]);
+  addLabel("La segunda punta, paralela a la primera", [24, 14, 0], 4.6, 7.4);
+  dim([P1[0], 4.7, 9], [P3[0], 4.7, 9], "46.7 de pieza", 7.6, 999, [0, 9, 11]);
+  addLabel("Úsala de plantilla para rayar las otras 3", [0, 12, -26], 8.2, 999);
+  addLabel("Al revés sale un trapecio: la pata no se para", [0, 18, 0], 9.4, 999, "warn");
+  cam([[0, [-30, 60, 55], [-15, 2, 0]], [3.4, [-10, 70, 50], [0, 2, 0]], [5, [25, 60, 50], [10, 2, 0]], [7.6, [10, 80, 70], [0, 2, -10]], [11, [5, 95, 75], [0, 0, -14]]]);
+  subs([[0, "2x4 acostado sobre la cara de 9 cm"], [3.6, "Mide 44.3 por un canto largo"], [7.8, "Corta la primera, revísala y úsala de plantilla"]]);
+} });
+
+/* 11. La cruz de arriba */
+BUILD.push({ d: 8, f: function () {
+  env("bench");
+  var A = add(mesh(prismG(topArmPts(true, 0), 4.5), MAT.pino)); A.position.z = 0;
+  var g2 = add(new THREE.Group()), in2 = new THREE.Group(); g2.add(in2); in2.position.y = -3.5;
+  var B = mesh(prismG(topArmPts(true, 0), 4.5), MAT.pino2); in2.add(B);
+  var wA = add(board(4.5, 3.5, 4.5, MAT.pino2)), wB = board(4.5, 3.5, 4.5, MAT.pino); in2.add(wB); wB.position.y = 5.25;
+  on(function (t) {
+    var k = E(t, 0.6, 2.0); wA.position.set(0, 5.25 + 12 * k, 0); wA.visible = k < 0.98; wB.position.set(0, 5.25 + 12 * k, 0); wB.visible = k < 0.98;
+    var m = E(t, 3.4, 6.2), lift = Math.sin(Math.PI * m) * 16;
+    g2.position.set(0, 3.5 + lift, lerp(14, 0, m)); g2.rotation.set(Math.PI * m, Math.PI / 2 * m, 0);
+  });
+  dim([-37, 7.8, 3], [37, 7.8, 3], "74", 0.4, 3.4, [20, 11, 3]);
+  dim([-37, 9.6, -3], [0, 9.6, -3], "centro 37.0", 0.8, 3.4, [-18, 13, -3]);
+  dim([3.4, 3.5, 2.6], [3.4, 7, 2.6], "3.5", 1.4, 3.4, [7, 4, 2.6]);
+  addLabel("Media madera igual que en los pasos 7 y 8", [0, 16, 0], 1.6, 3.4);
+  addLabel("Puntas rectas", [37, 10, 0], 6.2, 999);
+  addLabel("Con cola y tornillos: carga una tapa de pino pesada", [0, 16, 0], 6.4, 999, "big");
+  cam([[0, [40, 50, 85], [0, 3, 6]], [3.4, [35, 45, 75], [0, 3, 6]], [6.2, [60, 60, 80], [0, 3, 0]], [8, [70, 65, 85], [0, 3, 0]]]);
+  subs([[0, "2x3 de 74 cm: la misma media madera, centro a 37.0 y 3.5 de hondo"], [3.4, "Pruébala en seco"]]);
+} });
+
+/* 12. Pegar y atornillar las 2 cruces */
+BUILD.push({ d: 12, f: function () {
+  env("bench");
+  var cross = add(new THREE.Group()), inner = new THREE.Group(); cross.add(inner); inner.position.y = -3.5; cross.position.y = 3.5;
+  var A = mesh(prismG(floorArmPts(true, true), 4.5), MAT.pino); inner.add(A);
+  var Bg = new THREE.Group(); inner.add(Bg); var B = mesh(prismG(floorArmPts(false, true), 4.5), MAT.pino2); B.rotation.y = Math.PI / 2; Bg.add(B);
+  var glue = [];
+  function gl(w, h, d, x, y, z, parent, rotY) { var m = boxM(w, h, d, MAT.glue); m.position.set(x, y, z); if (rotY) m.rotation.y = rotY; parent.add(m); glue.push(m); return m; }
+  gl(4.5, 0.14, 4.5, 0, 3.57, 0, inner); gl(0.14, 3.5, 4.5, -2.18, 5.25, 0, inner); gl(0.14, 3.5, 4.5, 2.18, 5.25, 0, inner);
+  gl(4.5, 0.14, 4.5, 0, 3.43, 0, Bg); gl(4.5, 3.5, 0.14, 0, 1.75, -2.18, Bg); gl(4.5, 3.5, 0.14, 0, 1.75, 2.18, Bg);
+  var sq = add(speedSquare());
+  var holes = [], screws = [], P = [[-1.05, -1.05], [1.05, 1.05]];
+  P.forEach(function (p) { var h = add(cylM(0.5, 1.5, MAT.hole, 16)); h.position.set(p[0], 7 - 0.75 + 0.02, p[1]); holes.push(h); var s = add(screw(4, 0.2)); s.userData.p = p; screws.push(s); });
+  var dr = add(drill(0.5, 9, 1.5));
+  on(function (t) {
+    glue.forEach(function (m, i) { var k = E(t, 0.6 + i * 0.3, 1.0 + i * 0.3); m.visible = k > 0.01; m.scale.setScalar(Math.max(0.01, k)); });
+    var dn = E(t, 3, 4.8); Bg.position.set(0, 24 * (1 - dn), 0);
+    sq.visible = t > 5 && t < 6.7; sq.position.set(2.25, 0.05 + 10 * (1 - E(t, 5, 5.6)), 2.25); sq.rotation.y = 0;
+    cross.rotation.x = Math.PI * E(t, 6.8, 7.8);
+    var x = t > 9.6 ? MAT.xray : null; A.material = x || MAT.pino; B.material = x || MAT.pino2;
+    holes.forEach(function (h, i) { h.visible = t > (i ? 9.3 : 8.4); });
+    var di = t < 8.9 ? 0 : 1, a0 = di ? 8.9 : 8.0, k2 = E(t, a0, a0 + 0.4) * (1 - E(t, a0 + 0.5, a0 + 0.8));
+    dr.visible = t > 7.9 && t < 9.7; dr.position.set(P[di][0], 7 + 12 - (12 + 1.5) * k2, P[di][1]); dr.userData.bit.rotation.y = t * 40;
+    screws.forEach(function (s, i) { var k = E(t, 9.8 + i * 0.5, 10.8 + i * 0.5); s.visible = t > 9.7; s.position.set(s.userData.p[0], lerp(11, 5.5, k), s.userData.p[1]); s.rotation.y = k * 40; });
+  });
+  addLabel("Cola en el fondo y los 2 costados del hueco, en las 2 piezas", [0, 16, 0], 0.8, 3.4, "glue");
+  addLabel("Revisa los 4 ángulos a 90°", [12, 6, 12], 5.4, 6.8, "big");
+  addLabel("Voltea: los tornillos van por la cara de PISO", [0, 15, 0], 6.8, 8);
+  addLabel("Caja de 10 mm, 1.5 de hondo", [0, 14, 0], 8, 9.6, "screw");
+  addLabel("Tornillo de 40 mm: paso de 4 mm y guía de 3 mm; entra 2 cm en la otra pieza", [0, 14, 0], 9.8, 11.4, "screw");
+  addLabel("En diagonal, a 1.2 de las esquinas; nunca en línea con la veta", [10, 3, 10], 10, 999, "warn");
+  addLabel("Prensa chica 30 minutos", [-14, 10, 0], 11.3, 999);
+  cam([[0, [40, 36, 46], [0, 4, 0]], [3, [36, 40, 50], [0, 5, 0]], [5, [30, 30, 40], [3, 3, 3]], [6.6, [40, 45, 55], [0, 4, 0]], [8, [16, 26, 22], [0, 6, 0]], [9.6, [14, 18, 18], [0, 4, 0]], [12, [18, 20, 22], [0, 4, 0]]]);
+  subs([[0, "Cola en las 2 piezas"], [3, "Encaja"], [5, "Escuadra en las 4 esquinas"], [6.8, "Caja, paso y guía; 2 tornillos por cruce"]]);
+} });
+
+/* 13. Perforar y avellanar */
+BUILD.push({ d: 12, f: function () {
+  env("bench");
+  var cross = add(new THREE.Group()), inner = new THREE.Group(); cross.add(inner); inner.position.y = -3.5; cross.position.y = 3.5;
+  var P = base1(MAT.pino, { noTop: true }); P.legs.forEach(function (l) { P.g.remove(l); }); inner.add(P.g);
+  var foot = [], dots = [], guides = [], cajas = [], pasos = [];
+  for (var i = 0; i < 4; i++) {
+    var arm = new THREE.Group(); arm.rotation.y = i * Math.PI / 2; inner.add(arm);
+    var f = boxM(9.3, 0.08, 4.5, MAT.hi); f.position.set(35 - 4.65, 7.05, 0); arm.add(f); foot.push(f);
+    [32.5, 28.5].forEach(function (x) {
+      var d = cylM(0.2, 0.06, MAT.pencil, 10); d.position.set(x, 7.06, 0); arm.add(d); dots.push(d);
+      var g = cylM(0.15, 7.06, MAT.hole, 8); g.position.set(x, 3.5, 0); arm.add(g); g.userData.i = i; guides.push(g);
+      var c = cylM(0.5, 3.5, MAT.hole, 16); c.position.set(x, 1.75 - 0.02, 0); arm.add(c); c.userData.i = i; c.userData.x = x; cajas.push(c);
+      var p = cylM(0.25, 3.55, MAT.hole, 10); p.position.set(x, 5.25, 0); arm.add(p); p.userData.i = i; pasos.push(p);
+    });
+  }
+  var top = add(new THREE.Group()); var TA = mesh(prismG(topArmPts(true, 0), 4.5), MAT.pino), TB = mesh(prismG(topArmPts(false, 0), 4.5), MAT.pino2); TB.rotation.y = Math.PI / 2; top.add(TA); top.add(TB);
+  var tdots = [];
+  for (var j = 0; j < 4; j++) { var ag = new THREE.Group(); ag.rotation.y = j * Math.PI / 2; top.add(ag); var tf = boxM(9.32, 0.08, 4.5, MAT.hi); tf.position.set(23.56 - 4.66, 7.05, 0); ag.add(tf); [21, 16.7].forEach(function (x) { var c = cylM(0.5, 0.1, MAT.hole, 16); c.position.set(x, 7.05, 0); ag.add(c); tdots.push(c); }); }
+  var d3 = add(drill(0.15, 12)), d10 = add(drill(0.5, 9, 3.5)), d5 = add(drill(0.25, 12));
+  on(function (t) {
+    foot.forEach(function (f) { f.visible = t > 0.5 && t < 9; }); dots.forEach(function (d) { d.visible = t > 1.2 && t < 9; });
+    guides.forEach(function (g) { g.visible = t > (g.userData.i === 0 ? (g.position.x > 30 ? 2.8 : 3.6) : 3.8) && t < 9; });
+    cross.rotation.x = Math.PI * E(t, 4, 5);
+    var xr = t > 5 && t < 9; P.fa.material = xr ? MAT.xray : MAT.pino; P.fb.material = xr ? MAT.xray : MAT.pino;
+    cajas.forEach(function (c) { c.visible = t > (c.userData.i === 0 ? (c.userData.x > 30 ? 5.7 : 6.9) : 7.3) && t < 9; });
+    pasos.forEach(function (p) { p.visible = t > (p.userData.i === 0 ? 7.9 : 8.5) && t < 9; });
+    // broca de 3 mm desde arriba (antes de voltear)
+    var a = t < 3 ? 2.2 : 3.0, k = E(t, a, a + 0.5) * (1 - E(t, a + 0.55, a + 0.8));
+    d3.visible = t > 2.1 && t < 3.85; d3.position.set(t < 3 ? 32.5 : 28.5, 19 - 19.6 * k, 0); d3.userData.bit.rotation.y = t * 40;
+    // caja de 10 mm con banderita a 3.5 (después de voltear: la cara de PISO arriba, y = 7)
+    var b = t < 6.4 ? 5.1 : 6.3, k2 = E(t, b, b + 0.6) * (1 - E(t, b + 0.75, b + 1.0));
+    d10.visible = t > 5 && t < 7.4; d10.position.set(t < 6.4 ? 32.5 : 28.5, 7 + 14 - (14 + 3.5) * k2, 0); d10.userData.bit.rotation.y = t * 40;
+    var c5 = t < 8.1 ? 7.4 : 8.0, k3 = E(t, c5, c5 + 0.3) * (1 - E(t, c5 + 0.35, c5 + 0.55));
+    d5.visible = t > 7.3 && t < 8.6; d5.position.set(t < 8.1 ? 32.5 : 28.5, 7 + 14 - 21.5 * k3, 0); d5.userData.bit.rotation.y = t * 40;
+    var sw = E(t, 8.8, 9.6); cross.position.z = -95 * sw; cross.visible = sw < 0.99;
+    top.visible = t > 8.9; top.position.set(0, 20 * (1 - E(t, 8.9, 9.7)), 0);
+    tdots.forEach(function (d, i) { d.visible = t > 9.8 + (i % 2) * 0.2; });
+  });
+  dim([25.7, 7.7, 3.2], [35, 7.7, 3.2], "9.3", 0.6, 3.8, [30, 11, 3.2]);
+  addLabel("Huella de la pata: los últimos 9.3 cm del brazo", [20, 14, 0], 0.6, 2.2, "big");
+  addLabel("2 puntos a 2.5 y 6.5 de la punta", [30, 10, -6], 1.4, 2.4);
+  addLabel("Guía de 3 mm de arriba abajo", [30, 16, 0], 2.2, 4);
+  addLabel("Voltea: cara de PISO arriba", [0, 14, 0], 4, 5.1);
+  addLabel("Caja de 10 mm a 3.5 de hondo: para cuando la banderita toque", [30, 18, 0], 5.1, 7.4, "screw");
+  dim([36.5, 3.5, 3], [36.5, 7, 3], "3.5", 5.6, 8.8, [40, 4, 3]);
+  addLabel("Paso de 5 mm hasta salir", [30, 16, 0], 7.4, 8.8, "screw");
+  addLabel("Cruz de arriba: a 16.0 y 20.3 de cada punta, desde la cara de la tapa", [0, 16, 0], 9.8, 999, "big");
+  dim([23.56, 7.7, 3.2], [37, 7.7, 3.2], "13.5", 10, 999, [32, 11, 3.2]);
+  addLabel("Puntas de las patas: marca con un clavo y guía de 3 mm x 4 cm", [-20, 8, 20], 10.6, 999);
+  cam([[0, [70, 60, 70], [15, 3, 0]], [2, [52, 30, 38], [30, 5, 0]], [4, [55, 40, 45], [25, 4, 0]], [5.2, [48, 24, 30], [30, 5, 0]], [8.6, [50, 28, 34], [28, 4, 0]], [9.6, [60, 70, 80], [10, 3, 0]], [12, [55, 75, 85], [8, 3, 0]]]);
+  subs([[0, "Los hoyos van en los brazos, no en las patas"], [5, "Desde la cara de PISO: caja con banderita de masking"], [9, "La cruz de arriba, igual pero desde la cara que va contra la tapa"]]);
+} });
+
+/* 14. Patas a la cruz del piso */
+BUILD.push({ d: 12, f: function () {
+  env("floor");
+  var P = base1(MAT.pino, { noTop: true });
+  add(P.g);
+  var LG = P.legs.map(function (l, i) { P.g.remove(l); var g = new THREE.Group(); g.rotation.y = i * Math.PI / 2; add(g); g.add(l); l.rotation.y = 0; return g; });
+  var legMesh = LG.map(function (g) { return g.children[0]; });
+  var gf = boxM(9.3, 0.14, 4.5, MAT.glue); gf.position.set(30.34, 7.08, 0); add(gf);
+  var gl = boxM(9.3, 0.14, 4.5, MAT.glue); gl.position.set(30.34, 6.95, 0); LG[0].add(gl);
+  var H = [32.5, 28.5], scr = [];
+  H.forEach(function (x) {
+    var c = add(cylM(0.5, 3.5, MAT.hole, 16)); c.position.set(x, 1.75, 0); var p = add(cylM(0.25, 3.5, MAT.hole, 10)); p.position.set(x, 5.25, 0);
+    var s = add(screw(7, 0.25)); s.rotation.x = Math.PI; s.userData.x = x; scr.push(s);
+  });
+  var vref = lineM([35.05, 7, 2.5], [35.05, 30, 2.5], MAT.dim, 0.12); add(vref);
+  on(function (t) {
+    gf.visible = t > 0.6 && t < 4.6; gf.scale.x = Math.max(0.01, E(t, 0.6, 1.4));
+    gl.visible = t > 1.2 && t < 4.6; gl.scale.x = Math.max(0.01, E(t, 1.2, 2.2));
+    LG.forEach(function (g, i) {
+      var k = i === 0 ? E(t, 2.4, 4.4) : E(t, 8 + (i - 1) * 0.5, 8.8 + (i - 1) * 0.5);
+      g.position.set(0, 34 * (1 - k), 0); g.visible = i === 0 || k > 0.01;
+    });
+    var xr = t > 4.4 && t < 8.4; P.fa.material = xr ? MAT.xray : MAT.pino; legMesh[0].material = xr ? MAT.xray : MAT.pino;
+    scr.forEach(function (s, i) { var k = E(t, 5 + i * 1.1, 6 + i * 1.1); s.visible = t > 4.8; s.position.set(s.userData.x, lerp(-12, 3.5, k), 0); s.rotation.y = k * 40; });
+    vref.visible = t > 9.6; vref.userData.show(E(t, 9.6, 10.2));
+  });
+  addLabel("Cola: punta de abajo de la pata (2 manos) y su huella", [30, 16, 0], 0.6, 2.6, "glue");
+  addLabel("La pata se para en la punta del brazo, inclinada hacia adentro", [30, 40, 0], 2.6, 4.6);
+  addLabel("2 tornillos de 5 x 70 mm desde abajo", [30, -6, 0], 4.8, 8, "screw");
+  addLabel("Entran 3.5 cm en la pata", [30, 13, 0], 6.6, 8.2, "screw");
+  addLabel("<b>15°</b> con la escuadra rápida", [33, 24, 3], 9.8, 999, "dim");
+  addLabel("Las 4 igual; de frente, a 90°", [0, 45, 0], 10.2, 999);
+  addLabel("La cara de 9 cm va en la dirección del brazo", [-30, 30, 0], 10.6, 999, "warn");
+  cam([[0, [70, 40, 70], [28, 8, 0]], [2.4, [80, 55, 80], [28, 18, 0]], [4.6, [60, -26, 40], [30, 6, 0]], [8, [62, -24, 42], [30, 6, 0]], [8.6, [100, 60, 110], [0, 20, 0]], [9.8, [62, 24, 46], [25, 20, 0]], [12, [80, 45, 92], [0, 24, 0]]]);
+  subs([[0, "Cola en la punta y en la huella"], [2.4, "La cara de afuera sigue la punta inclinada del brazo"], [4.6, "Desde abajo: 2 tornillos de 5 x 70 mm por pata"], [8, "Las otras 3 patas, igual"], [9.6, "Revisa cada pata a 15° y las 4 iguales"]]);
+} });
+
+/* 15. Cruz de arriba sobre las patas */
+BUILD.push({ d: 11, f: function () {
+  env("floor");
+  var P = base1(MAT.pino); add(P.g);
+  var TG = add(new THREE.Group()); P.g.remove(P.ta); P.g.remove(P.tb); TG.add(P.ta); TG.add(P.tb);
+  var marks = [];
+  for (var i = 0; i < 4; i++) { var a = i * Math.PI / 2, gm = new THREE.Group(); gm.rotation.y = a; TG.add(gm); var l = lineM([23.56, 56.85, -2.25], [23.56, 56.85, 2.25]); gm.add(l); marks.push(l); }
+  var glue = P.legs.map(function (l, i) { var g = boxM(9.3, 0.14, 4.5, MAT.glue); g.position.set(legOut(49.8) - 4.66, 49.86, 0); var w = new THREE.Group(); w.rotation.y = i * Math.PI / 2; w.add(g); add(w); return g; });
+  var scr = [];
+  for (var j = 0; j < 4; j++) { [21, 16.7].forEach(function (x) { var w = new THREE.Group(); w.rotation.y = j * Math.PI / 2; add(w); var h = cylM(0.5, 3.5, MAT.hole, 16); h.position.set(x, 56.8 - 1.75 + 0.02, 0); w.add(h); var s = screw(7, 0.25); s.position.set(x, 53.3, 0); w.add(s); s.userData.j = j; h.userData.j = j; scr.push([s, h]); }); }
+  on(function (t) {
+    var k = E(t, 5.4, 7.2); TG.position.y = 22 * (1 - k); TG.visible = t > 2.4;
+    marks.forEach(function (m, i) { m.userData.show(E(t, 3 + i * 0.2, 3.4 + i * 0.2)); });
+    glue.forEach(function (g, i) { g.visible = t > 4.2 + i * 0.2 && t < 7.4; });
+    var xr = t > 7.2 && t < 10; P.ta.material = xr ? MAT.xray : MAT.pino; P.tb.material = xr ? MAT.xray : MAT.pino;
+    scr.forEach(function (p) {
+      var s = p[0], h = p[1], st = 7.4 + p[0].userData.j * 0.5, kk = E(t, st, st + 0.9);
+      h.visible = t > 7.2; s.visible = t > st - 0.3; s.position.y = lerp(66, 53.3, kk); s.rotation.y = kk * 40;
+    });
+  });
+  dim([-legOut(49.8), 50.4, 2.6], [legOut(49.8), 50.4, 2.6], "47.1", 0.4, 5.4, [0, 53, 2.6]);
+  addLabel("De afuera a afuera, arriba, entre 2 patas opuestas", [0, 46, 0], 0.6, 2.6);
+  dim([23.56, 80.2, 3], [37, 80.2, 3], "13.5", 3, 5.4, [30, 84, 3]);
+  addLabel("(74 − 47.1) ÷ 2 = 13.5 desde cada punta", [0, 88, 0], 3.2, 5.4, "big");
+  addLabel("Cola en la punta de arriba de cada pata (2 manos)", [20, 52, 0], 4.2, 5.8, "glue");
+  addLabel("2 tornillos de 5 x 70 mm por pata, desde arriba", [18, 64, 0], 7.4, 9.8, "screw");
+  addLabel("Revisa: diagonales iguales y que no cojee", [0, 66, 0], 9.6, 999, "big");
+  cam([[0, [70, 80, 110], [0, 45, 0]], [2.6, [80, 110, 110], [10, 60, 0]], [5.4, [90, 100, 120], [0, 55, 0]], [7.4, [55, 85, 55], [18, 55, 0]], [9.6, [120, 90, 140], [0, 30, 0]], [11, [125, 85, 145], [0, 30, 0]]]);
+  subs([[0, "Mide arriba de afuera a afuera"], [2.6, "La raya, a 13.5 de cada punta"], [5.4, "Cara de los hoyos hacia arriba"], [7.4, "2 tornillos por pata"]]);
+} });
+
+/* 16. Marcar el centro */
+BUILD.push({ d: 9, f: function () {
+  env("bench");
+  for (var i = 0; i < 6; i++) { var b = add(board(91, 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino)); b.position.set(0, 1.6, (i - 2.5) * 14.5); }
+  var d1 = add(lineM([-45.5, 3.26, -43.5], [45.5, 3.26, 43.5])), d2 = add(lineM([45.5, 3.26, -43.5], [-45.5, 3.26, 43.5]));
+  var dot = add(cylM(0.5, 0.1, MAT.hole, 12)); dot.position.y = 3.25;
+  var arm = add(new THREE.Group()); arm.position.y = 3.2;
+  var strip = boxM(46, 0.8, 3, MAT.bench); strip.position.set(20, 1.2, 0); arm.add(strip);
+  var nail = cylM(0.18, 4, MAT.steel, 8); nail.position.set(0, 1.4, 0); arm.add(nail);
+  var pen = pencil(); pen.position.set(40, 0, 0); arm.add(pen);
+  var ring = ringM(40, 0.12, MAT.pencil); ring.position.y = 3.27; add(ring);
+  on(function (t) {
+    d1.userData.show(E(t, 0.8, 2.2)); d2.userData.show(E(t, 2.2, 3.6)); dot.visible = t > 3.6;
+    arm.visible = t > 4; var a = 2 * Math.PI * E(t, 4.6, 8.4); arm.rotation.y = a; ring.userData.show(E(t, 4.6, 8.4));
+  });
+  addLabel("Cara de abajo: ahí queda el hoyo del pivote", [0, 8, 30], 0.2, 2.6, "big");
+  addLabel("Las diagonales de un rectángulo se cruzan en el centro", [0, 8, -20], 2.4, 4.4);
+  addLabel("Clavo en el centro y lápiz a 40 cm", function () { var a = arm.rotation.y; return [20 * Math.cos(a), 10, -20 * Math.sin(a)]; }, 4.4, 999);
+  dim([0, 4.2, 0], [40, 4.2, 0], "40", 4.2, 5.2, [30, 6, 0]);
+  cam([[0, [60, 110, 120], [0, 0, 0]], [4, [40, 130, 100], [0, 0, 0]], [9, [30, 150, 90], [0, 0, 0]]]);
+  subs([[0, "El tablero mide unos 91 x 84 a 87 cm"], [4.2, "Dibuja el círculo con un listón"]]);
+} });
+
+/* 17. Cortar el círculo */
+BUILD.push({ d: 12, f: function () {
+  env("bench");
+  [[-30, -30], [30, -30], [-30, 30], [30, 30]].forEach(function (p) { var s = add(boxM(8, 5, 8, MAT.bench)); s.position.set(p[0], 2.5, p[1]); });
+  var panel = add(new THREE.Group());
+  for (var i = 0; i < 6; i++) { var b = board(91, 3.2, 14.5, i % 2 ? MAT.pino2 : MAT.pino); b.position.set(0, 6.6, (i - 2.5) * 14.5); panel.add(b); }
+  var line = ringM(40, 0.12, MAT.pencil); line.position.y = 8.22; add(line);
+  var cut = ringM(40.4, 0.2, MAT.hole); cut.position.y = 8.23; add(cut);
+  var sh = new THREE.Shape(); sh.moveTo(-45.5, -43.5); sh.lineTo(45.5, -43.5); sh.lineTo(45.5, 43.5); sh.lineTo(-45.5, 43.5); sh.closePath();
+  var hp = new THREE.Path(); hp.absarc(0, 0, 40.4, 0, Math.PI * 2, true); sh.holes.push(hp);
+  var fg = new THREE.ExtrudeGeometry(sh, { depth: 3.2, bevelEnabled: false, curveSegments: 64 }); fg.rotateX(-Math.PI / 2); uvAlong(fg, [1, 0, 0]);
+  var frame = add(mesh(fg, MAT.pino)); frame.position.y = 5;
+  var disc = add(mesh(discG(40, 3.2), MAT.pino)); disc.position.y = 6.6;
+  var rimT = ringM(40.2, 0.2, MAT.pino2, 96); rimT.scale.y = 2; rimT.position.y = 7.8; add(rimT);
+  var rimB = ringM(40.2, 0.2, MAT.pino2, 96); rimB.scale.y = 6; rimB.position.y = 6.2; add(rimB);
+  var js = add(jigsaw());
+  var rot = add(new THREE.Group()); rot.position.y = 8.2;
+  var rt = router(0.6); rt.position.x = 40.6; rot.add(rt);
+  var strip = boxM(56, 0.6, 10, MAT.bench); strip.position.set(22, 0.9, 0); rot.add(strip);
+  var pin = cylM(0.15, 2.4, MAT.steel, 8); pin.position.set(0, 0.2, 0); rot.add(pin);
+  particles(30, MAT.pino2, 0.7, function (i) { var r = seeded(i + 7), a = 2 * Math.PI * (i / 30); var tt = 6 + (i % 15) / 15 * 5.2; var aa = 2 * Math.PI * ((tt - (tt < 8.6 ? 6 : 8.6)) / 2.6); return { t0: tt, p: [41 * Math.cos(aa), 8.4, -41 * Math.sin(aa)], v: [Math.cos(aa) * 12 * r(), 10 + 6 * r(), -Math.sin(aa) * 12 * r()], life: 0.7, r: r() }; });
+  on(function (t) {
+    var a = 2 * Math.PI * E(t, 0.4, 4.4);
+    js.visible = t > 0.3 && t < 4.5; js.position.set(40.4 * Math.cos(a), 8.2, -40.4 * Math.sin(a)); js.rotation.y = a + Math.PI;
+    cut.userData.show(E(t, 0.4, 4.4)); cut.visible = t < 4.6;
+    panel.visible = t < 4.5; line.visible = t < 4.5;
+    var fk = E(t, 4.5, 5.6); frame.visible = t >= 4.5 && fk < 0.98; frame.position.set(60 * fk, 5 + 14 * Math.sin(Math.PI * Math.min(fk, 0.5)), 0);
+    disc.visible = t >= 4.5;
+    rimT.visible = t >= 4.5; rimB.visible = t >= 4.5;
+    var p1 = E(t, 6, 8.6), p2 = E(t, 8.6, 11.2);
+    rimT.geometry.setDrawRange(Math.floor(rimT.userData.count * p1 / 6) * 6, rimT.userData.count); rimT.visible = t >= 4.5 && p1 < 0.999;
+    rimB.geometry.setDrawRange(Math.floor(rimB.userData.count * p2 / 6) * 6, rimB.userData.count); rimB.visible = t >= 4.5 && p2 < 0.999;
+    rot.visible = t > 5.2; rot.position.y = 8.2 + 12 * (1 - E(t, 5.2, 5.8)); rot.rotation.y = 2 * Math.PI * (t < 8.6 ? p1 : p2);
+    rt.userData.bit.position.y = t < 8.6 ? -1.0 : -1.6; rt.userData.bit.rotation.y = t * 50;
+  });
+  addLabel("Caladora de 3 a 5 mm afuera de la línea", function () { return [js.position.x, 22, js.position.z]; }, 0.4, 4.4);
+  addLabel("La cara bonita hacia abajo", [0, 14, 0], 1.4, 4.4);
+  dim([0, 9.2, 0], [40, 9.2, 0], "40.0 del pivote al filo de la broca", 5.6, 7.2, [16, 12, 0]);
+  addLabel("Pivote de 3 mm en un hoyo de 1 cm, sin traspasar", [0, 14, -6], 5.6, 7.2);
+  addLabel("Broca recta de 12 mm, pasadas de 3 mm", function () { var a = rot.rotation.y; return [40 * Math.cos(a), 22, -40 * Math.sin(a)]; }, 7.2, 11.2, "screw");
+  addLabel("En contra de las agujas del reloj", [0, 16, 0], 7.6, 10.4);
+  addLabel("Donde no alcance: voltea y termina con la broca al ras de 12.7 con balero", [0, 18, 0], 11.2, 999, "big");
+  cam([[0, [70, 110, 120], [0, 4, 0]], [4.5, [60, 100, 115], [0, 4, 0]], [5.6, [45, 75, 70], [10, 6, 0]], [7.2, [80, 100, 110], [0, 6, 0]], [12, [70, 110, 110], [0, 6, 0]]]);
+  subs([[0, "Primero la caladora, por afuera de la línea"], [5.2, "Después el router con el compás"], [11.2, "La broca no alcanza los 3.2 cm"]]);
+} });
+
+/* 18. Redondear el canto */
+BUILD.push({ d: 9, f: function () {
+  env("bench");
+  [[-30, -30], [30, -30], [-30, 30], [30, 30]].forEach(function (p) { var s = add(boxM(8, 5, 8, MAT.bench)); s.position.set(p[0], 2.5, p[1]); });
+  var R = 0.63, prRound = [new THREE.Vector2(0, 0), new THREE.Vector2(40, 0), new THREE.Vector2(40, 3.2 - R)];
+  for (var i = 1; i <= 6; i++) { var a = i / 6 * Math.PI / 2; prRound.push(new THREE.Vector2(40 - R + R * Math.cos(a), 3.2 - R + R * Math.sin(a))); }
+  prRound.push(new THREE.Vector2(0, 3.2));
+  var prSharp = [new THREE.Vector2(0, 0), new THREE.Vector2(40, 0), new THREE.Vector2(40, 3.2), new THREE.Vector2(0, 3.2)];
+  var mR = add(new THREE.Mesh(new THREE.BufferGeometry(), MAT.pino)), mS = add(new THREE.Mesh(new THREE.BufferGeometry(), MAT.pino)); mR.position.y = 5; mS.position.y = 5;
+  var last = -1, rt = add(router(0.9));
+  function rebuild(q) {
+    if (q === last) return; last = q;
+    var phi = q / 96 * Math.PI * 2;
+    mR.geometry.dispose(); mS.geometry.dispose();
+    mR.geometry = q > 0 ? uvAlong(new THREE.LatheGeometry(prRound, Math.max(1, q), 0, phi), [1, 0, 0]) : new THREE.BufferGeometry();
+    mS.geometry = q < 96 ? uvAlong(new THREE.LatheGeometry(prSharp, Math.max(1, 96 - q), phi, Math.PI * 2 - phi), [1, 0, 0]) : new THREE.BufferGeometry();
+  }
+  stepDisp.push({ dispose: function () { mR.geometry.dispose(); mS.geometry.dispose(); } });
+  particles(24, MAT.pino2, 0.6, function (i) { var r = seeded(i + 21), tt = 1.6 + i * 0.22, ph = 2 * Math.PI * E(tt, 1.6, 7); return { t0: tt, p: [40 * Math.sin(ph), 8.4, 40 * Math.cos(ph)], v: [Math.sin(ph) * 10 * r(), 8 + 5 * r(), Math.cos(ph) * 10 * r()], life: 0.7, r: r() }; });
+  on(function (t) {
+    var k = E(t, 1.6, 7); rebuild(Math.round(k * 96));
+    var ph = 2 * Math.PI * k; rt.visible = t > 1 && t < 7.6;
+    rt.position.set(40.6 * Math.sin(ph), 8.2 + 10 * (1 - E(t, 1, 1.6)) + 10 * E(t, 7, 7.6), 40.6 * Math.cos(ph)); rt.userData.bit.rotation.y = t * 50;
+  });
+  addLabel("Broca de esquina R-6.3 mm (redondeo de 1/4\") con balero", function () { return [rt.position.x, 26, rt.position.z]; }, 1.2, 4.6, "screw");
+  addLabel("En contra de las agujas del reloj; primero una pasada baja", [0, 14, 0], 2, 7);
+  addLabel("El canto de abajo: solo lija 120 para quitar el filo", [0, 3, 44], 7.2, 999, "big");
+  cam([[0, [20, 30, 75], [0, 6, 38]], [3, [35, 26, 70], [10, 6, 30]], [6.5, [60, 70, 100], [0, 5, 0]], [9, [30, 18, 70], [0, 5, 36]]]);
+  subs([[0, "El canto de arriba, con el balero contra el canto"], [7.2, "Un canto con bultos: el balero los copia; lija antes"]]);
+} });
+
+/* Varias manos seguidas: en cada ventana la capa k avanza sobre la k-1 */
+function multiSweep(meshes, mats, axis, from, to, wins) {
+  var ax = new THREE.Vector3(axis[0], axis[1], axis[2]).normalize(), dir = to >= from ? 1 : -1;
+  var pA = new THREE.Plane(ax.clone().multiplyScalar(dir), 0), pB = new THREE.Plane(ax.clone().multiplyScalar(-dir), 0);
+  var MA = mats.map(function (m) { var c = m.clone(); c.clippingPlanes = [pA]; stepDisp.push(c); return c; });
+  var MB = mats.map(function (m) { var c = m.clone(); c.clippingPlanes = [pB]; stepDisp.push(c); return c; });
+  var pairs = meshes.map(function (o) { var c = new THREE.Mesh(o.geometry, MB[0]); c.position.copy(o.position); c.rotation.copy(o.rotation); c.scale.copy(o.scale); o.parent.add(c); return [o, c]; });
+  return function (t) {
+    var k = 0, prog = 0;
+    for (var i = 0; i < wins.length; i++) { if (t >= wins[i][0]) { k = i + 1; prog = Lin(t, wins[i][0], wins[i][1]); } }
+    var lvl = k === 0 ? from : from + (to - from) * prog;
+    pA.constant = -dir * lvl; pB.constant = dir * lvl;
+    pairs.forEach(function (p) { p[0].material = MA[Math.max(0, k - 1)]; p[1].material = MB[k]; });
+    return { k: k, lvl: lvl };
+  };
+}
+function baseMeshes(P) { return [P.fa, P.fb].concat(P.legs, P.ta ? [P.ta, P.tb] : []); }
+function blocks4(x0, h) { [[-28, -28], [28, -28], [-28, 28], [28, 28]].forEach(function (p) { var s = add(boxM(8, h, 8, MAT.bench)); s.position.set(x0 + p[0], h / 2, p[1]); }); }
+
+/* 19. Perforar la tapa y atornillarla */
+BUILD.push({ d: 12, f: function () {
+  env("floor");
+  var bl = add(boxM(110, 1, 110, MAT.blanket)); bl.position.y = 0.5;
+  var disc = add(mesh(discG(40, 3.2), MAT.pino)); disc.position.y = 2.6;
+  var P = base1(MAT.pino); add(P.g); P.g.rotation.x = Math.PI;
+  var pts = [[32, 0, 0], [9, 0, 0], [-32, 0, 0], [-9, 0, 0], [0, 0, 32], [0, 0, 9], [0, 0, -32], [0, 0, -9]];
+  var cajas = [], pasos = [], guias = [], scr = [];
+  pts.forEach(function (p, i) {
+    var c = add(cylM(0.5, 5.2, MAT.hole, 16)); c.position.set(p[0], 6.0 + 2.6 + 0.02, p[2]); cajas.push(c);
+    var slot = i >= 4;
+    var s = add(slot ? boxM(0.45, 1.8, 1.45, MAT.hole) : cylM(0.24, 1.8, MAT.hole, 10)); s.position.set(p[0], 5.1, p[2]); pasos.push(s);
+    var g = add(cylM(0.15, 2.0, MAT.hole, 8)); g.position.set(p[0], 3.2, p[2]); guias.push(g);
+    var sc = add(screw(4, 0.2)); sc.userData.p = p; scr.push(sc);
+  });
+  var d10 = add(drill(0.5, 9, 5.2));
+  on(function (t) {
+    var k = E(t, 0.4, 2.4); P.g.position.y = 61 + 30 * (1 - k);
+    cajas.forEach(function (c, i) { c.visible = t > (i === 0 ? 4.6 : 5.4 + i * 0.05); });
+    pasos.forEach(function (s, i) { s.visible = t > 5.6 + i * 0.05; });
+    var xr = t > 6.2; disc.material = xr ? MAT.xray : MAT.pino; P.ta.material = xr ? MAT.xray : MAT.pino; P.tb.material = xr ? MAT.xray : MAT.pino;
+    guias.forEach(function (g, i) { g.visible = t > 6.6 + i * 0.1; });
+    var a = E(t, 3.4, 4.4) * (1 - E(t, 4.6, 5.0));
+    d10.visible = t > 3.2 && t < 5.1; d10.position.set(32, 11.2 + 14 - (14 + 5.2) * a, 0); d10.userData.bit.rotation.y = t * 40;
+    scr.forEach(function (s, i) { var kk = E(t, 8.2 + i * 0.12, 9.4 + i * 0.12); s.visible = t > 8.1 + i * 0.12; s.position.set(s.userData.p[0], lerp(16, 6.0, kk), s.userData.p[2]); s.rotation.y = kk * 40; });
+  });
+  addLabel("Tapa boca abajo sobre una cobija; base de cabeza, centrada", [0, 70, 0], 0.4, 2.6);
+  dim([37, 3.0, 4], [40, 3.0, 4], "3.0", 2.2, 4.2, [40, 8, 6]);
+  addLabel("De cada punta de la cruz al canto", [44, 14, 10], 2.4, 4.2);
+  addLabel("2 por brazo: a 5 y a 28 cm de la punta", [20, 18, 0], 3, 4.6);
+  addLabel("Caja de 10 mm a 5.2 de hondo, desde abajo", [32, 28, 0], 3.4, 5.6, "screw");
+  dim([34, 6.0, 0], [34, 11.2, 0], "5.2", 4.4, 6.4, [37, 9, 0]);
+  addLabel("Paso de 4 a 5 mm; en el brazo que cruza las tablas, ranura de 1 cm", [0, 16, 24], 5.6, 7.6, "screw");
+  addLabel("En la tapa: guía de 3 mm con banderita a 2.0", [0, 10, -20], 6.6, 8.2, "screw");
+  addLabel("Tornillo de 40 mm: entra 2.2 en la tapa y deja 1 cm sin tocar", [20, 18, 0], 8.2, 10.4, "screw");
+  addLabel("Sin cola", [-20, 16, 0], 9.4, 999, "glue");
+  addLabel("Los tornillos se ponen al final, con el barniz ya puesto", [0, 34, 0], 10.4, 999, "warn");
+  cam([[0, [110, 90, 130], [0, 25, 0]], [2.6, [70, 40, 80], [25, 6, 0]], [4.4, [58, 30, 40], [30, 7, 0]], [6.2, [70, 50, 80], [10, 6, 10]], [8, [55, 22, 50], [16, 5, 6]], [12, [95, 70, 110], [0, 10, 0]]]);
+  subs([[0, "Presenta la base en la tapa"], [3.2, "Perfora todo antes del acabado"], [8, "Así quedan los tornillos (al final)"]]);
+} });
+
+/* 20. Tapar los tornillos */
+BUILD.push({ d: 9, f: function () {
+  env("floor");
+  var P = table1(MAT.pino); add(P.g);
+  var blk = add(board(30, 4.5, 9, MAT.pino2)); blk.position.set(75, 2.25, 0);
+  var hole = add(cylM(0.5, 1.0, MAT.hole, 16)); hole.position.set(75, 4.0, 0);
+  var gl = add(cylM(0.45, 0.4, MAT.glue, 16)); gl.position.set(75, 4.2, 0);
+  var dw = add(new THREE.Group()), dTop = cylM(0.5, 3.0, MAT.dowel, 16), dBot = cylM(0.5, 1.0, MAT.dowel, 16); dTop.position.y = 2.5; dBot.position.y = 0.5; dw.add(dTop); dw.add(dBot);
+  var hm = add(hammer()), ch = add(chisel()), sd = add(sander());
+  on(function (t) {
+    gl.visible = t > 4.6 && t < 5.8;
+    var drop = E(t, 5.0, 5.6), taps = Math.floor(Math.max(0, t - 5.8) / 0.4), tapK = Math.min(3, taps);
+    var dy = 3.5 + 0.9 - 0.3 * tapK + 12 * (1 - drop); dw.visible = t > 4.9; dw.position.set(75, dy, 0);
+    hm.visible = t > 5.6 && t < 7.2; var sw = Math.abs(Math.sin((t - 5.8) / 0.4 * Math.PI)); hm.position.set(75 - 27, dy + 4 + 1.5, 0); hm.rotation.z = -Math.PI / 2 + sw * 0.9;
+    var cut = E(t, 7.2, 7.8); dTop.position.set(cut * 6, 2.5 + cut * 4, 0); dTop.visible = cut < 0.98;
+    ch.visible = t > 7 && t < 7.9; ch.position.set(75 - 7 + cut * 3, 4.55, 0); ch.rotation.set(0, Math.PI / 2, 0);
+    sd.visible = t > 7.9 && t < 9; sd.position.set(75 + 3 * Math.cos(t * 9), 4.5, 3 * Math.sin(t * 9));
+  });
+  addLabel("Mesa 1: los tornillos quedan escondidos, debajo de la cruz del piso y debajo de la tapa", [0, -8, 0], 0.4, 4.2, "big");
+  addLabel("No lleva tacos", [0, 30, 0], 1.6, 4.2, "big");
+  addLabel("Mesa 2 y Variante V: cola en el hoyo y espiga de 10 x 40 a golpecitos", [75, 14, 0], 4.6, 7.2, "glue");
+  addLabel("A la hora, córtala a ras con un serrucho fino o el formón", [75, 14, 0], 7.2, 8.2);
+  addLabel("Y lija", [75, 12, 0], 8.2, 999);
+  cam([[0, [70, -30, 80], [0, 20, 0]], [3.6, [-60, -26, 70], [0, 24, 0]], [4.4, [112, 36, 58], [72, 6, 0]], [9, [104, 30, 50], [74, 5, 0]]]);
+  subs([[0, "Vista desde abajo: no se ve ningún tornillo"], [4.4, "Así se tapan los tornillos en la mesa 2"]]);
+} });
+
+/* 21. Lijar */
+BUILD.push({ d: 9, f: function () {
+  env("floor");
+  var P = base1(MAT.pino); add(P.g); P.g.position.x = -45;
+  blocks4(50, 10); var disc = add(mesh(discG(40, 3.2), MAT.pino)); disc.position.set(50, 11.6, 0);
+  var sd = add(sander()), rg = add(rag());
+  particles(28, MAT.pino2, 0.4, function (i) { var r = seeded(i + 41), tt = 0.8 + i * 0.15, a = tt * 2.2; return { t0: tt, p: [50 + (-28 + 56 * Lin(tt, 0.6, 5)) , 13.4, 22 * Math.sin(a)], v: [(r() - 0.5) * 10, 6 + 6 * r(), (r() - 0.5) * 10], life: 0.8, r: r() }; });
+  on(function (t) {
+    sd.visible = t > 0.5 && t < 5.2; var s = Lin(t, 0.6, 5);
+    sd.position.set(50 - 28 + 56 * s + 4 * Math.cos(t * 10), 13.2, 22 * Math.sin(t * 2.2)); sd.rotation.y = t * 30;
+    rg.visible = t > 6.6; var r = Lin(t, 6.6, 9); rg.rotation.z = Math.PI / 2;
+    rg.position.set(-45 + legOut(lerp(10, 45, r)) + 0.9, lerp(10, 45, r), 0);
+  });
+  addLabel("La base y la tapa separadas, ya perforadas", [0, 75, 0], 0, 2);
+  addLabel("Lija 120 y luego 150 en todo, a favor de la veta", [50, 30, 0], 0.6, 5.2);
+  addLabel("La 80 solo donde haya marcas o cola", [50, 22, -24], 1.6, 5.2);
+  addLabel("Lámpara de lado en las juntas: la cola que quede no agarra tinte", [0, 40, 0], 5.2, 6.8, "big");
+  addLabel("Aspira y pasa un trapo apenas húmedo de diluyente mineral", [-30, 60, 0], 6.8, 999);
+  cam([[0, [60, 120, 170], [5, 20, 0]], [1, [70, 70, 110], [45, 12, 0]], [5, [80, 75, 115], [40, 12, 0]], [6.4, [40, 60, 120], [-30, 28, 0]], [9, [30, 65, 125], [-32, 28, 0]]]);
+  subs([[0, "Todo el acabado va con la base y la tapa separadas; se atornillan al final"], [5.2, "Revisa las juntas"], [6.6, "Quita el polvo"]]);
+} });
+
+/* 22. Comejenol */
+BUILD.push({ d: 10, f: function () {
+  env("floor");
+  var P = base1(MAT.pino); add(P.g); P.g.position.x = -45;
+  blocks4(50, 10); var disc = add(mesh(discG(40, 3.2), MAT.pino)); disc.position.set(50, 11.6, 0);
+  var sB = sweep(baseMeshes(P), FIN.pino, FIN.come, [0, 1, 0], 57.5, -0.5);
+  var sT = sweep([disc], FIN.pino, FIN.come, [1, 0, 0], 9.5, 90.5);
+  var br = add(brush());
+  on(function (t) {
+    var kb = E(t, 0.6, 4.6), kt = E(t, 4.8, 8); sB(kb); sT(kt);
+    br.visible = (t > 0.5 && t < 4.7) || (t > 4.8 && t < 8.1);
+    if (t < 4.7) { var y = lerp(57.5, 0, kb); br.position.set(-45 + Math.max(4, legOut(Math.max(7, Math.min(49.8, y)))) + 1, y + 2, 3); br.rotation.set(0, 0, -0.4); }
+    else { br.position.set(lerp(9.5, 90.5, kt), 13.4, 12 * Math.sin(t * 5)); br.rotation.set(0, 0, 0.6); }
+  });
+  addLabel("Brocha de pelo, tal como viene, que sature", [-45, 66, 0], 0.6, 4.6);
+  addLabel("La base completa", [-45, 30, 0], 1, 4.6);
+  addLabel("2 manos en las puntas que tocan el piso", [-45, 6, 30], 3.4, 5.6, "warn");
+  addLabel("Tapa boca abajo: la cara de abajo y el canto", [50, 26, 0], 4.8, 8);
+  addLabel("No en la cara de arriba, donde se come", [50, 4, 44], 5.6, 8.4, "warn");
+  addLabel("Espera unas 24 h (la ficha no lo dice): hasta que no huela a solvente ni se sienta aceitoso", [0, 50, 0], 8.2, 999, "big");
+  cam([[0, [20, 90, 170], [-30, 28, 0]], [3.6, [0, 40, 130], [-40, 15, 0]], [4.8, [100, 70, 120], [45, 10, 0]], [8, [110, 75, 125], [45, 10, 0]], [10, [50, 110, 190], [5, 20, 0]]]);
+  subs([[0, "Comejenol pintable de Fester: una mano bien cargada"], [8.2, "Con mascarilla para vapores orgánicos, al aire libre"]]);
+} });
+
+/* 23. Tinte KAT Miel */
+BUILD.push({ d: 10, f: function () {
+  env("floor");
+  var P = base1(FIN.come); add(P.g); P.g.position.x = -45;
+  blocks4(50, 10); var disc = add(mesh(discG(40, 3.2), FIN.pino)); disc.position.set(50, 11.6, 0);
+  var sB = sweep(baseMeshes(P), FIN.come, FIN.miel, [0, 1, 0], 57.5, -0.5);
+  var sT = sweep([disc], FIN.pino, FIN.miel, [1, 0, 0], 9.5, 90.5);
+  var rg = add(rag());
+  on(function (t) {
+    var kb = E(t, 0.6, 4.6), kt = E(t, 4.8, 8.2); sB(kb); sT(kt);
+    rg.visible = (t > 0.5 && t < 4.7) || (t > 4.8 && t < 8.3);
+    if (t < 4.7) { var y = lerp(57.5, 1, kb); rg.position.set(-45 + Math.max(4, legOut(Math.max(7, Math.min(49.8, y)))) + 1.2, y, 2); rg.rotation.set(0, 0, Math.PI / 2); }
+    else { rg.position.set(lerp(9.5, 90.5, kt), 13.2, 14 * Math.sin(t * 4)); rg.rotation.set(0, 0, 0); }
+  });
+  addLabel("Con trapo de algodón, a favor de la veta, parejo", [-45, 66, 0], 0.6, 4.6);
+  addLabel("Quita el sobrante antes de que seque", [0, 40, 0], 2.6, 5.4);
+  addLabel("Una mano; otra a la hora si lo quieres más oscuro", [50, 26, 0], 5.4, 8.2);
+  addLabel("Espera 2 a 3 h antes del barniz", [0, 50, 0], 8.2, 999, "big");
+  addLabel("No se lija entre manos de tinte", [50, 22, 0], 8.6, 999);
+  cam([[0, [20, 90, 170], [-30, 28, 0]], [3.6, [0, 50, 140], [-40, 20, 0]], [4.8, [100, 80, 120], [45, 10, 0]], [8.2, [105, 80, 125], [45, 10, 0]], [10, [50, 110, 190], [5, 20, 0]]]);
+  subs([[0, "Tinte KAT-MD317 Miel"], [8.2, "Más claro: solo con thinner para laca, y pruébalo en retazo"]]);
+} });
+
+/* 24. Barniz brillante */
+BUILD.push({ d: 12, f: function () {
+  env("floor");
+  var P = base1(FIN.miel); add(P.g); P.g.position.x = -45;
+  blocks4(50, 10); var disc = add(mesh(discG(40, 3.2), FIN.miel)); disc.position.set(50, 11.6, 0);
+  var wB = [[0.6, 2.4], [3.0, 4.8], [5.4, 7.2]], wT = [[0.6, 2.4], [3.0, 4.8], [5.4, 7.2], [7.8, 9.6]];
+  var mB = multiSweep(baseMeshes(P), FIN.coat.slice(0, 4), [0, 1, 0], 57.5, -0.5, wB);
+  var mT = multiSweep([disc], FIN.coat, [1, 0, 0], 9.5, 90.5, wT);
+  var br = add(brush()), sd = add(sander());
+  on(function (t) {
+    mB(t); var r = mT(t);
+    var inCoat = wT.some(function (w) { return t >= w[0] && t <= w[1]; });
+    br.visible = inCoat; br.position.set(r.lvl, 13.4, 10 * Math.sin(t * 6)); br.rotation.set(0, 0, 0.6);
+    var gaps = [[2.4, 3.0], [4.8, 5.4], [7.2, 7.8]], g = gaps.filter(function (w) { return t > w[0] && t < w[1]; })[0];
+    sd.visible = !!g; if (g) { var s = Lin(t, g[0], g[1]); sd.position.set(50 - 25 + 50 * s, 13.2, 15 * Math.sin(t * 8)); sd.rotation.y = t * 30; }
+  });
+  ["Mano 1", "Mano 2", "Mano 3", "Mano 4, solo la cara de arriba de la tapa"].forEach(function (s, i) { addLabel("<b>" + s + "</b>", [50, 30, 0], wT[i][0], wT[i][1] + 0.3, "big"); });
+  [[2.4, 3.0], [4.8, 5.4], [7.2, 7.8]].forEach(function (w) { addLabel("3 a 4 h entre manos (Minwax); lija 240 suave y quita el polvo", [50, 30, 0], w[0] + 0.05, w[1], "screw"); });
+  addLabel("Manos delgadas, sin diluir, brocha de 3\"; revuelve, no agites", [-45, 66, 0], 0.6, 4.8);
+  addLabel("4 manos arriba de la tapa; 3 en el canto, la cara de abajo y la base", [0, 50, 0], 9.6, 999, "big");
+  addLabel("Trapos con barniz: en un balde con agua", [-45, 6, 30], 10.2, 999, "warn");
+  cam([[0, [70, 80, 140], [20, 12, 0]], [2.4, [95, 60, 100], [48, 10, 0]], [9.6, [100, 55, 95], [50, 10, 0]], [12, [40, 90, 180], [5, 18, 0]]]);
+  subs([[0, "Barniz brillante Sher-Wood"], [9.6, "Si falta tiempo, 3 manos en todo"]]);
+} });
+
+/* 25. Atornillar, uso y curado */
+BUILD.push({ d: 10, f: function () {
+  env("floor");
+  var bl = add(boxM(110, 1, 110, MAT.blanket)); bl.position.y = 0.5;
+  var T = add(new THREE.Group()), inner = new THREE.Group(); T.add(inner); inner.position.y = -30;
+  var P = base1(FIN.coat[3]); inner.add(P.g);
+  var disc = mesh(discG(40, 3.2), FIN.coat[4]); disc.position.y = 58.4; inner.add(disc);
+  var scr = [[32, 0], [9, 0], [-32, 0], [-9, 0], [0, 32], [0, 9], [0, -32], [0, -9]].map(function (p) { var s = screw(4, 0.2); s.rotation.x = Math.PI; s.position.set(p[0], 55.0, p[1]); inner.add(s); return s; });
+  on(function (t) {
+    var drop = E(t, 0.3, 1.8); P.g.position.y = -30 * (1 - drop);
+    scr.forEach(function (s, i) { s.visible = t > 1.9 + i * 0.12; });
+    var k = E(t, 3.2, 5.4); T.rotation.x = Math.PI * (1 - k); T.position.y = 30 + (1 - k) * 1 + 22 * Math.sin(Math.PI * k);
+    bl.visible = t < 5.6;
+  });
+  addLabel("Con el barniz ya puesto: los 8 tornillos de 40 mm, sobre una cobija", [0, 70, 0], 0.4, 3.2, "screw");
+  addLabel("Voltéala con cuidado", [0, 90, 0], 3.2, 5.4);
+  addLabel("24 h después de la última mano: uso con cuidado", [0, 78, 0], 5.6, 999, "big");
+  addLabel("Curado completo en unos 30 días", [0, 30, 0], 6.6, 999);
+  addLabel("Portavasos el primer mes; nada de manteles húmedos", [0, 66, 30], 7.6, 999, "warn");
+  cam([[0, [100, 90, 130], [0, 20, 0]], [3.2, [130, 80, 150], [0, 30, 0]], [5.6, [150, 75, 120], [0, 30, 0]], [7, [40, 80, 190], [0, 30, 0]], [8.5, [-120, 85, 150], [0, 30, 0]], [10, [-170, 70, 40], [0, 30, 0]]]);
+  subs([[0, "Atornilla la tapa a la base"], [5.6, "La mesa 1 terminada"]]);
+} });
+
+/* M2. Mesa 2, patas rectas */
+BUILD.push({ d: 12, f: function () {
+  env("floor");
+  var P = base2(MAT.pino); add(P.g);
+  var disc = add(mesh(discG(40, 3.2), MAT.pino)); disc.position.y = 58.4;
+  var plugs = [];
+  for (var i = 0; i < 4; i++) { var g = new THREE.Group(); g.rotation.y = i * Math.PI / 2; add(g); var c = cylM(0.5, 0.12, MAT.dowel, 16); c.rotation.z = Math.PI / 2; c.position.set(31.27, 11.5, 0); g.add(c); plugs.push(c); }
+  on(function (t) {
+    P.legs.forEach(function (l, i) { var k = E(t, 0.3 + i * 0.3, 1.3 + i * 0.3); l.position.y = 24.9 + 40 * (1 - k); l.visible = k > 0.01; });
+    var kt = E(t, 2.4, 4.0); P.ta.position.y = P.tb.position.y = 30 * (1 - kt); P.ta.visible = P.tb.visible = t > 2.3;
+    var kl = E(t, 4.6, 6.4); P.la.position.y = P.lb.position.y = 45 * (1 - kl); P.la.visible = P.lb.visible = t > 4.5;
+    plugs.forEach(function (p, i) { p.visible = t > 6.8 + i * 0.3; });
+    var kd = E(t, 8.6, 10); disc.position.y = 58.4 + 30 * (1 - kd); disc.visible = t > 8.5;
+  });
+  addLabel("4 patas de 2x4 de 49.8, puntas rectas a 90°", [0, 70, 0], 0.4, 2.4);
+  addLabel("Cruz de arriba de 70: la cara de afuera de la pata a 3.75 de cada punta", [0, 75, 0], 2.4, 4.6);
+  dim([31.25, 57.6, 3], [35, 57.6, 3], "3.75", 3.8, 6.6, [34, 62, 3]);
+  addLabel("Cruz baja de 53.5 (2x4 rebajado a 7 de alto)", [0, 28, 0], 4.6, 6.8);
+  dim([12, 0, 3], [12, 8, 3], "8", 5.8, 8.6, [8, 4, 3]);
+  addLabel("1 tornillo de 5 x 70 por punta y espiga de 10 x 40: 4 tacos a la vista", [32, 20, 0], 6.8, 8.6, "screw");
+  addLabel("La tapa queda 5 cm afuera de las puntas de la cruz de arriba", [0, 72, 0], 9.6, 999, "big");
+  dim([35, 60.4, 3], [40, 60.4, 3], "5", 10, 999, [38, 64, 3]);
+  cam([[0, [110, 80, 130], [0, 28, 0]], [2.4, [90, 90, 100], [10, 50, 0]], [4.6, [100, 40, 100], [10, 14, 0]], [6.8, [80, 30, 40], [28, 14, 0]], [8.6, [140, 90, 150], [0, 30, 0]], [12, [-120, 80, 160], [0, 30, 0]]]);
+  subs([[0, "Mesa 2: no sale en el video"], [8.6, "El acabado, igual que la mesa 1"]]);
+} });
+
+/* ================= Reproductor ================= */
+var N = TXT.length, HOLD = 0.8;
+var cur = 0, t = 0, playing = false, dirty = true, lastNow = 0, scrubbing = false, lastSub = null;
+var stepsEl = document.getElementById("steps"), card = document.getElementById("card"), bPlay = document.getElementById("bPlay");
+var scrub = document.getElementById("scrub"), clock = document.getElementById("clock"), ovStep = document.getElementById("ovStep"), subEl = document.getElementById("sub");
+var KEY = "cotoni-mesas-3d-v1";
+if (BUILD.length !== N && window.console) console.error("Pasos con animación: " + BUILD.length + "; pasos con texto: " + N);
+
+function label(i) { return i < 25 ? String(i + 1) : "M2"; }
+function fmt(s) { s = Math.max(0, Math.floor(s)); return Math.floor(s / 60) + ":" + (s % 60 < 10 ? "0" : "") + (s % 60); }
+
+function buildNav() {
+  var groups = [["A", 0, 1], ["B", 2, 4], ["C", 5, 14], ["D", 15, 17], ["E", 18, 19], ["F", 20, 24], ["M", 25, 25]], html = "";
+  groups.forEach(function (g) {
+    html += '<div class="row"><span class="ch">' + CHAPS[g[0]] + "</span>";
+    for (var i = g[1]; i <= g[2]; i++) html += '<button type="button" data-i="' + i + '"' + (i === 25 ? ' class="m2"' : "") + ' title="' + TXT[i].t.replace(/"/g, "&quot;") + '" aria-label="' + (i < 25 ? "Paso " + (i + 1) + ": " : "") + TXT[i].t.replace(/"/g, "&quot;") + '">' + label(i) + "</button>";
+    html += "</div>";
+  });
+  stepsEl.innerHTML = html;
+  stepsEl.addEventListener("click", function (e) { var b = e.target.closest("button[data-i]"); if (b) go(+b.getAttribute("data-i")); });
+}
+function updateNav() {
+  Array.prototype.forEach.call(stepsEl.querySelectorAll("button[data-i]"), function (b) { if (+b.getAttribute("data-i") === cur) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+  document.getElementById("bPrev").disabled = cur === 0; document.getElementById("bNext").disabled = cur === N - 1;
+  ovStep.textContent = cur < 25 ? "Paso " + (cur + 1) + " de 25 · " + TXT[cur].t : TXT[cur].t;
+}
+function renderCard() {
+  var x = TXT[cur], h = '<div class="chap">' + CHAPS[x.c] + (cur < 25 ? " · paso " + (cur + 1) + " de 25" : "") + "</div>";
+  h += "<h2>" + (cur < 25 ? (cur + 1) + ". " : "") + x.t + "</h2>";
+  h += '<p class="vid">' + x.vid + "</p>";
+  if (x.rows.length) h += '<dl class="kv">' + x.rows.map(function (r) { return "<dt>" + r[0] + "</dt><dd>" + r[1] + "</dd>"; }).join("") + "</dl>";
+  if (x.how.length) h += '<ol class="how">' + x.how.map(function (s) { return "<li>" + s + "</li>"; }).join("") + "</ol>";
+  if (x.ojo) h += '<p class="ojo"><b>Ojo:</b> ' + x.ojo + "</p>";
+  if (x.shots.length) h += '<div class="shots">' + x.shots.map(function (s) { return '<figure><img src="frames/' + s[0] + '" alt="' + s[1].replace(/"/g, "&quot;") + '" width="800" height="450" loading="lazy"><figcaption>' + s[1] + "</figcaption></figure>"; }).join("") + "</div>";
+  card.innerHTML = h;
+}
+function teardown() {
+  if (!renderer) return;
+  stepGroup.traverse(function (o) { if (o.geometry) o.geometry.dispose(); });
+  while (stepGroup.children.length) stepGroup.remove(stepGroup.children[0]);
+  stepDisp.forEach(function (m) { if (m && m.dispose) m.dispose(); });
+  stepDisp = []; stepUpd = []; stepCam = null; stepSubs = [];
+  stepLabels.forEach(function (L) { if (L.el.parentNode) L.el.parentNode.removeChild(L.el); }); stepLabels = [];
+}
+function setStep(i, tt) {
+  cur = Math.max(0, Math.min(N - 1, i));
+  if (renderer) {
+    teardown(); BUILD[cur].f();
+    bench.visible = stepEnv === "bench"; grid.position.y = stepEnv === "bench" ? -80 : 0;
+    man = null; startBlend();
+  }
+  t = tt === "end" ? BUILD[cur].d : (tt || 0);
+  lastSub = null; renderCard(); updateNav(); dirty = true;
+  try { window.localStorage.setItem(KEY, JSON.stringify({ i: cur })); } catch (e) { /* sin almacenamiento */ }
+}
+function go(i) { setStep(i, playing ? 0 : "end"); }
+function setPlaying(p) {
+  playing = p;
+  if (p) { if (t >= BUILD[cur].d) t = 0; if (man) { man = null; startBlend(); } }
+  bPlay.textContent = p ? "Pausa" : "Reproducir"; bPlay.setAttribute("aria-pressed", p ? "true" : "false"); dirty = true;
+}
+document.getElementById("bPrev").addEventListener("click", function () { go(cur - 1); });
+document.getElementById("bNext").addEventListener("click", function () { go(cur + 1); });
+bPlay.addEventListener("click", function () { setPlaying(!playing); });
+scrub.addEventListener("input", function () { if (playing) setPlaying(false); scrubbing = true; t = (+scrub.value / 1000) * BUILD[cur].d; if (man) { man = null; startBlend(); } dirty = true; });
+scrub.addEventListener("change", function () { scrubbing = false; });
+
+function updateUI() {
+  var d = BUILD[cur].d, tc = Math.min(t, d);
+  if (!scrubbing) scrub.value = String(Math.round(tc / d * 1000));
+  clock.textContent = fmt(tc) + " / " + fmt(d);
+  var s = ""; for (var i = 0; i < stepSubs.length; i++) if (tc >= stepSubs[i][0]) s = stepSubs[i][1];
+  if (!renderer) s = "";
+  if (s !== lastSub) { subEl.textContent = s; lastSub = s; }
+}
+function frame(now) {
+  requestAnimationFrame(frame);
+  var dt = lastNow ? Math.min(0.1, (now - lastNow) / 1000) : 0; lastNow = now;
+  if (playing) {
+    t += dt; dirty = true;
+    if (t >= BUILD[cur].d + HOLD) { if (cur < N - 1) setStep(cur + 1, 0); else { t = BUILD[cur].d; setPlaying(false); } }
+  }
+  if (!dirty && !blend) return;
+  dirty = false;
+  var tc = Math.min(t, BUILD[cur].d);
+  if (renderer) {
+    for (var i = 0; i < stepUpd.length; i++) stepUpd[i](tc);
+    applyCam(tc, now); renderer.render(scene, camera); placeLabels(tc);
+  }
+  updateUI();
+}
+
+/* Girar con el dedo (en pausa; si está reproduciendo, se pausa) */
+function initMan() {
+  if (!curPos) return;
+  var o = [curPos[0] - curTgt[0], curPos[1] - curTgt[1], curPos[2] - curTgt[2]], r = Math.sqrt(o[0] * o[0] + o[1] * o[1] + o[2] * o[2]) || 100;
+  man = { r: r, phi: Math.acos(Math.max(-1, Math.min(1, o[1] / r))), th: Math.atan2(o[0], o[2]), t: curTgt.slice() }; blend = null;
+}
+function bindOrbit(el) {
+  var ptrs = {}, pd = 0;
+  function dist() { var k = Object.keys(ptrs); if (k.length < 2) return 0; var a = ptrs[k[0]], b = ptrs[k[1]]; return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  el.addEventListener("pointerdown", function (e) { try { el.setPointerCapture(e.pointerId); } catch (x) { /* nada */ } ptrs[e.pointerId] = [e.clientX, e.clientY]; if (playing) setPlaying(false); if (!man) initMan(); pd = dist(); });
+  el.addEventListener("pointermove", function (e) {
+    var p = ptrs[e.pointerId]; if (!p || !man) return;
+    var n = Object.keys(ptrs).length;
+    if (n === 1) { man.th -= (e.clientX - p[0]) * 0.008; man.phi = Math.max(0.08, Math.min(3.06, man.phi - (e.clientY - p[1]) * 0.008)); }
+    ptrs[e.pointerId] = [e.clientX, e.clientY];
+    if (n >= 2) { var d = dist(); if (pd > 0 && d > 0) man.r = Math.max(12, Math.min(700, man.r * pd / d)); pd = d; }
+    dirty = true;
+  });
+  function up(e) { delete ptrs[e.pointerId]; pd = dist(); }
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  el.addEventListener("wheel", function (e) { e.preventDefault(); if (playing) setPlaying(false); if (!man) initMan(); if (man) { man.r = Math.max(12, Math.min(700, man.r * Math.exp(e.deltaY * 0.001))); dirty = true; } }, { passive: false });
+}
+
+function resize() {
+  if (!renderer) return;
+  var w = viewer.clientWidth, h = viewer.clientHeight; renderer.setSize(w, h, false); camera.aspect = w / Math.max(1, h); camera.updateProjectionMatrix();
+  stepLabels.forEach(function (L) { L.w = 0; }); dirty = true;
+}
+
+/* Arranque */
+buildNav();
+if (hasGL) { try { initGL(); } catch (err) { renderer = null; if (window.console) console.error(err); } }
+if (!renderer) { document.getElementById("fallback").hidden = false; ["bPlay"].forEach(function (id) { document.getElementById(id).disabled = true; }); scrub.disabled = true; }
+else {
+  bindOrbit(renderer.domElement);
+  if (window.ResizeObserver) new ResizeObserver(resize).observe(viewer); else window.addEventListener("resize", resize);
+  resize();
+  if (window.matchMedia) { var mq = window.matchMedia("(prefers-color-scheme: dark)"); if (mq.addEventListener) mq.addEventListener("change", retheme); }
+  new MutationObserver(retheme).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+}
+var start = 0, startT = 0, fromHash = false, m = /^#p(\d+)(?:t([\d.]+))?$/.exec(location.hash || "");
+if (m) { start = Math.max(0, Math.min(25, parseInt(m[1], 10) - 1)); startT = m[2] ? parseFloat(m[2]) : "end"; fromHash = true; }
+else if (/^#m2$/i.test(location.hash || "")) { start = 25; startT = "end"; fromHash = true; }
+else { try { var sv = JSON.parse(window.localStorage.getItem(KEY) || "null"); if (sv && typeof sv.i === "number" && sv.i > 0 && sv.i < N) { start = sv.i; startT = "end"; } } catch (e) { /* sin almacenamiento */ } }
+setStep(start, startT);
+blend = null;
+if (renderer && !reduce && !fromHash && start === 0) setPlaying(true);
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body>
+</html>
