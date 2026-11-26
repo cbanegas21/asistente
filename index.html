@@ -87,6 +87,10 @@ details.inv img{width:100%;height:auto;border-radius:10px;margin-top:10px;displa
 details.inv p{margin:8px 0 0;font-size:.9rem}
 .invlink{display:inline-block;margin-top:10px;font-weight:600;color:var(--accent)}
 .notebtn.ver{font-weight:600}
+.invin{grid-column:2;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.invin .invt{font-weight:600;font-family:var(--f-head)}
+.invin img{width:100%;height:auto;border-radius:10px;margin-top:8px;display:block}
+.invin p{margin:8px 0 0;font-size:.9rem}
 @media (prefers-reduced-motion: reduce){.fill{transition:none}}
 
 :root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -126,7 +130,7 @@ body{margin:0}
 
   <section class="section" id="investigaciones">
     <h2>Lo investigado, para verlo aquí</h2>
-    <p class="week-note">Cada tarea con el botón Ver te trae aquí. Tócalo para abrir.</p>
+    <p class="week-note">Lo mismo que abre el botón Ver dentro de cada tarea, todo junto. Toca cada uno para abrirlo.</p>
     <div id="invs" class="section"></div>
   </section>
 
@@ -218,9 +222,19 @@ function taskLi(task) {
     timer = setTimeout(() => { save(task.id, { n: ta.value }).then(ok => { saved.textContent = ok ? "Guardado" : "No se guardó"; }); }, 900);
   });
   addMic(row, ta);
-  if (task.inv) {
-    const vb = document.createElement("button"); vb.type = "button"; vb.className = "notebtn ver"; vb.textContent = "Ver";
-    vb.addEventListener("click", () => abrirInv(task.inv)); li.append(cb, tt, vb, shown, btn, box);
+  const x = task.inv && INV.find(i => i.id === task.inv);
+  if (x) {
+    // Ver abre lo investigado aquí mismo, debajo de la tarea (sigue también abajo, en "Lo investigado").
+    const vb = document.createElement("button"); vb.type = "button"; vb.className = "notebtn ver"; vb.textContent = "Ver: " + x.t;
+    vb.setAttribute("aria-expanded", "false");
+    const panel = document.createElement("div"); panel.className = "invin"; panel.hidden = true; panel.id = "vin-" + task.id;
+    vb.setAttribute("aria-controls", panel.id);
+    vb.addEventListener("click", () => {
+      if (!panel.firstChild) { const t = document.createElement("div"); t.className = "invt"; t.textContent = x.t; panel.appendChild(t); invContenido(x, panel); }
+      panel.hidden = !panel.hidden; vb.setAttribute("aria-expanded", String(!panel.hidden));
+      vb.textContent = (panel.hidden ? "Ver: " : "Cerrar: ") + x.t;
+    });
+    li.append(cb, tt, vb, panel, shown, btn, box);
   } else li.append(cb, tt, shown, btn, box);
   allIds.push(task.id);
   return li;
@@ -260,9 +274,7 @@ function render() {
   INV.forEach(x => {
     const d = document.createElement("details"); d.className = "card inv"; d.id = "inv-" + x.id;
     const su = document.createElement("summary"); su.textContent = x.t; d.appendChild(su);
-    if (x.img) { const im = document.createElement("img"); im.alt = x.t; im.dataset.src = x.img; d.appendChild(im); }
-    x.lines.forEach(l => { const p = document.createElement("p"); p.textContent = l; d.appendChild(p); });
-    if (x.url && /^https:\/\//.test(x.url)) { const a = document.createElement("a"); a.href = x.url; a.textContent = x.urlLabel || "Abrir"; a.target = "_blank"; a.rel = "noopener"; a.className = "invlink"; d.appendChild(a); }
+    d.addEventListener("toggle", () => { if (d.open && d.childNodes.length === 1) invContenido(x, d); });
     invs.appendChild(d);
   });
   const later = $("#later"); LATER.forEach(x => later.appendChild(taskLi(x)));
@@ -277,16 +289,24 @@ function render() {
   });
 }
 
-async function cargarImagenes() {
-  for (const im of document.querySelectorAll("img[data-src]")) {
-    try {
-      const r = await gh(BASE + im.dataset.src, { headers: { Accept: "application/vnd.github.raw" } });
-      if (r.ok) im.src = URL.createObjectURL(await r.blob());
-    } catch (_) {}
-  }
+// Las imágenes viven en el repo privado: se bajan una sola vez cada una, cuando algo las abre.
+const imagenes = {};
+function imagen(path) {
+  if (!imagenes[path]) imagenes[path] = gh(BASE + path, { headers: { Accept: "application/vnd.github.raw" } })
+    .then(r => { if (!r.ok) throw new Error("GitHub " + r.status); return r.blob(); })
+    .then(b => URL.createObjectURL(b))
+    .catch(e => { delete imagenes[path]; throw e; });
+  return imagenes[path];
 }
-
-function abrirInv(id) { const d = document.getElementById("inv-" + id); if (!d) return; d.open = true; d.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+function invContenido(x, el) {
+  if (x.img) {
+    const im = document.createElement("img"); im.alt = x.t; el.appendChild(im);
+    const nota = document.createElement("p"); nota.className = "saved"; nota.textContent = "Cargando la imagen…"; el.appendChild(nota);
+    imagen(x.img).then(u => { im.src = u; nota.remove(); }).catch(() => { nota.textContent = "No cargó la imagen. Revisa la conexión y vuelve a abrir."; im.remove(); });
+  }
+  (x.lines || []).forEach(l => { const p = document.createElement("p"); p.textContent = l; el.appendChild(p); });
+  if (x.url && /^https:\/\//.test(x.url)) { const a = document.createElement("a"); a.href = x.url; a.textContent = x.urlLabel || "Abrir"; a.target = "_blank"; a.rel = "noopener"; a.className = "invlink"; el.appendChild(a); }
+}
 
 function paint() {
   let done = 0;
@@ -374,7 +394,6 @@ $("#goToday").addEventListener("click", e => {
     ({ PLAN, LATER, QS, INV } = data); FIJO = data.FIJO || FIJO; DINERO = data.DINERO || DINERO;
     render(); paint();
     await cargarMarcas();
-    cargarImagenes();
     setInterval(() => { if (!escribiendo && !pendientes.size && document.visibilityState === "visible") cargarMarcas().catch(() => {}); }, 30000);
   } catch (e) {
     setStatus(e.message === "llave" ? "La llave de este navegador no sirve o venció." : "No pude leer el plan: " + e.message, true);
