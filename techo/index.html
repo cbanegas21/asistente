@@ -1,0 +1,598 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Techo del patio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@500;700&family=Saira+Condensed:wght@600;700&display=swap">
+<style>
+:root {
+  --bg: #f3f0e8; --surface: #fffdf7; --surface-2: #e9e3d6; --ink: #15130e; --muted: #4c473d; --line: #cbc2ae;
+  --accent: #0a5a86; --accent-ink: #ffffff; --warn: #a3241a; --warn-bg: #fbe8e3; --ok: #1b6a3a;
+  --scene: #e4ded0; --hi: #d96200; --dim: #c0261b; --screw: #2f5874;
+  --pin-bg: rgba(255, 253, 247, 0.94); --sub-bg: rgba(21, 19, 14, 0.80); --sub-ink: #fffdf7;
+  --font-display: "Saira Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12110d; --surface: #1b1a15; --surface-2: #27241d; --ink: #f2ede2; --muted: #bdb4a2; --line: #3d382e;
+    --accent: #6cc2f2; --accent-ink: #08151e; --warn: #ff8b7b; --warn-bg: #3a1914; --ok: #72d79b;
+    --scene: #1d1b16; --hi: #ff9d45; --dim: #ff6b5c; --screw: #9fc8ea;
+    --pin-bg: rgba(27, 26, 21, 0.94); --sub-bg: rgba(0, 0, 0, 0.74); --sub-ink: #f2ede2;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12110d; --surface: #1b1a15; --surface-2: #27241d; --ink: #f2ede2; --muted: #bdb4a2; --line: #3d382e;
+  --accent: #6cc2f2; --accent-ink: #08151e; --warn: #ff8b7b; --warn-bg: #3a1914; --ok: #72d79b;
+  --scene: #1d1b16; --hi: #ff9d45; --dim: #ff6b5c; --screw: #9fc8ea;
+  --pin-bg: rgba(27, 26, 21, 0.94); --sub-bg: rgba(0, 0, 0, 0.74); --sub-ink: #f2ede2;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 17px; line-height: 1.5;
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) 56px max(16px, env(safe-area-inset-left, 0px)); overflow-x: hidden; }
+.wrap { max-width: 920px; margin: 0 auto; display: grid; gap: 18px; }
+a { color: var(--accent); overflow-wrap: anywhere; }
+button:focus-visible, a:focus-visible { outline: 3px solid var(--hi); outline-offset: 2px; }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.06; margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(2rem, 8vw, 3rem); margin: 2px 0 6px; }
+h2 { font-size: 1.7rem; }
+h3 { font-size: 1.25rem; margin-top: 14px; }
+p { margin: 8px 0; }
+.eyebrow { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.player { display: grid; gap: 8px; }
+@media (max-width: 640px) {
+  .player { margin-left: calc(-1 * max(16px, env(safe-area-inset-left, 0px))); margin-right: calc(-1 * max(16px, env(safe-area-inset-right, 0px))); }
+  .player .transport, .player .steps, .player .stepnote { padding-left: 16px; padding-right: 16px; }
+  .viewer { border-radius: 0 !important; border-left: 0 !important; border-right: 0 !important; }
+}
+.viewer { position: relative; height: 62vh; height: 62svh; min-height: 320px; max-height: 700px; background: var(--scene); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.viewer canvas { display: block; width: 100%; height: 100%; touch-action: none; cursor: grab; }
+.labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.pin { position: absolute; left: 0; top: 0; max-width: 58%; font-family: var(--font-display); font-weight: 600; font-size: 0.92rem; line-height: 1.15;
+  color: var(--ink); background: var(--pin-bg); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 5px; padding: 2px 7px; }
+.pin.dim { border-left-color: var(--dim); }
+.pin.screw { border-left-color: var(--screw); }
+.pin.warn { border-left-color: var(--warn); }
+.ovtop { position: absolute; top: 8px; left: 8px; right: 8px; display: flex; justify-content: space-between; gap: 6px; pointer-events: none; }
+.ovtop span { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; background: var(--pin-bg); color: var(--ink); border: 1px solid var(--line); border-radius: 5px; padding: 1px 8px; }
+.sub { position: absolute; left: 8px; right: 8px; bottom: 8px; text-align: center; pointer-events: none; }
+.sub span { display: inline-block; background: var(--sub-bg); color: var(--sub-ink); font-size: 0.95rem; line-height: 1.3; border-radius: 6px; padding: 4px 10px; }
+.sub span:empty { display: none; }
+.fallback { position: absolute; inset: 0; display: grid; place-items: center; padding: 24px; text-align: center; color: var(--muted); }
+[hidden] { display: none !important; }
+.transport { display: grid; grid-template-columns: auto auto auto minmax(0, 1fr); gap: 6px; align-items: center; }
+.transport button, .steps button { font: inherit; font-family: var(--font-display); font-weight: 700; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 8px; cursor: pointer; }
+.transport button { padding: 7px 10px; font-size: 1rem; min-height: 42px; }
+.transport button.play { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); min-width: 96px; }
+.transport .clock { font-size: 0.85rem; color: var(--muted); text-align: right; }
+.steps { display: flex; flex-wrap: wrap; gap: 4px; }
+.steps button { min-width: 40px; height: 38px; padding: 0 6px; font-size: 1rem; }
+.steps button[aria-current="step"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.stepnote { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 0 0; }
+.stepnote h3 { margin: 0 0 4px; }
+.stepnote ul { margin: 6px 0 0; padding-left: 1.2em; }
+.stepnote li { margin: 4px 0; }
+@media (max-width: 640px) { .stepnote { border-radius: 0; border-left: 0; border-right: 0; } }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.card h2 { margin: 2px 0 8px; }
+.ojo { border-left: 4px solid var(--warn); background: var(--warn-bg); border-radius: 0 8px 8px 0; padding: 8px 10px; margin: 10px 0; }
+.ojo b { color: var(--warn); }
+.note { font-size: 0.9rem; color: var(--muted); }
+.tw { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--line); }
+th { font-family: var(--font-display); font-size: 1rem; color: var(--muted); }
+td.q { font-family: var(--font-mono); white-space: nowrap; }
+tr.grp td { background: var(--surface-2); font-family: var(--font-display); font-weight: 700; font-size: 1.02rem; }
+.tag { display: inline-block; font-family: var(--font-mono); font-size: 0.72rem; border: 1px solid var(--line); border-radius: 4px; padding: 0 5px; color: var(--muted); }
+.tag.ya { color: var(--ok); border-color: var(--ok); }
+svg.plano { width: 100%; height: auto; display: block; background: var(--surface-2); border-radius: 8px; }
+svg.plano text { font-family: var(--font-mono); fill: var(--ink); }
+ol.pasos { padding-left: 1.4em; margin: 6px 0; }
+ol.pasos > li { margin: 10px 0; }
+ol.qs { padding-left: 1.4em; }
+ol.qs li { margin: 6px 0; }
+.src { font-size: 0.85rem; color: var(--muted); }
+.src li { margin: 4px 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Plano 1 · para ajustar con tus medidas</div>
+  <h1>Techo del patio</h1>
+  <p>Es un techo de una sola caída, de <b class="num">2.80 × 1.70 m</b>, con 2 láminas de metal y la transparente en medio. Lo más alto queda en la franja verde de la losa y lo más bajo en la pared del fondo, donde va la canal con su bajante para que el agua no le caiga al vecino.</p>
+  <p><b>Por qué se cayó y qué cambia:</b> antes colgaba de una sola madera. Ahora va apoyado en las 2 paredes, a todo lo largo: una viga atornillada a cada pared con 5 tacos, 4 cuartones de una viga a la otra y 4 reglas encima para las láminas.</p>
+</header>
+
+<section class="player" aria-label="Armado en 3D">
+  <div class="viewer" id="viewer">
+    <div class="labels" id="labels"></div>
+    <div class="ovtop"><span id="ovStep">Paso 1</span><span>Arrastra para girar · pellizca para acercar</span></div>
+    <div class="sub"><span id="subtitle"></span></div>
+    <div class="fallback" id="fallback" hidden>Tu teléfono no pudo abrir el 3D. Abajo están el corte, el mapa de tornillos y los pasos escritos.</div>
+  </div>
+  <div class="transport">
+    <button id="prev" aria-label="Paso anterior">◀</button>
+    <button id="play" class="play">▶ Ver</button>
+    <button id="next" aria-label="Paso siguiente">▶▶</button>
+    <span class="clock" id="clock"></span>
+  </div>
+  <div class="steps" id="steps"></div>
+  <div class="stepnote" id="stepnote"></div>
+</section>
+
+<section class="card">
+  <h2>Corte de lado</h2>
+  <p class="note">Visto desde la pared alta, de la losa (izquierda) a la pared del fondo (derecha). Medidas en cm.</p>
+  <div id="corte"></div>
+</section>
+
+<section class="card">
+  <h2>Mapa de tornillos</h2>
+  <p class="note">Visto desde arriba, con la franja verde arriba y la pared del fondo abajo. Las líneas cafés son las 4 reglas y los puntos son los tornillos de lámina, en la cresta de la onda.</p>
+  <div id="mapa"></div>
+  <ul>
+    <li><b>Metal:</b> 5 tornillos por lámina en cada regla. Es la fijación que da Ternium para su lámina ondulada de 1 m.</li>
+    <li><b>Transparente:</b> en la regla de arriba y la de abajo, una onda sí y otra no. En las 2 del medio, una de cada 3. Así lo pide Palram.</li>
+    <li><b>Traslapes:</b> onda y media, con un cordón de sellador adentro, y un tornillo de lámina a lámina entre cada par de reglas (3 por traslape, los rojos).</li>
+    <li><b>Clavos:</b> en las láminas, no (Palram: "NEVER use nails"). Solo sirven en las reglas, si se acaban los tornillos de 3".</li>
+  </ul>
+</section>
+
+<section class="card">
+  <h2>Lista de materiales</h2>
+  <p class="note">"Ya está" es lo que me dijiste que tienen. Lo demás revísalo en lo que ya hay antes de comprar. Los precios no los he verificado.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Qué</th><th>Cuánto</th><th>Para qué</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Madera</td></tr>
+      <tr><td>Cuartón 2"x4" <span class="tag ya">ya está</span></td><td class="q">4 de 12 pies</td><td>2 vigas de 2.80 m y 4 cuartones de 1.70 m. De cada pieza salen 2 cuartones. Sana, sin podrido: la madera vieja que se cayó no.</td></tr>
+      <tr><td>Regla 2"x2" <span class="tag ya">ya está</span></td><td class="q">4 de 2.80 m</td><td>Las reglas donde se atornillan las láminas. Palram pide mínimo 2"x2".</td></tr>
+      <tr><td>Preservante o pintura de aceite</td><td class="q">1/4 galón</td><td>Toda la madera, sobre todo las puntas, antes de subirla.</td></tr>
+      <tr><td>Pintura acrílica blanca o cinta de aluminio</td><td class="q">poquito</td><td>Encima de las reglas donde va la transparente, para que no se calienten (Palram).</td></tr>
+      <tr class="grp"><td colspan="3">Láminas</td></tr>
+      <tr><td>Lámina de metal 1.70 × 1 m <span class="tag ya">ya está</span></td><td class="q">2</td><td>Los 2 lados.</td></tr>
+      <tr><td>Lámina transparente 1.70 × 1 m <span class="tag ya">ya está</span></td><td class="q">1</td><td>En medio, encima de las 2 de metal.</td></tr>
+      <tr class="grp"><td colspan="3">Fijación a las paredes</td></tr>
+      <tr><td>Ancla de camisa (de expansión) de 3/8" x 4", con arandela</td><td class="q">12</td><td>5 en cada viga y 2 de repuesto. Broca de concreto de 3/8". Si la pared del fondo es de bloque hueco, me avisas: lleva otro taco.</td></tr>
+      <tr><td>Escuadra de metal de 3"</td><td class="q">16</td><td>2 en cada punta de cada cuartón, una de cada lado.</td></tr>
+      <tr><td>Tornillo para madera #10 x 1 1/4"</td><td class="q">64</td><td>4 por escuadra.</td></tr>
+      <tr><td>Tornillo para madera de 3"</td><td class="q">32</td><td>2 en cada cruce de regla con cuartón (16 cruces).</td></tr>
+      <tr class="grp"><td colspan="3">Láminas</td></tr>
+      <tr><td>Tornillo de techo para madera, cabeza hexagonal, con arandela de neopreno, 2"</td><td class="q">1 bolsa de 100</td><td>Se usan unos 70: 40 en las de metal, 24 en la transparente y 6 en los traslapes.</td></tr>
+      <tr><td>Arandela de hule grande (25 mm)</td><td class="q">30</td><td>Si la consigues, para la transparente, que lleva el agujero más grande.</td></tr>
+      <tr class="grp"><td colspan="3">Agua</td></tr>
+      <tr><td>Tubo PVC de 4" partido a lo largo, o canal PVC</td><td class="q">2.80 m</td><td>La canal. Si el tubo de antes está entero, sirve.</td></tr>
+      <tr><td>Tapas para la canal</td><td class="q">2</td><td>Las 2 puntas.</td></tr>
+      <tr><td>Soporte de canal o fleje perforado</td><td class="q">4</td><td>Uno cada 80 cm, atornillado a la viga baja.</td></tr>
+      <tr><td>Tubo PVC de 3"</td><td class="q">1 de 3 m</td><td>El bajante, de la canal al desagüe del piso.</td></tr>
+      <tr><td>Codo de 3" y salida de 4" a 3"</td><td class="q">2 y 1</td><td>Para bajar por la pared y llegar al desagüe.</td></tr>
+      <tr><td>Abrazadera para tubo de 3"</td><td class="q">3</td><td>Para sujetar el bajante a la pared.</td></tr>
+      <tr><td>Pegamento para PVC</td><td class="q">1 lata chica</td><td>Codos y salida.</td></tr>
+      <tr class="grp"><td colspan="3">Que no se meta el agua</td></tr>
+      <tr><td>Lámina lisa galvanizada, calibre 26, de 4 x 8 pies</td><td class="q">1</td><td>Salen 4 tiras de 30 cm: 2 arriba, en la franja verde, y 2 sobre la viga baja.</td></tr>
+      <tr><td>Cinta tapagoteras de aluminio con butilo, de 10 cm</td><td class="q">1 rollo</td><td>Donde las láminas topan con las paredes de los lados.</td></tr>
+      <tr><td>Sellador de poliuretano para exterior (tipo Sikaflex)</td><td class="q">2 tubos</td><td>La orilla de arriba de las tiras, los traslapes y los tacos.</td></tr>
+      <tr class="grp"><td colspan="3">Herramienta (me dijiste que la tienen)</td></tr>
+      <tr><td colspan="3">Rotomartillo con broca de concreto de 3/8", taladro, broca de 3/8" para la transparente, ingletadora o sierra circular, tijera para lámina, nivel y manguera de nivel, tiralíneas, cinta métrica, 2 escaleras, dado de 5/16" para los tornillos de techo, pistola de sellador, guantes y lentes.</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="card">
+  <h2>Los pasos, escritos</h2>
+  <ol class="pasos">
+    <li><b>Pintar la madera</b> con preservante, sobre todo las puntas. Si no da tiempo, por lo menos las puntas y la cara que va contra la pared.</li>
+    <li><b>Quitar lo viejo:</b> la madera que cuelga de la esquina de la losa, el soporte de la pared del fondo y lo que quede del tubo. Revisa que el concreto donde estaban no esté quebrado.</li>
+    <li><b>Marcar las 2 líneas.</b> La alta va en la franja verde: es donde queda el canto de arriba de la viga alta. Tiene que quedar por lo menos 12 cm abajo de la orilla de arriba de la franja, porque encima de la viga van la regla y la lámina (unos 6 cm) y arriba de eso la tira de lámina lisa. La baja va en la pared del fondo, <b class="num">48.7 cm</b> más abajo, que es la caída del 30%. Pasa la altura de una pared a la otra con la manguera de nivel, en las 2 esquinas, y marca con el tiralíneas.</li>
+    <li><b>Viga alta:</b> la 2x4 de 2.80 m, acostada contra la franja verde, con el canto de arriba en la línea. Se perfora la madera primero (3/8"), se presenta, se marca la pared, se perfora el concreto, se meten las anclas y se aprietan. Van 5, a 15, 77, 140, 203 y 265 cm de la pared alta, para que no choquen con los cuartones. Un poco de sellador en cada hueco antes del ancla.</li>
+    <li><b>Viga baja:</b> igual, en la pared del fondo, con el canto de arriba en la línea baja. Si al perforar se siente hueca, me avisas antes de meter las anclas.</li>
+    <li><b>Cuartones:</b> son 4, de punta a punta entre las vigas: uno pegado a cada pared de los lados y 2 en medio, cada 92 cm. Las puntas van cortadas a 17° para que queden paradas contra las vigas. Miden unos 170 cm por arriba, pero mide cada uno en su lugar, porque las paredes nunca están parejas. El canto de arriba queda al ras del canto de arriba de las vigas. Se sujetan con 2 escuadras por punta.</li>
+    <li><b>Reglas:</b> las 4 de 2x2, acostadas sobre los cuartones, a lo ancho. Mide sobre el cuartón desde su punta de arriba hasta el centro de cada regla: <b class="num">4, 55, 105 y 156 cm</b>. Quedan a 51 cm una de otra, y Palram permite hasta 80. Van 2 tornillos de 3" en cada cruce. Pinta de blanco el tramo de las reglas que queda bajo la transparente.</li>
+    <li><b>Canal y bajante:</b> la canal se cuelga de la cara de la viga baja, justo debajo, con 1.5 cm de caída hacia la esquina donde baja el tubo. La salida va abajo en esa punta y el bajante baja pegado a la pared hasta el desagüe. Luego se pone la tira de lámina lisa sobre la viga baja: sube 10 cm por la pared, tapa el canto de la viga y se dobla hacia abajo dentro de la canal. Así el agua que cae ahí se va a la canal y no pudre la viga.</li>
+    <li><b>Lámina de metal junto a la pared alta:</b> pegada a la pared alta, con la punta de arriba contra la franja verde. Por abajo sale 8 cm después de la última regla, y esos 8 cm quedan sobre la canal. Lleva 5 tornillos por regla, en la cresta.</li>
+    <li><b>Lámina de metal del lado de la casa verde:</b> igual, del otro lado.</li>
+    <li><b>Transparente en medio:</b> va encima de las 2 de metal, montada onda y media sobre cada una, con un cordón de sellador debajo del traslape. Las letras van hacia arriba, porque ese es el lado que aguanta el sol. Antes de atornillar se le hace el agujero más grande que el tornillo, para que se pueda estirar con el calor. Con tornillo de 1/4", broca de 3/8": así le quedan unos 3 mm de juego. Los tornillos se aprietan solo hasta que el hule asiente, sin aplastarlo. Si las ondas no calzan con las de metal, se rellena el traslape con sellador.</li>
+    <li><b>Tiras de arriba y de los lados:</b> 2 tiras de lámina lisa en la franja verde, montadas 10 cm entre ellas. Bajan sobre las láminas unos 12 cm y la orilla de arriba se sella contra la pared. En los 2 lados, donde las láminas topan con las paredes, va la cinta tapagoteras, mitad en la pared y mitad sobre la lámina.</li>
+    <li><b>Prueba con la manguera</b> desde arriba, de la franja verde hacia abajo. Revisa por debajo que no gotee en los traslapes, los tornillos y las orillas.</li>
+  </ol>
+  <div class="ojo"><b>Ojo:</b>
+    <ul>
+      <li>Arriba de la pared del fondo hay concertina. Se trabaja abajo de ella, con guantes.</li>
+      <li>Nadie se para en las láminas, y menos en la transparente.</li>
+      <li>El tubito de desagüe del balcón, el de la franja verde, tiene que caer encima de las láminas, no detrás de la tira de arriba.</li>
+    </ul>
+  </div>
+  <p class="note">Tiempo, calculado por mí: entre 2 personas, unas 6 horas de trabajo, sin contar el secado de la pintura.</p>
+</section>
+
+<section class="card">
+  <h2>Lo que supuse y me falta saber</h2>
+  <p>Este plano 1 se armó con tus 2 medidas y las 12 fotos. Para cerrarlo me hace falta esto:</p>
+  <ol class="qs">
+    <li><b>Alturas:</b> del piso al borde de abajo de la franja verde, cuánto mide la franja de alto y qué altura tiene la pared del fondo. Con la caída del 30%, la orilla baja queda 49 cm más abajo que la alta. Si así queda muy baja para pasar, se puede bajar al 25%.</li>
+    <li><b>El lado alto:</b> lo puse en la losa y la canal en la pared del fondo, por lo que dijiste del agua del vecino. Si antes era al revés, me dices.</li>
+    <li><b>La madera que tienen:</b> cuántas piezas y de qué medida (por ejemplo 2x4 de 12 pies). Con eso ajusto los cortes.</li>
+    <li><b>Las ondas:</b> pon la transparente encima de una de metal y fíjate si las ondas calzan.</li>
+    <li><b>El desagüe del piso:</b> en qué esquina está, para poner ahí el bajante. Lo puse en la esquina de la pared alta con la del fondo.</li>
+  </ol>
+  <p><b>Por qué 30% y no menos:</b> Ternium pide como mínimo 20% para su lámina de zinc ondulada. Con 30%, la lámina de 1.70 m termina 7 cm antes de la pared del fondo, así que el agua cae limpia en la canal y no sobre la viga. Con 20%, terminaría encima de la viga.</p>
+  <h3>Fuentes</h3>
+  <ul class="src">
+    <li>Ternium, Catálogo de soluciones (lámina galvanizada ondulada): pendiente mínima de 20%, 5 tornillos por lámina en cada apoyo y tornillo autotaladrante con arandela de neopreno. <a href="https://amcen.ternium.com/media/4obedfth/cata-logo-de-soluciones-tx-nicaragua.pdf" target="_blank" rel="noopener">amcen.ternium.com</a></li>
+    <li>Palram SUNTUF, guía de techos: pendiente mínima de 5°, reglas a 800 mm como máximo, una onda sí y otra no en las reglas de las puntas y una de cada 3 en las del medio, traslape de onda y media, no apretar de más y reglas de madera pintadas de blanco bajo la transparente. <a href="https://www.palram.com/au/wp-content/uploads/sites/3/2019/07/SUNTUFF_Roofing_Installation_Guide-.pdf" target="_blank" rel="noopener">palram.com</a></li>
+    <li>Palram, guía para hacerlo uno mismo: las letras hacia el cielo, "NEVER use nails", perforar antes para el movimiento por calor, tornillos de 2" en techos y reglas de 2"x2" como mínimo. Para un tornillo de 1/4" no da la medida del agujero: la broca de 3/8" es mía. <a href="https://pdf.lowes.com/productdocuments/aa5f306d-ee62-402a-ab4a-e7d2bfa59bbd/82002376.pdf" target="_blank" rel="noopener">pdf.lowes.com</a></li>
+  </ul>
+</section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function () {
+"use strict";
+// ---------- Medidas (cm). x: a lo largo (2.80 m); z: de la losa (0) a la pared del fondo (170); y: hacia arriba ----------
+var W = 280, D = 170, P = 0.30, K = Math.sqrt(1 + P * P), ANG = Math.atan(P);
+var T = 3.8, H4 = 8.9;                 // grueso y alto de una 2x4
+var zA = T, zB = D - T;                // caras de las 2 vigas
+var yH = 262;                          // canto de arriba de la viga alta (supuesto)
+var BAND0 = 250, BAND1 = 275;          // franja verde (supuesto)
+function yRaf(z) { return yH - P * (z - zA); }       // canto de arriba de los cuartones
+var yL = yRaf(zB);                                  // canto de arriba de la viga baja
+var SHEET = 170, zEnd = SHEET / K;                  // la lámina, de la franja verde hacia abajo
+function ySheet(z) { return yRaf(z) + T; }          // cara de abajo de la lámina
+var SP = [8, 58.7, 109.3, 160];                     // centro de cada regla, medido sobre la lámina desde arriba
+var ZP = SP.map(function (s) { return s / K; });
+var XR = [1.9, 93.97, 186.03, 278.1];               // centro de cada cuartón
+var XANCH = [15, 77, 140, 203, 265];                // tacos
+var GR = 5.7, gZ = zB - GR, gTop = yL - H4 - 1;     // canal de 4"
+var XDOWN = 15;                                     // bajante
+var PITCH = 7.6, AMP = 1.7;                         // onda de la lámina (dibujo)
+var SHEETS = [ { x0: 0, kind: "metal" }, { x0: 180, kind: "metal" }, { x0: 90, kind: "pc" } ];
+
+function tok(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function f1(v) { return (Math.round(v * 10) / 10).toString(); }
+
+// ---------- Pasos ----------
+var STEPS = [
+  { t: "Así está", sub: "El patio de 2.80 × 1.70 m. Lo rojo es lo viejo que se quita.",
+    li: ["La madera que cuelga de la esquina de la losa se quita.", "El soporte de la pared del fondo se quita.", "Revisa que el concreto donde estaban no esté quebrado."],
+    cam: [-35, 32, 520], pins: [["Madera vieja: se quita", [W - 6, 215, -3], "warn"], ["Soporte viejo: se quita", [110, 240, 168], "warn"], ["2.80 m", [140, 150, 172], "dim"], ["1.70 m", [282, 60, 85], "dim"]] },
+  { t: "Marcar las 2 líneas", sub: "La línea alta en la franja verde y la baja en la pared del fondo, 48.7 cm más abajo.",
+    li: ["Línea alta: el canto de arriba de la viga alta, por lo menos 12 cm abajo de la orilla de arriba de la franja.", "Línea baja: 48.7 cm más abajo, en la pared del fondo (caída del 30%).", "La altura se pasa de una pared a otra con la manguera de nivel, en las 2 esquinas."],
+    cam: [-20, 18, 430], pins: [["Línea alta", [60, yH + 3, 0], "dim"], ["Línea baja: 48.7 cm más abajo", [60, yL + 3, D], "dim"]] },
+  { t: "Viga alta", sub: "Una 2x4 de 2.80 m acostada contra la franja verde, con 5 anclas de 3/8\".",
+    li: ["Perfora primero la madera, presenta, marca, perfora el concreto y mete las anclas.", "Anclas a 15, 77, 140, 203 y 265 cm de la pared alta.", "Un poco de sellador en cada hueco antes del ancla."],
+    cam: [20, 22, 330], tgt: [140, yH, 20], pins: [["Viga alta 2x4 de 2.80 m", [200, yH + 2, 2], ""], ["5 anclas de 3/8\" x 4\"", [77, yH - 4, 3.8], "screw"]] },
+  { t: "Viga baja", sub: "Igual, en la pared del fondo, con el canto de arriba en la línea baja.",
+    li: ["Misma viga y mismas 5 anclas.", "El canto de arriba queda en la línea baja.", "Si al perforar la pared se siente hueca, me avisas: el bloque hueco lleva otro taco."],
+    cam: [-62, 24, 330], tgt: [140, yL, 150], pins: [["Viga baja 2x4 de 2.80 m", [200, yL + 2, D - 2], ""], ["5 anclas", [140, yL - 4, D - T], "screw"]] },
+  { t: "Los 4 cuartones", sub: "De viga a viga, cada 92 cm, con las puntas cortadas a 17° y 2 escuadras por punta.",
+    li: ["4 cuartones 2x4: uno pegado a cada pared de los lados y 2 en medio.", "Las puntas van cortadas a 17°. Miden unos 170 cm por arriba, pero mide cada uno en su lugar.", "El canto de arriba queda al ras de las vigas. Van 2 escuadras de 3\" en cada punta."],
+    cam: [-30, 35, 420], pins: [["Cuartón 2x4, unos 170 cm", [94, yRaf(90) + 6, 90], ""], ["Cada 92 cm", [140, yRaf(60) + 6, 60], "dim"], ["2 escuadras por punta", [186, yH - 6, 6], "screw"]] },
+  { t: "Las 4 reglas", sub: "Reglas 2x2 de 2.80 m a lo ancho, cada 51 cm, con 2 tornillos de 3\" en cada cruce.",
+    li: ["Medido sobre el cuartón, desde su punta de arriba al centro de cada regla: 4, 55, 105 y 156 cm.", "Quedan a 51 cm una de otra. Palram permite hasta 80.", "Pinta de blanco el tramo que queda bajo la transparente."],
+    cam: [-30, 40, 420], pins: [["Regla 2x2 de 2.80 m", [250, ySheet(ZP[1]) + 3, ZP[1]], ""], ["4 · 55 · 105 · 156 cm", [40, ySheet(ZP[2]) + 3, ZP[2]], "dim"]] },
+  { t: "Canal y bajante", sub: "La canal colgada bajo la viga baja, con 1.5 cm de caída hacia el bajante.",
+    li: ["Canal de PVC de 4\" (el tubo partido, si el de antes sirve) colgada de la cara de la viga baja.", "1.5 cm de caída hacia la esquina del bajante.", "Tira de lámina lisa sobre la viga baja: sube 10 cm por la pared y se dobla dentro de la canal."],
+    cam: [170, -5, 330], tgt: [130, yL - 40, 160], pins: [["Canal PVC 4\"", [200, gTop + 2, gZ - 4], ""], ["Bajante PVC 3\" al desagüe", [XDOWN, 150, gZ], ""], ["Lámina lisa sobre la viga", [120, yL + 6, D - 1], "dim"]] },
+  { t: "Metal junto a la pared alta", sub: "Contra la pared alta, con la punta de arriba contra la franja verde.",
+    li: ["Por abajo sale 8 cm después de la última regla, sobre la canal.", "5 tornillos por regla, en la cresta de la onda."],
+    cam: [-30, 45, 420], pins: [["Metal 1.70 × 1 m", [50, ySheet(60) + 4, 60], ""], ["5 tornillos por regla", [50, ySheet(ZP[0]) + 3, ZP[0]], "screw"]] },
+  { t: "Metal del lado de la casa verde", sub: "Igual, del otro lado, contra la casa verde.",
+    li: ["Misma posición: la punta de arriba contra la franja verde.", "5 tornillos por regla."],
+    cam: [-30, 45, 420], pins: [["Metal 1.70 × 1 m", [230, ySheet(60) + 4, 60], ""]] },
+  { t: "Transparente al centro", sub: "Encima de las 2 de metal, montada onda y media sobre cada una.",
+    li: ["Las letras hacia arriba, porque es el lado que aguanta el sol.", "Agujero más grande que el tornillo (3/8\" para uno de 1/4\") y apretar solo hasta que asiente el hule.", "Arriba y abajo, una onda sí y otra no. En las 2 del medio, una de cada 3. Sellador en los traslapes."],
+    cam: [-20, 50, 420], pins: [["Transparente", [140, ySheet(85) + 4, 85], ""], ["Traslape: onda y media con sellador", [92, ySheet(130) + 4, 130], "dim"]] },
+  { t: "Tiras y cinta", sub: "Lámina lisa en la franja verde y cinta tapagoteras en los 2 lados.",
+    li: ["2 tiras de lámina lisa en la franja verde, montadas 10 cm entre ellas, que bajan 12 cm sobre las láminas. La orilla de arriba se sella.", "En los lados, cinta tapagoteras: mitad en la pared y mitad sobre la lámina.", "El tubito del balcón tiene que caer encima de las láminas."],
+    cam: [-40, 30, 380], tgt: [140, 240, 30], pins: [["Tira de lámina lisa sellada", [180, BAND1 - 2, 0], ""], ["Cinta tapagoteras", [278, ySheet(100) + 4, 100], "dim"]] },
+  { t: "Listo", sub: "Prueba con la manguera desde arriba y revisa por debajo que no gotee.",
+    li: ["Prueba con la manguera de la franja verde hacia abajo.", "Por debajo, revisa los traslapes, los tornillos y las orillas.", "Nadie se para en las láminas."],
+    cam: [-35, 40, 470], pins: [["30% de caída", [282, ySheet(80) + 8, 80], "dim"], ["El agua a la canal", [200, gTop - 6, gZ], ""]] }
+];
+
+// ---------- Escena ----------
+var viewer = document.getElementById("viewer"), labels = document.getElementById("labels");
+var hasGL = typeof THREE !== "undefined" && (function () { try { var c = document.createElement("canvas"); return !!(c.getContext("webgl") || c.getContext("experimental-webgl")); } catch (e) { return false; } })();
+var step = 0, playing = false, stepT0 = performance.now(), dirty = true;
+var renderer, scene, camera, parts = [], pinEls = [];
+var cam = { th: 0, ph: 0, r: 450, tgt: hasGL ? new THREE.Vector3(140, 210, 85) : null }, camGoal = null, manual = false;
+
+function mat(c, o) { o = o || {}; o.color = new THREE.Color(c); return new THREE.MeshStandardMaterial(o); }
+function box(w, h, d, m) { return new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); }
+function addPart(obj, s, until) { obj.userData.s = s; obj.userData.until = until == null ? 99 : until; obj.userData.base = obj.position.y; parts.push(obj); scene.add(obj); return obj; }
+
+function corrugated(x0, wide, c, opacity) {
+  var nu = Math.round(wide / 1.9), nv = 24, pos = [], idx = [];
+  for (var j = 0; j <= nv; j++) {
+    var z = zEnd * j / nv;
+    for (var i = 0; i <= nu; i++) {
+      var u = wide * i / nu, x = x0 + u;
+      var wv = AMP * (1 - Math.cos(2 * Math.PI * x / PITCH)) / 2;
+      pos.push(x, ySheet(z) + wv + 0.2, z);
+    }
+  }
+  for (var j2 = 0; j2 < nv; j2++) for (var i2 = 0; i2 < nu; i2++) {
+    var a = j2 * (nu + 1) + i2, b = a + 1, cc = a + nu + 1, d = cc + 1;
+    idx.push(a, cc, b, b, cc, d);
+  }
+  var g = new THREE.BufferGeometry();
+  g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
+  var m = opacity ? mat(c, { transparent: true, opacity: opacity, roughness: 0.25, side: THREE.DoubleSide, depthWrite: false })
+                  : mat(c, { metalness: 0.55, roughness: 0.42, side: THREE.DoubleSide });
+  return new THREE.Mesh(g, m);
+}
+function crestX(x) { return Math.round(x / PITCH) * PITCH; }
+
+function build() {
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setPixelRatio(Math.min(2, window.devicePixelRatio || 1));
+  viewer.insertBefore(renderer.domElement, labels);
+  scene = new THREE.Scene(); scene.background = new THREE.Color(tok("--scene"));
+  camera = new THREE.PerspectiveCamera(40, 1, 1, 5000);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8a8576, 0.65));
+  var sun = new THREE.DirectionalLight(0xffffff, 0.65); sun.position.set(-150, 500, 250); scene.add(sun);
+  var fill = new THREE.DirectionalLight(0xffffff, 0.3); fill.position.set(400, 150, -200); scene.add(fill);
+
+  var wallM = mat("#8b7375", { transparent: true, opacity: 0.22, depthWrite: false });
+  var greenM = mat("#86c9a6", { transparent: true, opacity: 0.5, depthWrite: false });
+  var floor = box(330, 2, 330, mat("#cfc6b4")); floor.position.set(140, -1, 30); scene.add(floor);
+  var back = box(330, 330, 15, wallM); back.position.set(140, 165, D + 7.5); scene.add(back);
+  var right = box(15, 420, 330, wallM); right.position.set(-7.5, 210, 30); scene.add(right);
+  var left = box(15, BAND0, 330, wallM); left.position.set(W + 7.5, BAND0 / 2, 30); scene.add(left);
+  var slab = box(W + 30, BAND1 - BAND0, 135, greenM); slab.position.set(140, (BAND0 + BAND1) / 2, -67.5); scene.add(slab);
+  var bandFace = box(W, BAND1 - BAND0, 0.6, mat("#5fae86")); bandFace.position.set(140, (BAND0 + BAND1) / 2, -0.3); scene.add(bandFace);
+  var upper = box(W + 30, 230, 10, mat("#86c9a6", { transparent: true, opacity: 0.18, depthWrite: false })); upper.position.set(140, BAND1 + 115, -55); scene.add(upper);
+
+  // 1: lo viejo
+  var red = mat("#c0261b");
+  var oldWood = box(5, 60, 5, red); oldWood.position.set(W - 6, BAND0 - 30, -3); addPart(oldWood, 0, 1);
+  var oldBr = box(14, 22, 2, red); oldBr.position.set(110, 240, D - 1); addPart(oldBr, 0, 1);
+  // 2: líneas
+  var lineM = mat("#c0261b", { emissive: new THREE.Color("#7a0d05") });
+  var lh = box(W, 0.8, 0.8, lineM); lh.position.set(140, yH, 0.5); addPart(lh, 1, 2);
+  var ll = box(W, 0.8, 0.8, lineM); ll.position.set(140, yL, D - 0.5); addPart(ll, 1, 3);
+  // 3-4: vigas y tacos
+  var woodM = mat("#c9995a", { roughness: 0.8 }), woodM2 = mat("#b9884c", { roughness: 0.8 });
+  var screwM = mat("#2f5874", { metalness: 0.6, roughness: 0.4 });
+  var gH = new THREE.Group(), vH = box(W, H4, T, woodM); vH.position.set(140, yH - H4 / 2, T / 2); gH.add(vH);
+  var gL = new THREE.Group(), vL = box(W, H4, T, woodM); vL.position.set(140, yL - H4 / 2, D - T / 2); gL.add(vL);
+  XANCH.forEach(function (x) {
+    var a = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1.2, 12), screwM); a.rotation.x = Math.PI / 2; a.position.set(x, yH - H4 / 2, T + 0.5); gH.add(a);
+    var b = a.clone(); b.position.set(x, yL - H4 / 2, D - T - 0.5); gL.add(b);
+  });
+  addPart(gH, 2); addPart(gL, 3);
+  // 5: cuartones y escuadras
+  var gR = new THREE.Group(), Ls = (zB - zA) * K;
+  var brM = mat("#7d8a94", { metalness: 0.6, roughness: 0.4 });
+  XR.forEach(function (x) {
+    var r = box(T, H4, Ls, woodM2);
+    var zm = (zA + zB) / 2, ym = yRaf(zm) - (H4 / 2) * Math.cos(ANG);
+    r.position.set(x, ym, zm - (H4 / 2) * Math.sin(ANG)); r.rotation.x = ANG; gR.add(r);
+    [[zA + 2.5, yH - 4.5], [zB - 2.5, yL - 4.5]].forEach(function (p) {
+      [-1, 1].forEach(function (sd) {
+        var e = box(0.4, 6, 5, brM); e.position.set(x + sd * (T / 2 + 0.2), p[1], p[0]); gR.add(e);
+      });
+    });
+  });
+  addPart(gR, 4);
+  // 6: reglas
+  var gP = new THREE.Group(), pinoM = mat("#d8b075", { roughness: 0.8 });
+  ZP.forEach(function (z) { var p = box(W, T, T, pinoM); p.position.set(140, yRaf(z) + (T / 2) * Math.cos(ANG), z + (T / 2) * Math.sin(ANG)); p.rotation.x = ANG; gP.add(p); });
+  addPart(gP, 5);
+  // 7: canal, bajante, lámina lisa de la viga baja
+  var gG = new THREE.Group(), pvcM = mat("#e8e6df", { roughness: 0.5, side: THREE.DoubleSide });
+  var half = new THREE.Mesh(new THREE.CylinderGeometry(GR, GR, W, 20, 1, true, Math.PI, Math.PI), pvcM);
+  half.rotation.z = Math.PI / 2; half.position.set(140, gTop, gZ); gG.add(half);
+  var cap1 = new THREE.Mesh(new THREE.CircleGeometry(GR, 16, Math.PI, Math.PI), pvcM); cap1.rotation.y = Math.PI / 2; cap1.position.set(0.2, gTop, gZ); gG.add(cap1);
+  var cap2 = cap1.clone(); cap2.position.x = W - 0.2; gG.add(cap2);
+  var down = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, gTop - 12, 16), pvcM); down.position.set(XDOWN, (gTop - 12) / 2 + 6, gZ); gG.add(down);
+  var elbow = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, 22, 16), pvcM); elbow.rotation.x = Math.PI / 2; elbow.position.set(XDOWN, 6, gZ - 9); gG.add(elbow);
+  var flM = mat("#b8c2c9", { metalness: 0.7, roughness: 0.35 });
+  var fl1 = box(W, 10, 0.3, flM); fl1.position.set(140, yL + 5, D - 0.2); gG.add(fl1);
+  var fl2 = box(W, 0.3, T + 0.4, flM); fl2.position.set(140, yL + 0.2, D - T / 2); gG.add(fl2);
+  var fl3 = box(W, 12, 0.3, flM); fl3.position.set(140, yL - 5, zB - 0.25); gG.add(fl3);
+  addPart(gG, 6);
+  // 8-10: láminas con tornillos
+  SHEETS.forEach(function (sh, k) {
+    var g = new THREE.Group();
+    var m = sh.kind === "pc" ? corrugated(sh.x0, 100, "#9fd3ff", 0.5) : corrugated(sh.x0, 100, "#b9c0c6");
+    if (sh.kind === "pc") m.position.y = 0.6;
+    g.add(m);
+    ZP.forEach(function (z, pi) {
+      var xs = [];
+      if (sh.kind === "metal") { [6, 28, 50, 72, 94].forEach(function (u) { xs.push(crestX(sh.x0 + u)); }); }
+      else { var every = (pi === 0 || pi === 3) ? 2 : 3; for (var c = 1; c * PITCH < 100; c += every) xs.push(crestX(sh.x0 + c * PITCH)); }
+      xs.forEach(function (x) {
+        var s = new THREE.Mesh(new THREE.CylinderGeometry(1.0, 1.0, 1.2, 10), screwM);
+        s.position.set(x, ySheet(z) + AMP + (sh.kind === "pc" ? 1.4 : 0.8), z); s.rotation.x = ANG; g.add(s);
+      });
+    });
+    addPart(g, 7 + k);
+  });
+  // 11: tiras y cinta
+  var gF = new THREE.Group();
+  var t1 = box(W, BAND1 - 2 - (ySheet(0) + AMP), 0.3, flM); t1.position.set(140, (BAND1 - 2 + ySheet(0) + AMP) / 2, 0.4); gF.add(t1);
+  var t2 = box(W, 0.3, 12, flM); t2.position.set(140, ySheet(6) + AMP + 1.2, 6); t2.rotation.x = ANG; gF.add(t2);
+  var tapeM = mat("#c8cdd1", { metalness: 0.5, roughness: 0.5 });
+  [1.5, W - 1.5].forEach(function (x) { var tp = box(3, 1, zEnd, tapeM); tp.position.set(x, ySheet(zEnd / 2) + AMP + 1.2, zEnd / 2); tp.rotation.x = ANG; gF.add(tp); });
+  addPart(gF, 10);
+
+  // fondo del 3D arriba, el patio se ve de arriba
+  onResize(); window.addEventListener("resize", onResize);
+  initControls();
+}
+
+function onResize() {
+  if (!renderer) return;
+  var w = viewer.clientWidth, h = viewer.clientHeight;
+  renderer.setSize(w, h, false); camera.aspect = w / h; camera.updateProjectionMatrix(); dirty = true;
+}
+
+// ---------- Cámara ----------
+function camFromStep(s) {
+  var c = STEPS[s].cam, tg = STEPS[s].tgt || [140, 215, 80];
+  return { th: c[0] * Math.PI / 180, ph: c[1] * Math.PI / 180, r: c[2] * (viewer.clientWidth < 500 ? 1.25 : 1), tgt: new THREE.Vector3(tg[0], tg[1], tg[2]) };
+}
+function placeCam() {
+  var x = cam.tgt.x + cam.r * Math.cos(cam.ph) * Math.sin(cam.th);
+  var z = cam.tgt.z + cam.r * Math.cos(cam.ph) * Math.cos(cam.th);
+  var y = cam.tgt.y + cam.r * Math.sin(cam.ph);
+  // la cámara mira desde el lado del patio (z > 0 hacia el fondo); se gira para ver desde la losa
+  camera.position.set(x, y, z);
+  camera.lookAt(cam.tgt);
+}
+function initControls() {
+  var el = renderer.domElement, ptrs = {}, pd = 0;
+  function dist() { var k = Object.keys(ptrs); if (k.length < 2) return 0; var a = ptrs[k[0]], b = ptrs[k[1]]; return Math.hypot(a[0] - b[0], a[1] - b[1]); }
+  el.addEventListener("pointerdown", function (e) { try { el.setPointerCapture(e.pointerId); } catch (x) {} ptrs[e.pointerId] = [e.clientX, e.clientY]; manual = true; camGoal = null; if (playing) setPlaying(false); pd = dist(); });
+  el.addEventListener("pointermove", function (e) {
+    if (!ptrs[e.pointerId]) return;
+    var p = ptrs[e.pointerId], dx = e.clientX - p[0], dy = e.clientY - p[1]; ptrs[e.pointerId] = [e.clientX, e.clientY];
+    var n = Object.keys(ptrs).length;
+    if (n === 1) { cam.th -= dx * 0.008; cam.ph = Math.max(-0.2, Math.min(1.45, cam.ph + dy * 0.006)); }
+    else if (n === 2) { var d = dist(); if (pd > 0 && d > 0) cam.r = Math.max(120, Math.min(1200, cam.r * pd / d)); pd = d; }
+    dirty = true;
+  });
+  function up(e) { delete ptrs[e.pointerId]; pd = dist(); }
+  el.addEventListener("pointerup", up); el.addEventListener("pointercancel", up);
+  el.addEventListener("wheel", function (e) { e.preventDefault(); manual = true; camGoal = null; cam.r = Math.max(120, Math.min(1200, cam.r * Math.exp(e.deltaY * 0.001))); dirty = true; }, { passive: false });
+}
+
+// ---------- Pasos: botones y textos ----------
+var stepsEl = document.getElementById("steps"), noteEl = document.getElementById("stepnote");
+STEPS.forEach(function (s, i) { var b = document.createElement("button"); b.textContent = i + 1; b.title = s.t; b.addEventListener("click", function () { setPlaying(false); go(i); }); stepsEl.appendChild(b); });
+function go(i) {
+  step = Math.max(0, Math.min(STEPS.length - 1, i)); stepT0 = performance.now();
+  Array.prototype.forEach.call(stepsEl.children, function (b, k) { if (k === step) b.setAttribute("aria-current", "step"); else b.removeAttribute("aria-current"); });
+  var s = STEPS[step];
+  document.getElementById("ovStep").textContent = "Paso " + (step + 1) + " de " + STEPS.length;
+  document.getElementById("subtitle").textContent = s.sub;
+  document.getElementById("clock").textContent = s.t;
+  noteEl.innerHTML = "";
+  var h = document.createElement("h3"); h.textContent = (step + 1) + ". " + s.t; noteEl.appendChild(h);
+  var ul = document.createElement("ul"); s.li.forEach(function (t) { var li = document.createElement("li"); li.textContent = t; ul.appendChild(li); }); noteEl.appendChild(ul);
+  if (hasGL) {
+    camGoal = camFromStep(step); manual = false;
+    labels.innerHTML = ""; pinEls = s.pins.map(function (p) { var d = document.createElement("div"); d.className = "pin " + (p[2] || ""); d.textContent = p[0]; labels.appendChild(d); return { el: d, v: new THREE.Vector3(p[1][0], p[1][1], p[1][2]) }; });
+  }
+  dirty = true;
+}
+var playBtn = document.getElementById("play");
+function setPlaying(v) { playing = v; playBtn.textContent = v ? "❚❚ Pausa" : "▶ Ver"; if (v) stepT0 = performance.now(); }
+playBtn.addEventListener("click", function () { if (!playing && step === STEPS.length - 1) go(0); setPlaying(!playing); });
+document.getElementById("prev").addEventListener("click", function () { setPlaying(false); go(step - 1); });
+document.getElementById("next").addEventListener("click", function () { setPlaying(false); go(step + 1); });
+
+// ---------- Cuadro por cuadro ----------
+function frame(now) {
+  requestAnimationFrame(frame);
+  if (playing && now - stepT0 > 5200) { if (step < STEPS.length - 1) go(step + 1); else setPlaying(false); }
+  var anim = false;
+  parts.forEach(function (o) {
+    var s = o.userData.s, vis = step >= s && step <= o.userData.until;
+    o.visible = vis;
+    if (vis && s === step) { var e = Math.min(1, (now - stepT0) / 900); e = 1 - Math.pow(1 - e, 3); o.position.y = o.userData.base + (1 - e) * 45; if (e < 1) anim = true; }
+    else o.position.y = o.userData.base;
+  });
+  if (camGoal) {
+    var k = 0.08, done = true;
+    var dth = camGoal.th - cam.th; cam.th += dth * k; cam.ph += (camGoal.ph - cam.ph) * k; cam.r += (camGoal.r - cam.r) * k; cam.tgt.lerp(camGoal.tgt, k);
+    if (Math.abs(dth) > 0.002 || Math.abs(camGoal.r - cam.r) > 0.5 || cam.tgt.distanceTo(camGoal.tgt) > 0.5) done = false;
+    if (done) camGoal = null; anim = true;
+  }
+  if (!anim && !dirty) return;
+  dirty = false;
+  placeCam();
+  renderer.render(scene, camera);
+  var w = viewer.clientWidth, h = viewer.clientHeight, v = new THREE.Vector3();
+  pinEls.forEach(function (p) {
+    v.copy(p.v).project(camera);
+    var x = (v.x + 1) / 2 * w, y = (1 - v.y) / 2 * h;
+    if (v.z > 1 || x < -40 || x > w + 40 || y < 20 || y > h - 30) { p.el.style.opacity = "0"; return; }
+    p.el.style.opacity = "1";
+    var bw = p.el.offsetWidth; x = Math.max(4, Math.min(w - bw - 4, x - bw / 2));
+    p.el.style.transform = "translate(" + Math.round(x) + "px," + Math.round(y - 12) + "px)";
+  });
+}
+
+// ---------- Corte y mapa (SVG) ----------
+function svgEl(tag, a, parent) { var e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (var k in a) e.setAttribute(k, a[k]); if (parent) parent.appendChild(e); return e; }
+function txt(p, x, y, s, size, anchor, color) { var t = svgEl("text", { x: x, y: y, "font-size": size || 9, "text-anchor": anchor || "start" }, p); if (color) t.setAttribute("style", "fill:" + color); t.textContent = s; return t; }
+function drawCorte() {
+  var S = 2.4, ox = 40, oy = 20, top = 290, sv = svgEl("svg", { viewBox: "0 0 600 300", class: "plano", role: "img", "aria-label": "Corte de lado del techo" });
+  function X(z) { return ox + z * S; } function Y(y) { return oy + (top - y) * S; }
+  var wall = "#8b7375", wood = "#c9995a", green = "#5fae86", sheet = "#6f7b85", dim = tok("--dim") || "#c0261b";
+  svgEl("rect", { x: X(-12), y: Y(BAND1), width: 12 * S, height: (BAND1 - BAND0) * S, fill: green }, sv);
+  svgEl("rect", { x: X(D), y: Y(top), width: 10 * S, height: (top - 180) * S, fill: wall, opacity: 0.6 }, sv);
+  svgEl("rect", { x: X(0), y: Y(yH), width: T * S, height: H4 * S, fill: wood }, sv);
+  svgEl("rect", { x: X(zB), y: Y(yL), width: T * S, height: H4 * S, fill: wood }, sv);
+  svgEl("polygon", { points: [X(zA) + "," + Y(yH), X(zB) + "," + Y(yL), X(zB) + "," + Y(yL - H4 * K), X(zA) + "," + Y(yH - H4 * K)].join(" "), fill: wood, opacity: 0.75 }, sv);
+  ZP.forEach(function (z) { svgEl("rect", { x: X(z - T / 2), y: Y(yRaf(z) + T), width: T * S, height: T * S, fill: "#d8b075", stroke: "#8a6a3a", "stroke-width": 0.6 }, sv); });
+  svgEl("line", { x1: X(0), y1: Y(ySheet(0) + 0.8), x2: X(zEnd), y2: Y(ySheet(zEnd) + 0.8), stroke: sheet, "stroke-width": 3 }, sv);
+  svgEl("path", { d: "M" + X(gZ - GR) + "," + Y(gTop) + " A" + GR * S + "," + GR * S + " 0 0 0 " + X(gZ + GR) + "," + Y(gTop), fill: "none", stroke: "#9a978d", "stroke-width": 2.5 }, sv);
+  svgEl("polyline", { points: [X(D) + "," + Y(yL + 10), X(D) + "," + Y(yL), X(zB) + "," + Y(yL), X(zB) + "," + Y(yL - 12)].join(" "), fill: "none", stroke: "#7d8a94", "stroke-width": 1.4 }, sv);
+  // cotas
+  svgEl("line", { x1: X(0), y1: Y(180), x2: X(D), y2: Y(180), stroke: dim, "stroke-width": 1 }, sv);
+  txt(sv, X(D / 2), Y(180) + 12, "170 de pared a pared", 10, "middle", dim);
+  svgEl("line", { x1: X(D) + 30, y1: Y(yH), x2: X(D) + 30, y2: Y(yL), stroke: dim, "stroke-width": 1 }, sv);
+  svgEl("line", { x1: X(0), y1: Y(yH), x2: X(D) + 34, y2: Y(yH), stroke: dim, "stroke-width": 0.6, "stroke-dasharray": "3 3" }, sv);
+  txt(sv, X(D) + 34, (Y(yH) + Y(yL)) / 2, f1(yH - yL) + " de caída", 10, "start", dim);
+  txt(sv, X(D) + 34, (Y(yH) + Y(yL)) / 2 + 12, "(30%)", 10, "start", dim);
+  txt(sv, X(-12), Y(BAND1) - 5, "franja verde", 9);
+  txt(sv, X(D) - 4, Y(top) + 12, "pared del fondo", 9, "end");
+  txt(sv, X(4), Y(yH - H4) + 12, "viga alta", 9);
+  txt(sv, X(zB) - 4, Y(yL - H4) + 22, "viga baja y canal", 9, "end");
+  txt(sv, X(zEnd / 2), Y(ySheet(zEnd / 2)) - 12, "lámina de 1.70 m", 10, "middle");
+  ZP.forEach(function (z, i) { txt(sv, X(z), Y(yRaf(z) + T) + 16 + (i % 2) * 9, ["4", "55", "105", "156"][i], 8, "middle", dim); });
+  txt(sv, X(zEnd), Y(ySheet(zEnd)) - 6, "7 cm libres", 8, "end", dim);
+  document.getElementById("corte").appendChild(sv);
+  var p = document.createElement("p"); p.className = "note";
+  p.textContent = "Los números chicos son el centro de cada regla, medido sobre el cuartón desde su punta de arriba. La viga baja queda " + f1(yH - yL) + " cm más abajo que la alta. Las alturas son supuestas: lo que importa es la diferencia.";
+  document.getElementById("corte").appendChild(p);
+}
+function drawMapa() {
+  var S = 1.7, ox = 14, oy = 26, sv = svgEl("svg", { viewBox: "0 0 545 340", class: "plano", role: "img", "aria-label": "Mapa de tornillos visto desde arriba" });
+  function X(x) { return ox + x * S; } function Y(s) { return oy + s * S; }
+  svgEl("rect", { x: X(0), y: Y(0), width: 100 * S, height: SHEET * S, fill: "#b9c0c6", opacity: 0.55 }, sv);
+  svgEl("rect", { x: X(180), y: Y(0), width: 100 * S, height: SHEET * S, fill: "#b9c0c6", opacity: 0.55 }, sv);
+  svgEl("rect", { x: X(90), y: Y(0), width: 100 * S, height: SHEET * S, fill: "#9fd3ff", opacity: 0.6, stroke: "#3b8ac4", "stroke-width": 1 }, sv);
+  XR.forEach(function (x) { svgEl("line", { x1: X(x), y1: Y(0), x2: X(x), y2: Y(SHEET), stroke: "#8a6a3a", "stroke-width": 1, "stroke-dasharray": "4 3", opacity: 0.6 }, sv); });
+  SP.forEach(function (s) { svgEl("line", { x1: X(0), y1: Y(s), x2: X(W), y2: Y(s), stroke: "#8a6a3a", "stroke-width": 3, opacity: 0.85 }, sv); });
+  var count = { metal: 0, pc: 0 };
+  SHEETS.forEach(function (sh) {
+    SP.forEach(function (s, pi) {
+      var xs = [];
+      if (sh.kind === "metal") [6, 28, 50, 72, 94].forEach(function (u) { xs.push(crestX(sh.x0 + u)); });
+      else { var every = (pi === 0 || pi === 3) ? 2 : 3; for (var c = 1; c * PITCH < 100; c += every) xs.push(crestX(sh.x0 + c * PITCH)); }
+      xs.forEach(function (x) { count[sh.kind]++; svgEl("circle", { cx: X(x), cy: Y(s), r: 3, fill: sh.kind === "pc" ? "#0a5a86" : "#2b2b2b" }, sv); });
+    });
+  });
+  [95, 185].forEach(function (x) { [33, 84, 135].forEach(function (s) { svgEl("circle", { cx: X(x), cy: Y(s), r: 2.6, fill: "#c0261b" }, sv); }); });
+  txt(sv, X(50), oy - 8, "metal · pared alta", 10, "middle"); txt(sv, X(140), oy - 8, "transparente", 11, "middle"); txt(sv, X(230), oy - 8, "metal · casa verde", 10, "middle");
+  txt(sv, X(W) + 4, Y(SP[0]) + 3, "regla 1", 8); txt(sv, X(W) + 4, Y(SP[3]) + 3, "regla 4", 8);
+  txt(sv, X(0), Y(SHEET) + 14, "franja verde arriba · canal abajo · rojo: tornillos de traslape", 9);
+  document.getElementById("mapa").appendChild(sv);
+  var p = document.createElement("p"); p.className = "note";
+  p.textContent = "Con este dibujo salen " + count.metal + " tornillos en las de metal y " + count.pc + " en la transparente, más 6 en los traslapes. El número exacto depende de cuántas ondas tenga tu lámina: el tornillo siempre va en la cresta más cercana a la marca.";
+  document.getElementById("mapa").appendChild(p);
+}
+
+drawCorte(); drawMapa();
+if (hasGL) { build(); go(0); var c0 = camFromStep(0); cam.th = c0.th; cam.ph = c0.ph; cam.r = c0.r; cam.tgt.copy(c0.tgt); requestAnimationFrame(frame); }
+else { document.getElementById("fallback").hidden = false; go(0); }
+})();
+</script>
+</body>
+</html>
