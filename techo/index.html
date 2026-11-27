@@ -348,7 +348,7 @@ function build() {
   var floor = box(330, 2, 330, mat("#cfc6b4")); floor.position.set(140, -1, 30); scene.add(floor);
   var back = box(330, BAND0, 15, wallM); back.position.set(140, BAND0 / 2, D + 7.5); scene.add(back);
   var wire = new THREE.Mesh(new THREE.TorusGeometry(6, 0.3, 4, 16), mat("#9aa3a9")); for (var wi = 0; wi < 14; wi++) { var wr = wire.clone(); wr.position.set(wi * 21, BAND0 + 6, D + 7.5); scene.add(wr); }
-  var nb = box(330, 1, 120, mat("#9aa3a9", { transparent: true, opacity: 0.45, depthWrite: false })); nb.position.set(140, BAND0 + 45, D + 75); nb.rotation.x = -0.35; scene.add(nb);
+
   var right = box(15, 420, 330, wallM); right.position.set(-7.5, 210, 30); scene.add(right);
   var left = box(15, BAND0, 330, wallM); left.position.set(W + 7.5, BAND0 / 2, 30); scene.add(left);
   var slab = box(W + 30, BAND1 - BAND0, 135, greenM); slab.position.set(140, (BAND0 + BAND1) / 2, -67.5); scene.add(slab);
