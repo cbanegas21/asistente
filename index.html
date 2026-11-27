@@ -338,6 +338,7 @@ async function cargarTextos() {
     if (!r.ok) return;
     const d = await r.json(); const n = {};
     (d.tarjetas || []).forEach(c => { n[c.id] = c; });
+    CARDS = n; pintarTextos();
     // Un clic que ya está guardado (aquí o en la página de aprobación) no se vuelve a pedir.
     try {
       const rd = await gh("decisiones/asistente", { headers: { Accept: "application/vnd.github+json" } });
