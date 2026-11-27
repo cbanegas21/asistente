@@ -92,6 +92,7 @@ details.inv p{margin:8px 0 0;font-size:.9rem}
 .invin img{width:100%;height:auto;border-radius:10px;margin-top:8px;display:block}
 .invin p{margin:8px 0 0;font-size:.9rem}
 .invin p,details.inv p{white-space:pre-line;overflow-wrap:anywhere}
+.invin p a,details.inv p a{color:var(--accent);font-weight:600}
 .txtpanel{grid-column:2;background:var(--card);border:2px solid var(--accent);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:8px}
 .txtpanel .tmeta{font-size:.8rem;color:var(--muted)}
 .txtpanel .tmeta b{color:var(--ink);font-weight:600}
@@ -320,17 +321,36 @@ function render() {
 let CARDS = {}; const clics = {};
 const hhmm = d => d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 const corto = s => String(s || "").split(" (")[0];
-const ESTADOS = { esperando: "espera tu clic", aprobado: "aprobado", enviado: "enviado", tirado: "tirado", en_pausa: "en pausa", cambio_pedido: "pediste un cambio" };
+const ESTADOS = { decidido: "ya le diste clic", esperando: "espera tu clic", aprobado: "aprobado", enviado: "enviado", tirado: "tirado", en_pausa: "en pausa", cambio_pedido: "pediste un cambio" };
+// Los links de lo investigado se pueden tocar (solo https).
+function conLinks(el, texto) {
+  String(texto).split(/(https:\/\/[^\s]+)/).forEach(parte => {
+    if (/^https:\/\//.test(parte)) {
+      const m = parte.match(/^(.*?)([.,;:)]*)$/); const a = document.createElement("a");
+      a.href = m[1]; a.textContent = m[1]; a.target = "_blank"; a.rel = "noopener"; el.appendChild(a); if (m[2]) el.append(m[2]);
+    } else if (parte) el.append(parte);
+  });
+}
+let DECIDIDOS = new Set();
 async function cargarTextos() {
   try {
     const r = await gh("tarjetas/asistente.json", { headers: { Accept: "application/vnd.github.raw+json" } });
     if (!r.ok) return;
     const d = await r.json(); const n = {};
     (d.tarjetas || []).forEach(c => { n[c.id] = c; });
+    // Un clic que ya está guardado (aquí o en la página de aprobación) no se vuelve a pedir.
+    try {
+      const rd = await gh("decisiones/asistente", { headers: { Accept: "application/vnd.github+json" } });
+      if (rd.ok) { const lista = await rd.json(); DECIDIDOS = new Set((Array.isArray(lista) ? lista : []).map(x => (x.name.match(/^(.*\.v\d+)\./) || [])[1]).filter(Boolean)); }
+    } catch (_) {}
     CARDS = n; pintarTextos();
   } catch (_) {}
 }
-function estadoDe(c) { const l = clics[c.id + "/" + c.v]; return l ? "clic" : (c.estado || "esperando"); }
+function estadoDe(c) {
+  const l = clics[c.id + "/" + c.v]; if (l) return "clic";
+  const e = c.estado || "esperando";
+  return e === "esperando" && DECIDIDOS.has(c.id + ".v" + c.v) ? "decidido" : e;
+}
 function pintarTextos() {
   document.querySelectorAll(".txtpanel[data-card]").forEach(tp => {
     const c = CARDS[tp.dataset.card]; const tb = tp.previousElementSibling;
@@ -357,6 +377,7 @@ function pintarTextos() {
     bs.appendChild(cp);
     const st = document.createElement("div"); st.className = "tst";
     if (l) { st.textContent = l.e === "fallo" ? "No se guardó tu clic (" + l.m + "). Toca otra vez." : (l.e === "guardando" ? "Guardando tu clic…" : est.charAt(0).toUpperCase() + est.slice(1) + ". La terminal lo toma."); st.classList.toggle("no", l.e === "fallo"); }
+    else if (e === "decidido") { st.textContent = "Ya le diste clic. La terminal lo toma."; }
     else if (e !== "esperando") { st.textContent = c.nota_estado || est; st.classList.toggle("no", e === "tirado"); }
     if (e === "esperando" || (l && l.e === "fallo")) {
       const ok = document.createElement("button"); ok.type = "button"; ok.className = "ok"; ok.textContent = "Aprobar";
@@ -419,7 +440,7 @@ function invContenido(x, el) {
     const nota = document.createElement("p"); nota.className = "saved"; nota.textContent = "Cargando la imagen…"; el.appendChild(nota);
     imagen(x.img).then(u => { im.src = u; nota.remove(); }).catch(() => { nota.textContent = "No cargó la imagen. Revisa la conexión y vuelve a abrir."; im.remove(); });
   }
-  (x.lines || []).forEach(l => { const p = document.createElement("p"); p.textContent = l; el.appendChild(p); });
+  (x.lines || []).forEach(l => { const p = document.createElement("p"); conLinks(p, l); el.appendChild(p); });
   if (x.url && /^https:\/\//.test(x.url)) { const a = document.createElement("a"); a.href = x.url; a.textContent = x.urlLabel || "Abrir"; a.target = "_blank"; a.rel = "noopener"; a.className = "invlink"; el.appendChild(a); }
 }
 
