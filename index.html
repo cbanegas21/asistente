@@ -52,6 +52,8 @@ td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
 .day{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:8px;scroll-margin-top:64px}
 .day.is-today{border-color:var(--today);box-shadow:0 0 0 2px var(--accent-soft)}
 .day.is-past{opacity:.72}
+details.pasado summary{cursor:pointer;font-size:.85rem;color:var(--muted);padding:2px 0}
+details.pasado[open] summary{margin-bottom:6px}
 .dh{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .dh h3{font-size:1rem}
 .badge{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--today)}
@@ -290,10 +292,17 @@ function render() {
       const h3 = document.createElement("h3"); h3.textContent = d.name; dh.appendChild(h3);
       if (d.d === t) { const b = document.createElement("span"); b.className = "badge"; b.textContent = "Hoy"; dh.appendChild(b); }
       card.appendChild(dh);
-      if (d.fixed) { const f = document.createElement("p"); f.className = "fixed"; f.textContent = "Fijo: " + d.fixed; card.appendChild(f); }
       const ul = document.createElement("ul"); ul.className = "tasks";
       d.tasks.forEach(x => ul.appendChild(taskLi(x)));
-      card.appendChild(ul); sec.appendChild(card);
+      if (d.d < t) {
+        // Los días que ya pasaron quedan plegados; se abren con un toque.
+        const det = document.createElement("details"); det.className = "pasado";
+        const sm = document.createElement("summary"); sm.textContent = "Ya pasó: toca para ver sus tareas"; det.append(sm, ul); card.appendChild(det);
+      } else {
+        if (d.fixed) { const f = document.createElement("p"); f.className = "fixed"; f.textContent = "Fijo: " + d.fixed; card.appendChild(f); }
+        card.appendChild(ul);
+      }
+      sec.appendChild(card);
     });
     weeks.appendChild(sec);
   });
@@ -456,6 +465,10 @@ function paint() {
     const ta = box.querySelector("textarea"); if (document.activeElement !== ta && box.hidden) ta.value = s.n || "";
   });
   QS.forEach(q => { const ta = $("#q-" + q.id); const s = state[q.id]; if (ta && document.activeElement !== ta) ta.value = (s && s.n) || ""; });
+  document.querySelectorAll(".day.is-past details.pasado").forEach(det => {
+    const lis = det.querySelectorAll("li.task"); const pend = [...lis].filter(li => !li.classList.contains("done")).length;
+    det.querySelector("summary").textContent = pend ? "Ya pasó: " + pend + " sin marcar de " + lis.length + " (toca para verlas)" : "Ya pasó: las " + lis.length + " hechas (toca para verlas)";
+  });
   $("#count").textContent = done + " de " + allIds.length + " hechas";
   $("#fill").style.width = (allIds.length ? Math.round(done * 100 / allIds.length) : 0) + "%";
 }
