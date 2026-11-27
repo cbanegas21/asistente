@@ -108,10 +108,11 @@ ol.qs li { margin: 6px 0; }
 <body>
 <div class="wrap">
 <header>
-  <div class="eyebrow">Plano 1 · la lista ya va con ménsulas; el 3D se ajusta con tus medidas</div>
+  <div class="eyebrow">Plano 2 · sobre ménsulas · 20% de caída · 27 nov, 4:30 pm</div>
   <h1>Techo del patio</h1>
   <p>Es un techo de una sola caída, de <b class="num">2.80 × 1.70 m</b>, con 2 láminas de metal y la transparente en medio. Lo más alto queda en la franja verde de la losa y lo más bajo en la pared del fondo, donde va la canal con su bajante para que el agua no le caiga al vecino.</p>
-  <p><b>Por qué se cayó y qué cambia:</b> antes colgaba de una sola madera. Ahora el techito (2 vigas, 4 cuartones encima y 4 reglas) se sienta sobre 6 ménsulas de madera con pie de amigo, cada una con 2 anclas en la pared: 3 en la pared del fondo y 3 para el lado alto.</p><div class="ojo"><b>Cambio del 27 nov, 3 pm:</b> el 3D de abajo todavía muestra las vigas atornilladas a la pared. Con tu idea, en los pasos 3 y 4 primero van las ménsulas y las vigas se sientan encima, atornilladas a ellas. La lista de materiales ya es la nueva. El 3D lo ajusto cuando me mandes las medidas.</div>
+  <p><b>Por qué se cayó y qué cambia:</b> antes colgaba de una sola madera. Ahora la viga de abajo se sienta en 3 ménsulas de madera con pie de amigo, en la pared del fondo, y la de arriba va con 5 anclas a la franja verde. Encima van 4 cuartones y 4 reglas.</p>
+  <div class="ojo"><b>Por qué no hay ménsulas en la franja verde:</b> abajo de la franja está el techo del pasillo, y no hay pared donde apoyar la pieza parada ni el pie de amigo (se ve en tus fotos de la 1:16). Por eso ahí la viga va con anclas directo a la franja, que es el borde de la losa. La lista de antes decía 6 ménsulas, 3 de ellas en el lado alto: eso estaba mal y ya lo cambié a 3.</div>
 </header>
 
 <section class="player" aria-label="Armado en 3D">
@@ -129,6 +130,23 @@ ol.qs li { margin: 6px 0; }
   </div>
   <div class="steps" id="steps"></div>
   <div class="stepnote" id="stepnote"></div>
+</section>
+
+<section class="card">
+  <h2>Dónde van los soportes</h2>
+  <p class="note">Todo se mide desde la pared alta. Las alturas se miden desde la línea alta, que es el canto de arriba de la viga alta en la franja verde.</p>
+  <div class="tw"><table>
+    <thead><tr><th>Soporte</th><th>Dónde</th><th>Desde la pared alta</th><th>Altura</th></tr></thead>
+    <tbody>
+      <tr><td>Ménsula 1</td><td>Pared del fondo</td><td class="q">25 cm</td><td>Canto de arriba del brazo, <b class="num">39.0 cm</b> abajo de la línea alta</td></tr>
+      <tr><td>Ménsula 2</td><td>Pared del fondo</td><td class="q">140 cm</td><td>Igual, 39.0 cm abajo</td></tr>
+      <tr><td>Ménsula 3</td><td>Pared del fondo</td><td class="q">255 cm</td><td>Igual, 39.0 cm abajo</td></tr>
+      <tr><td>Viga alta, con 5 anclas</td><td>Franja verde</td><td class="q">15, 77, 140, 203 y 265 cm</td><td>Canto de arriba en la línea alta, por lo menos 12 cm abajo de la orilla de arriba de la franja</td></tr>
+    </tbody>
+  </table></div>
+  <div id="pared"></div>
+  <p><b>De dónde sale el 39.0:</b> la lámina va con 20% de caída. Entre las caras de las 2 vigas hay 150.4 cm, así que la viga baja queda 150.4 × 0.20 = <b class="num">30.1 cm</b> más abajo que la alta. La viga baja va parada encima del brazo y mide 8.9 cm de alto: 30.1 + 8.9 = <b class="num">39.0 cm</b>.</p>
+  <p><b>El triángulo del cuartón:</b> 150.4 cm acostado, 30.1 cm parado y <b class="num">153.4 cm</b> de largo por arriba, con 11.3° de inclinación. <b>El de la lámina:</b> 166.7 cm acostada, 33.3 cm parada y 170 cm de largo. Termina 3.3 cm antes de la pared del fondo, encima de la canal.</p>
 </section>
 
 <section class="card">
@@ -151,38 +169,38 @@ ol.qs li { margin: 6px 0; }
 
 <section class="card">
   <h2>Lista de materiales</h2>
-  <p class="note">Lista nueva, para ponerlo sobre ménsulas como dijiste. Las láminas ya las tienen. Los precios no los he verificado.</p>
+  <p class="note">Lista del plano 2, sobre 3 ménsulas. Las láminas ya las tienen. Los precios con link son de la página de La Mundial de hoy, 27 nov; la página no dice si hay en existencia. Los demás precios no los he verificado.</p>
   <div class="tw"><table>
     <thead><tr><th>Qué</th><th>Cuánto</th><th>Para qué</th></tr></thead>
     <tbody>
       <tr class="grp"><td colspan="3">Madera</td></tr>
-      <tr><td>Cuartón 2"x4" de 12 pies (3.66 m), sano y seco</td><td class="q">7</td><td>3 para las vigas (la de arriba va doble, 2 piezas atornilladas), 2 para los 4 cuartones de 1.75 m y 2 para las 6 ménsulas. Si de la madera que ya tienen sirve alguna, se resta.</td></tr>
+      <tr><td>Cuartón 2"x4" de 12 pies (3.66 m), sano y seco</td><td class="q">5</td><td>1 para la viga alta, 1 para la baja, 2 para los 4 cuartones de 153.4 cm (salen 2 de cada pieza) y 1 para las 3 ménsulas. Si de la madera que ya tienen sirve alguna, se resta.</td></tr>
       <tr><td>Regla 2"x2" de 10 pies (3.05 m)</td><td class="q">4</td><td>Las 4 reglas de 2.80 m donde se atornillan las láminas. Palram pide mínimo 2"x2".</td></tr>
-      <tr class="grp"><td colspan="3">Ménsulas (los soportes en la pared)</td></tr>
-      <tr><td colspan="3">Cada ménsula, de 2x4: una pieza parada de 40 cm contra la pared, un brazo de 30 cm encima, donde se sienta la viga, y un pie de amigo de 35 cm con las 2 puntas a 45°, de la pieza parada al brazo. Van 6: 3 en la pared del fondo y 3 para el lado alto.</td></tr>
-      <tr><td>Ancla de expansión tipo camisa de 3/8" x 4", con tuerca y arandela</td><td class="q">14</td><td>2 en cada ménsula y 2 de repuesto. Va con broca de concreto de 3/8" y la tuerca se aprieta con llave de 9/16".</td></tr>
-      <tr><td>Tornillo para madera de 3", #10, galvanizado (para exterior)</td><td class="q">120</td><td>Ménsulas (6 cada una), la viga doble, las vigas sobre las ménsulas, los cuartones sobre las vigas y las reglas (2 por cruce).</td></tr>
-      <tr><td>Escuadra de metal de 3"</td><td class="q">8</td><td>Una en cada punta de cada cuartón, contra la viga.</td></tr>
-      <tr><td>Tornillo para madera #10 x 1 1/4"</td><td class="q">40</td><td>4 por escuadra y 8 de repuesto.</td></tr>
+      <tr class="grp"><td colspan="3">Ménsulas (los soportes de la pared del fondo)</td></tr>
+      <tr><td colspan="3">Van 3. Cada una, de 2x4: una pieza parada de 40 cm con la cara ancha contra la pared, un brazo de 30 cm encima, donde se sienta la viga baja, y un pie de amigo de 35 cm por el lado largo, con las 2 puntas a 45°, de la pieza parada al brazo. Las 3 salen de un cuartón (3 × 105 cm).</td></tr>
+      <tr><td>Ancla de expansión tipo camisa de 3/8" x 4", con tuerca y arandela</td><td class="q">13</td><td>5 en la viga alta, 2 en cada ménsula y 2 de repuesto. Va con broca de concreto de 3/8" y la tuerca se aprieta con llave de 9/16".</td></tr>
+      <tr><td>Tornillo para madera de 3", #10, galvanizado (para exterior)</td><td class="q">70</td><td>Las ménsulas (6 cada una), la viga baja sobre los brazos (2 por brazo) y las reglas (2 por cruce).</td></tr>
+      <tr><td>Escuadra de metal de 3"</td><td class="q">19</td><td>2 en cada punta de cada cuartón, una de cada lado (16), y una en cada brazo contra la viga baja (3).</td></tr>
+      <tr><td>Tornillo para madera #10 x 1 1/4"</td><td class="q">80</td><td>4 por escuadra y 4 de repuesto.</td></tr>
       <tr class="grp"><td colspan="3">Para pegar las láminas (no son clavos)</td></tr>
-      <tr><td>Tornillo de techo para madera: autorroscante, cabeza hexagonal de 5/16", arandela de neopreno, #12, de 2", galvanizado</td><td class="q">1 bolsa de 100</td><td>Se usan unos 70: 40 en las de metal, 24 en la transparente y 6 en los traslapes. Va en la cresta de la onda, nunca en el canal. Si solo hay "punta broca" (la de metal), también entra en madera.</td></tr>
-      <tr><td>Arandela de hule grande (25 mm)</td><td class="q">30</td><td>Si la hay, para la transparente, que lleva el agujero más grande (broca de 3/8").</td></tr>
-      <tr><td colspan="3" class="note">Clavo: Ternium también enseña el "clavo de lámina" con arandela para la de metal, pero el tornillo agarra mejor. En la transparente nunca va clavo: Palram dice "NEVER use nails".</td></tr>
+      <tr><td>Tornillo para techar #10 x 2", con arandela de goma, cabeza hexagonal y galvanizado. En La Mundial, Wadfow, bolsa de 120, L85: <a href="https://lamundial.com/shop/143954-tornillo-para-techar-10x2-120pc-wadfow-wxs4935-16423" target="_blank" rel="noopener">lamundial.com/shop/143954</a></td><td class="q">1 bolsa</td><td>Se usan unos 70: 40 en las de metal, 24 en la transparente y 6 en los traslapes. Va en la cresta de la onda, nunca en el canal. Se pone con dado de 5/16".</td></tr>
+      <tr><td>Arandela de hule grande (25 mm)</td><td class="q">30</td><td>Si la hay, para la transparente, que lleva el agujero más grande (broca de 5/16").</td></tr>
+      <tr><td colspan="3" class="note">Clavo: en la transparente nunca va clavo (Palram: "NEVER use nails"). En las de metal, Ternium también enseña el clavo de lámina con arandela, pero el tornillo agarra mejor.</td></tr>
       <tr class="grp"><td colspan="3">Agua</td></tr>
-      <tr><td>Canal (canoa) de PVC de 3 m, con 2 tapas, 1 salida para bajante de 3" y 4 ganchos</td><td class="q">1 juego</td><td>Si el tubo de 4" partido de antes está entero, sirve en vez de la canal.</td></tr>
+      <tr><td>Canal (canoa) de PVC de 3 m que no pase de 12 cm de ancho, con 2 tapas y 1 salida para bajante de 3"</td><td class="q">1 juego</td><td>Va sentada en los brazos de las ménsulas, en los 12 cm entre la viga baja y la pared. Si el tubo de 4" partido de antes está entero (mide 11.4 cm), sirve en vez de la canal.</td></tr>
       <tr><td>Tubo PVC de 3" para bajante</td><td class="q">1 de 3 m</td><td>Si el desagüe queda lejos, uno de 6 m.</td></tr>
       <tr><td>Codo de 3" a 90°</td><td class="q">2</td><td>Abajo, hacia el desagüe.</td></tr>
       <tr><td>Abrazadera de 3", con taco y tornillo</td><td class="q">3</td><td>Para sujetar el bajante a la pared.</td></tr>
       <tr><td>Pegamento para PVC</td><td class="q">1/8 de galón</td><td>Salida y codos.</td></tr>
       <tr class="grp"><td colspan="3">Que no se meta el agua</td></tr>
-      <tr><td>Lámina lisa galvanizada, calibre 26, de 4 x 8 pies</td><td class="q">1</td><td>Se corta en tiras de 30 cm para tapar la unión con la franja verde y con la pared del fondo.</td></tr>
-      <tr><td>Sellador de poliuretano para exterior (tipo Sikaflex-1a), tubo de 300 ml</td><td class="q">2</td><td>La orilla de arriba de las tiras, los traslapes y los huecos de las anclas.</td></tr>
-      <tr><td>Cinta tapagoteras de aluminio con butilo, de 10 cm</td><td class="q">1 rollo</td><td>Donde las láminas topan con las paredes de los lados.</td></tr>
+      <tr><td>Lámina lisa galvanizada, calibre 26, de 4 x 8 pies</td><td class="q">1</td><td>Se corta en tiras de 30 cm para tapar la unión de las láminas con la franja verde.</td></tr>
+      <tr><td>Sellador de poliuretano para exterior, 300 ml. En La Mundial, Sikaflex sellador adhesivo gris, L234: <a href="https://lamundial.com/shop/135612-sellador-adhesivo-300ml-sikaflex-gris-25342" target="_blank" rel="noopener">lamundial.com/shop/135612</a></td><td class="q">2</td><td>La orilla de arriba de las tiras, los traslapes y los huecos de las anclas. Con pistola de calafatear.</td></tr>
+      <tr><td>Cinta tapagotera de 6" con aluminio, por metro. En La Mundial, Abro, L52 el metro: <a href="https://lamundial.com/shop/61705-cinta-tapagotera-6-abro-rt-6-60-33-1-mt-plateado-36290" target="_blank" rel="noopener">lamundial.com/shop/61705</a></td><td class="q">7 m</td><td>Donde las láminas topan con las paredes de los lados (2 × 1.70 m) y encima de la tira de la franja verde (2.80 m).</td></tr>
       <tr class="grp"><td colspan="3">Pintura</td></tr>
       <tr><td>Preservante para madera o pintura de aceite, y una brocha</td><td class="q">1/4 de galón</td><td>Toda la madera, sobre todo las puntas, antes de subirla.</td></tr>
       <tr><td>Pintura acrílica blanca o cinta de aluminio</td><td class="q">poquito</td><td>Encima de las reglas donde va la transparente, para que no se calienten (Palram).</td></tr>
       <tr class="grp"><td colspan="3">Herramienta (revisa que esté)</td></tr>
-      <tr><td colspan="3">Rotomartillo con broca de concreto de 3/8", llave de 9/16", taladro con broca de 3/8" para metal (la transparente) y dado magnético de 5/16" (tornillos de techo), sierra o ingletadora (cortes a 45° y a 17°), tijera para lámina, nivel y manguera de nivel, tiralíneas, cinta métrica, escuadra, 2 escaleras, pistola de sellador, guantes y lentes.</td></tr>
+      <tr><td colspan="3">Rotomartillo con broca de concreto de 3/8", llave de 9/16", taladro con broca de 5/16" para metal (la transparente) y dado magnético de 5/16" (tornillos de techo), sierra o ingletadora (cortes a 45° y a 11.3°), tijera para lámina, nivel y manguera de nivel, tiralíneas, cinta métrica, escuadra, 2 escaleras, pistola de sellador, guantes y lentes.</td></tr>
     </tbody>
   </table></div>
 </section>
@@ -192,15 +210,16 @@ ol.qs li { margin: 6px 0; }
   <ol class="pasos">
     <li><b>Pintar la madera</b> con preservante, sobre todo las puntas. Si no da tiempo, por lo menos las puntas y la cara que va contra la pared.</li>
     <li><b>Quitar lo viejo:</b> la madera que cuelga de la esquina de la losa, el soporte de la pared del fondo y lo que quede del tubo. Revisa que el concreto donde estaban no esté quebrado.</li>
-    <li><b>Marcar las 2 líneas.</b> La alta va en la franja verde: es donde queda el canto de arriba de la viga alta. Tiene que quedar por lo menos 12 cm abajo de la orilla de arriba de la franja, porque encima de la viga van la regla y la lámina (unos 6 cm) y arriba de eso la tira de lámina lisa. La baja va en la pared del fondo, <b class="num">48.7 cm</b> más abajo, que es la caída del 30%. Pasa la altura de una pared a la otra con la manguera de nivel, en las 2 esquinas, y marca con el tiralíneas.</li>
-    <li><b>Viga alta:</b> la 2x4 de 2.80 m, acostada contra la franja verde, con el canto de arriba en la línea. Se perfora la madera primero (3/8"), se presenta, se marca la pared, se perfora el concreto, se meten las anclas y se aprietan. Van 5, a 15, 77, 140, 203 y 265 cm de la pared alta, para que no choquen con los cuartones. Un poco de sellador en cada hueco antes del ancla.</li>
-    <li><b>Viga baja:</b> igual, en la pared del fondo, con el canto de arriba en la línea baja. Si al perforar se siente hueca, me avisas antes de meter las anclas.</li>
-    <li><b>Cuartones:</b> son 4, de punta a punta entre las vigas: uno pegado a cada pared de los lados y 2 en medio, cada 92 cm. Las puntas van cortadas a 17° para que queden paradas contra las vigas. Miden unos 170 cm por arriba, pero mide cada uno en su lugar, porque las paredes nunca están parejas. El canto de arriba queda al ras del canto de arriba de las vigas. Se sujetan con 2 escuadras por punta.</li>
-    <li><b>Reglas:</b> las 4 de 2x2, acostadas sobre los cuartones, a lo ancho. Mide sobre el cuartón desde su punta de arriba hasta el centro de cada regla: <b class="num">4, 55, 105 y 156 cm</b>. Quedan a 51 cm una de otra, y Palram permite hasta 80. Van 2 tornillos de 3" en cada cruce. Pinta de blanco el tramo de las reglas que queda bajo la transparente.</li>
-    <li><b>Canal y bajante:</b> la canal se cuelga de la cara de la viga baja, justo debajo, con 1.5 cm de caída hacia la esquina donde baja el tubo. La salida va abajo en esa punta y el bajante baja pegado a la pared hasta el desagüe. Luego se pone la tira de lámina lisa sobre la viga baja: sube 10 cm por la pared, tapa el canto de la viga y se dobla hacia abajo dentro de la canal. Así el agua que cae ahí se va a la canal y no pudre la viga.</li>
-    <li><b>Lámina de metal junto a la pared alta:</b> pegada a la pared alta, con la punta de arriba contra la franja verde. Por abajo sale 8 cm después de la última regla, y esos 8 cm quedan sobre la canal. Lleva 5 tornillos por regla, en la cresta.</li>
+    <li><b>Marcar.</b> La línea alta va en la franja verde: es donde queda el canto de arriba de la viga alta. Tiene que quedar por lo menos 12 cm abajo de la orilla de arriba de la franja, porque encima de la viga van la regla y la lámina (unos 6 cm) y arriba de eso la tira de lámina lisa. Con la manguera de nivel pasa esa altura a la pared del fondo, en las 2 esquinas, mide <b class="num">39.0 cm</b> para abajo y une las marcas con el tiralíneas: esa es la línea de los brazos. Sobre esa línea marca el centro de cada ménsula, a <b class="num">25, 140 y 255 cm</b> de la pared alta.</li>
+    <li><b>Ménsulas:</b> son 3 y se arman en el piso. El brazo de 30 cm va encima de la pieza parada de 40 cm, con 2 tornillos de 3" de arriba hacia abajo. Perfora la pieza parada (3/8") a 5 cm y a 33 cm debajo del brazo. Presenta cada una con el canto de arriba del brazo en la línea y el centro en su marca, marca la pared, perfora el concreto, pon un poco de sellador y mete las 2 anclas. Revisa con el nivel que el brazo quede derecho. Al final va el pie de amigo de 35 cm debajo del brazo, una punta contra la pieza parada y la otra contra el brazo, con 2 tornillos en cada punta: va de último porque tapa el ancla de arriba. Si al perforar la pared se siente hueca, me avisas antes de meter las anclas.</li>
+    <li><b>Viga alta:</b> la 2x4 de 2.80 m, acostada contra la franja verde, con el canto de arriba en la línea alta. Aquí no van ménsulas porque abajo de la franja está el techo del pasillo y no hay pared. Se perfora la madera (3/8"), se presenta, se marca la franja, se perfora el concreto, se meten las anclas y se aprietan. Van 5, a 15, 77, 140, 203 y 265 cm de la pared alta, para que no choquen con los cuartones. Un poco de sellador en cada hueco antes del ancla.</li>
+    <li><b>Viga baja:</b> la otra 2x4 de 2.80 m va parada (de canto) sobre los 3 brazos, con la cara de atrás a <b class="num">12 cm</b> de la pared del fondo. Esos 12 cm son para la canal. Se sujeta a cada brazo con una escuadra y 2 tornillos de 3" en diagonal.</li>
+    <li><b>Cuartones:</b> son 4, de viga a viga: uno pegado a cada pared de los lados y 2 en medio, cada 92 cm. Miden <b class="num">153.4 cm</b> por arriba, con las 2 puntas cortadas a 11.3° y paralelas, para que queden paradas contra las vigas. Mide cada uno en su lugar antes de cortar, porque las paredes nunca están parejas. El canto de arriba queda al ras de las 2 vigas. Van 2 escuadras por punta, una de cada lado.</li>
+    <li><b>Reglas:</b> las 4 de 2x2, acostadas a lo ancho. Mide sobre el cuartón desde su punta de arriba hasta el centro de cada regla: <b class="num">4, 54.5 y 105 cm</b>. La cuarta va centrada encima de la viga baja. Quedan a 50 cm una de otra, y Palram permite hasta 80. Van 2 tornillos de 3" en cada cruce. Pinta de blanco el tramo de las reglas que queda bajo la transparente.</li>
+    <li><b>Canal y bajante:</b> la canal va sentada en los 3 brazos, en los 12 cm entre la viga baja y la pared. Para que el agua corra hacia el bajante, pon una calza de 1.4 cm debajo de la canal en la ménsula del lado de la casa y una de 0.8 cm en la del medio. La salida va a 10 cm de la pared alta y el bajante baja pegado a la pared del fondo hasta el desagüe.</li>
+    <li><b>Lámina de metal junto a la pared alta:</b> pegada a la pared alta, con la punta de arriba contra la franja verde. Por abajo pasa 11 cm después de la última regla y termina 3.3 cm antes de la pared del fondo, encima de la canal. Lleva 5 tornillos por regla, en la cresta.</li>
     <li><b>Lámina de metal del lado de la casa verde:</b> igual, del otro lado.</li>
-    <li><b>Transparente en medio:</b> va encima de las 2 de metal, montada onda y media sobre cada una, con un cordón de sellador debajo del traslape. Las letras van hacia arriba, porque ese es el lado que aguanta el sol. Antes de atornillar se le hace el agujero más grande que el tornillo, para que se pueda estirar con el calor. Con tornillo de 1/4", broca de 3/8": así le quedan unos 3 mm de juego. Los tornillos se aprietan solo hasta que el hule asiente, sin aplastarlo. Si las ondas no calzan con las de metal, se rellena el traslape con sellador.</li>
+    <li><b>Transparente en medio:</b> va encima de las 2 de metal, montada onda y media sobre cada una, con un cordón de sellador debajo del traslape. Las letras van hacia arriba, porque ese es el lado que aguanta el sol. Antes de atornillar se le hace el agujero más grande que el tornillo, para que se pueda estirar con el calor. El tornillo #10 mide 4.8 mm; con broca de 5/16" (7.9 mm) le quedan unos 3 mm de juego. Los tornillos se aprietan solo hasta que el hule asiente, sin aplastarlo. Si las ondas no calzan con las de metal, se rellena el traslape con sellador.</li>
     <li><b>Tiras de arriba y de los lados:</b> 2 tiras de lámina lisa en la franja verde, montadas 10 cm entre ellas. Bajan sobre las láminas unos 12 cm y la orilla de arriba se sella contra la pared. En los 2 lados, donde las láminas topan con las paredes, va la cinta tapagoteras, mitad en la pared y mitad sobre la lámina.</li>
     <li><b>Prueba con la manguera</b> desde arriba, de la franja verde hacia abajo. Revisa por debajo que no gotee en los traslapes, los tornillos y las orillas.</li>
   </ol>
@@ -216,15 +235,17 @@ ol.qs li { margin: 6px 0; }
 
 <section class="card">
   <h2>Lo que supuse y me falta saber</h2>
-  <p>Este plano 1 se armó con tus 2 medidas y las 12 fotos. Para cerrarlo me hace falta esto:</p>
+  <p>Este plano 2 se armó con tus 2 medidas y las 12 fotos de la 1:16. Para cerrarlo me hace falta esto:</p>
   <ol class="qs">
-    <li><b>Alturas:</b> del piso al borde de abajo de la franja verde, cuánto mide la franja de alto y qué altura tiene la pared del fondo. Con la caída del 30%, la orilla baja queda 49 cm más abajo que la alta. Si así queda muy baja para pasar, se puede bajar al 25%.</li>
-    <li><b>El lado alto:</b> lo puse en la losa y la canal en la pared del fondo, por lo que dijiste del agua del vecino. Si antes era al revés, me dices.</li>
-    <li><b>La madera que tienen:</b> cuántas piezas y de qué medida (por ejemplo 2x4 de 12 pies). Con eso ajusto los cortes.</li>
+    <li><b>Las láminas viejas:</b> ¿topaban contra la franja verde o entraban por debajo de la losa, debajo del techo del pasillo? La madera vieja que cuelga de la esquina baja más que la franja, y por eso pregunto. Si entraban por debajo, cambian las alturas.</li>
+    <li><b>La franja verde:</b> cuánto mide de alto. Tiene que medir por lo menos 21 cm para que quepan la viga (8.9 cm) y, encima, los 12 cm de la regla, la lámina y la tira.</li>
+    <li><b>El lado de la casa:</b> en tus fotos, lo verde de arriba sale más que la pared café de abajo. ¿Los 2.80 m los mediste hasta la orilla de lo verde o hasta la pared café?</li>
+    <li><b>El marco viejo:</b> si sirve, el largo y el grueso de sus piezas. Con eso ajusto los cortes.</li>
+    <li><b>Alturas:</b> del piso a la orilla de abajo de la franja verde y del piso a lo alto de la pared del fondo, para ver que no quede bajo para pasar.</li>
     <li><b>Las ondas:</b> pon la transparente encima de una de metal y fíjate si las ondas calzan.</li>
-    <li><b>El desagüe del piso:</b> en qué esquina está, para poner ahí el bajante. Lo puse en la esquina de la pared alta con la del fondo.</li>
+    <li><b>El desagüe del piso:</b> en qué esquina está. Puse el bajante junto a la pared alta.</li>
   </ol>
-  <p><b>Por qué 30% y no menos:</b> Ternium pide como mínimo 20% para su lámina de zinc ondulada. Con 30%, la lámina de 1.70 m termina 7 cm antes de la pared del fondo, así que el agua cae limpia en la canal y no sobre la viga. Con 20%, terminaría encima de la viga.</p>
+  <p><b>Por qué 20%:</b> es lo mínimo que pide Ternium para su lámina ondulada. Con 20%, la lámina de 1.70 m termina 3.3 cm antes de la pared del fondo, que es lo más cerca que puede quedar sin salirse. Para que la canal quepa debajo de esa punta, la viga baja va separada 12 cm de la pared, sentada en los brazos de las ménsulas.</p>
   <h3>Fuentes</h3>
   <ul class="src">
     <li>Ternium, Catálogo de soluciones (lámina galvanizada ondulada): pendiente mínima de 20%, 5 tornillos por lámina en cada apoyo y tornillo autotaladrante con arandela de neopreno. <a href="https://amcen.ternium.com/media/4obedfth/cata-logo-de-soluciones-tx-nicaragua.pdf" target="_blank" rel="noopener">amcen.ternium.com</a></li>
@@ -239,21 +260,25 @@ ol.qs li { margin: 6px 0; }
 (function () {
 "use strict";
 // ---------- Medidas (cm). x: a lo largo (2.80 m); z: de la losa (0) a la pared del fondo (170); y: hacia arriba ----------
-var W = 280, D = 170, P = 0.30, K = Math.sqrt(1 + P * P), ANG = Math.atan(P);
+var W = 280, D = 170, P = 0.20, K = Math.sqrt(1 + P * P), ANG = Math.atan(P);
 var T = 3.8, H4 = 8.9;                 // grueso y alto de una 2x4
-var zA = T, zB = D - T;                // caras de las 2 vigas
+var GAP = 12;                          // de la pared del fondo a la cara de atrás de la viga baja: ahí va la canal
+var zA = T, zB = D - GAP - T;          // caras de adentro de las 2 vigas (3.8 y 154.2)
 var yH = 262;                          // canto de arriba de la viga alta (supuesto)
 var BAND0 = 250, BAND1 = 275;          // franja verde (supuesto)
 function yRaf(z) { return yH - P * (z - zA); }       // canto de arriba de los cuartones
 var yL = yRaf(zB);                                  // canto de arriba de la viga baja
+var yArm = yL - H4;                                 // canto de arriba de los brazos de las ménsulas
 var SHEET = 170, zEnd = SHEET / K;                  // la lámina, de la franja verde hacia abajo
 function ySheet(z) { return yRaf(z) + T; }          // cara de abajo de la lámina
-var SP = [8, 58.7, 109.3, 160];                     // centro de cada regla, medido sobre la lámina desde arriba
+var SP = [8, 58.4, 108.8, 159.2];                   // centro de cada regla, medido sobre la lámina desde arriba
 var ZP = SP.map(function (s) { return s / K; });
 var XR = [1.9, 93.97, 186.03, 278.1];               // centro de cada cuartón
-var XANCH = [15, 77, 140, 203, 265];                // tacos
-var GR = 5.7, gZ = zB - GR, gTop = yL - H4 - 1;     // canal de 4"
-var XDOWN = 15;                                     // bajante
+var XANCH = [15, 77, 140, 203, 265];                // anclas de la viga alta
+var XM = [25, 140, 255];                            // centro de cada ménsula
+var MUP = 40, MARM = 30, MBR = 35;                  // pieza parada, brazo y pie de amigo (lado largo)
+var GR = 5.7, gZ = D - GAP / 2, gTop = yArm + GR;   // canal de 4" sentada en los brazos
+var XDOWN = 10;                                     // bajante
 var PITCH = 7.6, AMP = 1.7;                         // onda de la lámina (dibujo)
 var SHEETS = [ { x0: 0, kind: "metal" }, { x0: 180, kind: "metal" }, { x0: 90, kind: "pc" } ];
 
@@ -265,27 +290,30 @@ var STEPS = [
   { t: "Así está", sub: "El patio de 2.80 × 1.70 m. Lo rojo es lo viejo que se quita.",
     li: ["La madera que cuelga de la esquina de la losa se quita.", "El soporte de la pared del fondo se quita.", "Revisa que el concreto donde estaban no esté quebrado."],
     cam: [-35, 32, 520], pins: [["Madera vieja: se quita", [W - 6, 215, -3], "warn"], ["Soporte viejo: se quita", [110, 240, 168], "warn"], ["2.80 m", [140, 150, 172], "dim"], ["1.70 m", [282, 60, 85], "dim"]] },
-  { t: "Marcar las 2 líneas", sub: "La línea alta en la franja verde y la baja en la pared del fondo, 48.7 cm más abajo.",
-    li: ["Línea alta: el canto de arriba de la viga alta, por lo menos 12 cm abajo de la orilla de arriba de la franja.", "Línea baja: 48.7 cm más abajo, en la pared del fondo (caída del 30%).", "La altura se pasa de una pared a otra con la manguera de nivel, en las 2 esquinas."],
-    cam: [-20, 18, 430], pins: [["Línea alta", [60, yH + 3, 0], "dim"], ["Línea baja: 48.7 cm más abajo", [60, yL + 3, D], "dim"]] },
-  { t: "Viga alta", sub: "Una 2x4 de 2.80 m acostada contra la franja verde, con 5 anclas de 3/8\".",
-    li: ["Perfora primero la madera, presenta, marca, perfora el concreto y mete las anclas.", "Anclas a 15, 77, 140, 203 y 265 cm de la pared alta.", "Un poco de sellador en cada hueco antes del ancla."],
-    cam: [20, 22, 330], tgt: [140, yH, 20], pins: [["Viga alta 2x4 de 2.80 m", [200, yH + 2, 2], ""], ["5 anclas de 3/8\" x 4\"", [77, yH - 4, 3.8], "screw"]] },
-  { t: "Viga baja", sub: "Igual, en la pared del fondo, con el canto de arriba en la línea baja.",
-    li: ["Misma viga y mismas 5 anclas.", "El canto de arriba queda en la línea baja.", "Si al perforar la pared se siente hueca, me avisas: el bloque hueco lleva otro taco."],
-    cam: [-62, 24, 330], tgt: [140, yL, 150], pins: [["Viga baja 2x4 de 2.80 m", [200, yL + 2, D - 2], ""], ["5 anclas", [140, yL - 4, D - T], "screw"]] },
-  { t: "Los 4 cuartones", sub: "De viga a viga, cada 92 cm, con las puntas cortadas a 17° y 2 escuadras por punta.",
-    li: ["4 cuartones 2x4: uno pegado a cada pared de los lados y 2 en medio.", "Las puntas van cortadas a 17°. Miden unos 170 cm por arriba, pero mide cada uno en su lugar.", "El canto de arriba queda al ras de las vigas. Van 2 escuadras de 3\" en cada punta."],
-    cam: [-30, 35, 420], pins: [["Cuartón 2x4, unos 170 cm", [94, yRaf(90) + 6, 90], ""], ["Cada 92 cm", [140, yRaf(60) + 6, 60], "dim"], ["2 escuadras por punta", [186, yH - 6, 6], "screw"]] },
-  { t: "Las 4 reglas", sub: "Reglas 2x2 de 2.80 m a lo ancho, cada 51 cm, con 2 tornillos de 3\" en cada cruce.",
-    li: ["Medido sobre el cuartón, desde su punta de arriba al centro de cada regla: 4, 55, 105 y 156 cm.", "Quedan a 51 cm una de otra. Palram permite hasta 80.", "Pinta de blanco el tramo que queda bajo la transparente."],
-    cam: [-30, 40, 420], pins: [["Regla 2x2 de 2.80 m", [250, ySheet(ZP[1]) + 3, ZP[1]], ""], ["4 · 55 · 105 · 156 cm", [40, ySheet(ZP[2]) + 3, ZP[2]], "dim"]] },
-  { t: "Canal y bajante", sub: "La canal colgada bajo la viga baja, con 1.5 cm de caída hacia el bajante.",
-    li: ["Canal de PVC de 4\" (el tubo partido, si el de antes sirve) colgada de la cara de la viga baja.", "1.5 cm de caída hacia la esquina del bajante.", "Tira de lámina lisa sobre la viga baja: sube 10 cm por la pared y se dobla dentro de la canal."],
-    cam: [170, -5, 330], tgt: [130, yL - 40, 160], pins: [["Canal PVC 4\"", [200, gTop + 2, gZ - 4], ""], ["Bajante PVC 3\" al desagüe", [XDOWN, 150, gZ], ""], ["Lámina lisa sobre la viga", [120, yL + 6, D - 1], "dim"]] },
+  { t: "Marcar", sub: "La línea alta en la franja verde y, en la pared del fondo, la línea de los brazos 39 cm más abajo.",
+    li: ["Línea alta: el canto de arriba de la viga alta, por lo menos 12 cm abajo de la orilla de arriba de la franja.", "Con la manguera de nivel pasa esa altura a la pared del fondo y mide 39.0 cm para abajo: es la línea de los brazos.", "Sobre esa línea, el centro de cada ménsula a 25, 140 y 255 cm de la pared alta."],
+    cam: [-20, 18, 430], pins: [["Línea alta", [60, yH + 3, 0], "dim"], ["Línea de los brazos: 39 cm más abajo", [200, yArm + 3, D], "dim"], ["25 · 140 · 255 cm", [140, yArm - 14, D], "dim"]] },
+  { t: "Las 3 ménsulas", sub: "En la pared del fondo, a 25, 140 y 255 cm de la pared alta, con el brazo en la línea.",
+    li: ["Cada una: pieza parada de 40 cm con la cara ancha contra la pared, brazo de 30 cm encima y pie de amigo de 35 cm (lado largo) con las puntas a 45°.", "2 anclas de 3/8\" x 4\" por la pieza parada, a 5 y a 33 cm debajo del brazo. El brazo, nivelado y con su canto de arriba en la línea.", "El pie de amigo va de último, porque tapa el ancla de arriba."],
+    cam: [-115, 14, 300], tgt: [140, yArm - 20, 150], pins: [["Ménsula: brazo en la línea", [140, yArm + 4, D - 15], ""], ["2 anclas", [255, yArm - 30, D - 5], "screw"], ["25 cm de la pared alta", [25, yArm + 12, D - 3], "dim"]] },
+  { t: "Viga alta", sub: "Abajo de la franja no hay pared para ménsulas: aquí la viga va con 5 anclas a la franja.",
+    li: ["La 2x4 de 2.80 m acostada contra la franja verde, con el canto de arriba en la línea alta.", "Anclas a 15, 77, 140, 203 y 265 cm de la pared alta.", "Un poco de sellador en cada hueco antes del ancla."],
+    cam: [20, 22, 330], tgt: [140, yH, 20], pins: [["Viga alta 2x4 de 2.80 m", [200, yH + 2, 2], ""], ["5 anclas de 3/8\" x 4\"", [77, yH - 4, 3.8], "screw"], ["Abajo: techo del pasillo", [140, BAND0 - 18, -20], "warn"]] },
+  { t: "Viga baja sobre las ménsulas", sub: "Parada sobre los 3 brazos, con la cara de atrás a 12 cm de la pared del fondo.",
+    li: ["La otra 2x4 de 2.80 m va parada (de canto) sobre los brazos.", "Entre la viga y la pared quedan 12 cm libres: ahí va la canal.", "Una escuadra en cada brazo y 2 tornillos de 3\" en diagonal."],
+    cam: [-115, 14, 300], tgt: [140, yL - 12, 150], pins: [["Viga baja 2x4, parada en los brazos", [200, yL + 3, zB + 2], ""], ["12 cm para la canal", [60, yArm + 4, gZ], "dim"]] },
+  { t: "Los 4 cuartones", sub: "De viga a viga, cada 92 cm: 153.4 cm con las puntas a 11.3° y 2 escuadras por punta.",
+    li: ["4 cuartones 2x4: uno pegado a cada pared de los lados y 2 en medio.", "Miden 153.4 cm por arriba, con las 2 puntas cortadas a 11.3° y paralelas. Mide cada uno en su lugar antes de cortar.", "El canto de arriba queda al ras de las 2 vigas. 2 escuadras de 3\" en cada punta."],
+    cam: [-30, 35, 420], pins: [["Cuartón 2x4 de 153.4 cm", [94, yRaf(80) + 6, 80], ""], ["Cada 92 cm", [140, yRaf(60) + 6, 60], "dim"], ["Puntas a 11.3°, 2 escuadras", [186, yH - 6, 6], "screw"]] },
+  { t: "Las 4 reglas", sub: "Reglas 2x2 de 2.80 m a lo ancho, cada 50 cm. La última va encima de la viga baja.",
+    li: ["Medido sobre el cuartón, desde su punta de arriba al centro de cada regla: 4, 54.5 y 105 cm. La cuarta, centrada sobre la viga baja.", "Quedan a 50 cm una de otra. Palram permite hasta 80. 2 tornillos de 3\" en cada cruce.", "Pinta de blanco el tramo que queda bajo la transparente."],
+    cam: [-30, 40, 420], pins: [["Regla 2x2 de 2.80 m", [250, ySheet(ZP[1]) + 3, ZP[1]], ""], ["4 · 54.5 · 105 cm", [40, ySheet(ZP[2]) + 3, ZP[2]], "dim"], ["La 4ª, sobre la viga baja", [150, ySheet(ZP[3]) + 3, ZP[3]], "dim"]] },
+  { t: "Canal y bajante", sub: "La canal sentada en los brazos, en los 12 cm entre la viga baja y la pared.",
+    li: ["Canal de PVC de 4\" (o el tubo partido de antes) sobre los 3 brazos, pegada a la pared.", "Calza de 1.4 cm en la ménsula del lado de la casa y de 0.8 cm en la del medio, para que corra hacia el bajante.", "Salida a 10 cm de la pared alta; el bajante baja pegado a la pared del fondo hasta el desagüe."],
+    cam: [190, 62, 320], tgt: [140, yArm, 164], pins: [["Canal PVC 4\" en los brazos", [90, gTop + 2, gZ], ""], ["Bajante PVC 3\"", [XDOWN, 150, gZ], ""], ["Calza 1.4 cm", [255, yArm - 4, gZ], "dim"]] },
   { t: "Metal junto a la pared alta", sub: "Contra la pared alta, con la punta de arriba contra la franja verde.",
-    li: ["Por abajo sale 8 cm después de la última regla, sobre la canal.", "5 tornillos por regla, en la cresta de la onda."],
-    cam: [-30, 45, 420], pins: [["Metal 1.70 × 1 m", [50, ySheet(60) + 4, 60], ""], ["5 tornillos por regla", [50, ySheet(ZP[0]) + 3, ZP[0]], "screw"]] },
+    li: ["Por abajo pasa 11 cm después de la última regla y termina 3.3 cm antes de la pared, encima de la canal.", "5 tornillos por regla, en la cresta de la onda."],
+    cam: [-30, 45, 420], pins: [["Metal 1.70 × 1 m", [50, ySheet(60) + 4, 60], ""], ["5 tornillos por regla", [50, ySheet(ZP[0]) + 3, ZP[0]], "screw"], ["3.3 cm antes de la pared", [50, ySheet(zEnd) + 4, zEnd], "dim"]] },
   { t: "Metal del lado de la casa verde", sub: "Igual, del otro lado, contra la casa verde.",
     li: ["Misma posición: la punta de arriba contra la franja verde.", "5 tornillos por regla."],
     cam: [-30, 45, 420], pins: [["Metal 1.70 × 1 m", [230, ySheet(60) + 4, 60], ""]] },
@@ -297,7 +325,7 @@ var STEPS = [
     cam: [-40, 30, 380], tgt: [140, 240, 30], pins: [["Tira de lámina lisa sellada", [180, BAND1 - 2, 0], ""], ["Cinta tapagoteras", [278, ySheet(100) + 4, 100], "dim"]] },
   { t: "Listo", sub: "Prueba con la manguera desde arriba y revisa por debajo que no gotee.",
     li: ["Prueba con la manguera de la franja verde hacia abajo.", "Por debajo, revisa los traslapes, los tornillos y las orillas.", "Nadie se para en las láminas."],
-    cam: [-35, 40, 470], pins: [["30% de caída", [282, ySheet(80) + 8, 80], "dim"], ["El agua a la canal", [200, gTop - 6, gZ], ""]] }
+    cam: [-35, 40, 470], pins: [["20% de caída", [282, ySheet(80) + 8, 80], "dim"], ["El agua a la canal", [200, gTop - 6, gZ], ""]] }
 ];
 
 // ---------- Escena ----------
@@ -359,23 +387,43 @@ function build() {
   var red = mat("#c0261b");
   var oldWood = box(5, 60, 5, red); oldWood.position.set(W - 6, BAND0 - 30, -3); addPart(oldWood, 0, 1);
   var oldBr = box(14, 22, 2, red); oldBr.position.set(110, 240, D - 1); addPart(oldBr, 0, 1);
-  // 2: líneas
+  // 1: líneas
   var lineM = mat("#c0261b", { emissive: new THREE.Color("#7a0d05") });
-  var lh = box(W, 0.8, 0.8, lineM); lh.position.set(140, yH, 0.5); addPart(lh, 1, 2);
-  var ll = box(W, 0.8, 0.8, lineM); ll.position.set(140, yL, D - 0.5); addPart(ll, 1, 3);
-  // 3-4: vigas y tacos
+  var lh = box(W, 0.8, 0.8, lineM); lh.position.set(140, yH, 0.5); addPart(lh, 1, 3);
+  var gLn = new THREE.Group(), ll = box(W, 0.8, 0.8, lineM); ll.position.set(140, yArm, D - 0.5); gLn.add(ll);
+  XM.forEach(function (x) { var tk = box(0.8, 14, 0.8, lineM); tk.position.set(x, yArm - 4, D - 0.5); gLn.add(tk); });
+  addPart(gLn, 1, 2);
+  // 2: ménsulas en la pared del fondo
   var woodM = mat("#c9995a", { roughness: 0.8 }), woodM2 = mat("#b9884c", { roughness: 0.8 });
   var screwM = mat("#2f5874", { metalness: 0.6, roughness: 0.4 });
+  var brM = mat("#7d8a94", { metalness: 0.6, roughness: 0.4 });
+  var gM = new THREE.Group(), yAB = yArm - H4;                     // cara de abajo del brazo
+  var cOut = MBR / Math.SQRT2, aIn = cOut - H4 * Math.SQRT2;       // donde tocan las orillas del pie de amigo
+  var mid = aIn / 2 + H4 / (2 * Math.SQRT2), Lc = aIn * Math.SQRT2 + H4;
+  XM.forEach(function (x) {
+    var up = box(H4, MUP, T, woodM); up.position.set(x, yAB - MUP / 2, D - T / 2); gM.add(up);
+    var arm = box(T, H4, MARM, woodM); arm.position.set(x, yArm - H4 / 2, D - MARM / 2); gM.add(arm);
+    var br = box(T, H4, Lc, woodM2); br.rotation.x = Math.PI / 4; br.position.set(x, yAB - mid, D - T - mid); gM.add(br);
+    [5, 33].forEach(function (dy) {
+      var a = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1.2, 12), screwM); a.rotation.x = Math.PI / 2; a.position.set(x, yAB - dy, D - T - 0.5); gM.add(a);
+    });
+  });
+  addPart(gM, 2);
+  // 3: viga alta con anclas
   var gH = new THREE.Group(), vH = box(W, H4, T, woodM); vH.position.set(140, yH - H4 / 2, T / 2); gH.add(vH);
-  var gL = new THREE.Group(), vL = box(W, H4, T, woodM); vL.position.set(140, yL - H4 / 2, D - T / 2); gL.add(vL);
   XANCH.forEach(function (x) {
     var a = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.1, 1.2, 12), screwM); a.rotation.x = Math.PI / 2; a.position.set(x, yH - H4 / 2, T + 0.5); gH.add(a);
-    var b = a.clone(); b.position.set(x, yL - H4 / 2, D - T - 0.5); gL.add(b);
   });
-  addPart(gH, 2); addPart(gL, 3);
+  addPart(gH, 3);
+  // 4: viga baja parada sobre los brazos, con una escuadra en cada brazo
+  var gL = new THREE.Group(), vL = box(W, H4, T, woodM); vL.position.set(140, yL - H4 / 2, zB + T / 2); gL.add(vL);
+  XM.forEach(function (x) {
+    var e1 = box(2.5, 6, 0.4, brM); e1.position.set(x, yArm + 3, zB - 0.2); gL.add(e1);
+    var e2 = box(2.5, 0.4, 6, brM); e2.position.set(x, yArm + 0.2, zB - 3); gL.add(e2);
+  });
+  addPart(gL, 4);
   // 5: cuartones y escuadras
   var gR = new THREE.Group(), Ls = (zB - zA) * K;
-  var brM = mat("#7d8a94", { metalness: 0.6, roughness: 0.4 });
   XR.forEach(function (x) {
     var r = box(T, H4, Ls, woodM2);
     var zm = (zA + zB) / 2, ym = yRaf(zm) - (H4 / 2) * Math.cos(ANG);
@@ -386,24 +434,24 @@ function build() {
       });
     });
   });
-  addPart(gR, 4);
+  addPart(gR, 5);
   // 6: reglas
   var gP = new THREE.Group(), pinoM = mat("#d8b075", { roughness: 0.8 });
   ZP.forEach(function (z) { var p = box(W, T, T, pinoM); p.position.set(140, yRaf(z) + (T / 2) * Math.cos(ANG), z + (T / 2) * Math.sin(ANG)); p.rotation.x = ANG; gP.add(p); });
-  addPart(gP, 5);
-  // 7: canal, bajante, lámina lisa de la viga baja
+  addPart(gP, 6);
+  // 7: canal sentada en los brazos, calzas y bajante
   var gG = new THREE.Group(), pvcM = mat("#e8e6df", { roughness: 0.5, side: THREE.DoubleSide });
   var half = new THREE.Mesh(new THREE.CylinderGeometry(GR, GR, W, 20, 1, true, Math.PI, Math.PI), pvcM);
   half.rotation.z = Math.PI / 2; half.position.set(140, gTop, gZ); gG.add(half);
   var cap1 = new THREE.Mesh(new THREE.CircleGeometry(GR, 16, Math.PI, Math.PI), pvcM); cap1.rotation.y = Math.PI / 2; cap1.position.set(0.2, gTop, gZ); gG.add(cap1);
   var cap2 = cap1.clone(); cap2.position.x = W - 0.2; gG.add(cap2);
-  var down = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, gTop - 12, 16), pvcM); down.position.set(XDOWN, (gTop - 12) / 2 + 6, gZ); gG.add(down);
+  var dLen = gTop - GR - 12;
+  var down = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, dLen, 16), pvcM); down.position.set(XDOWN, 12 + dLen / 2, gZ); gG.add(down);
   var elbow = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, 22, 16), pvcM); elbow.rotation.x = Math.PI / 2; elbow.position.set(XDOWN, 6, gZ - 9); gG.add(elbow);
+  var shimM = mat("#8a6a3a", { roughness: 0.8 });
+  [[140, 0.8], [255, 1.4]].forEach(function (s) { var sh = box(T, s[1], 8, shimM); sh.position.set(s[0], yArm + s[1] / 2, gZ); gG.add(sh); });
+  addPart(gG, 7);
   var flM = mat("#b8c2c9", { metalness: 0.7, roughness: 0.35 });
-  var fl1 = box(W, 10, 0.3, flM); fl1.position.set(140, yL + 5, D - 0.2); gG.add(fl1);
-  var fl2 = box(W, 0.3, T + 0.4, flM); fl2.position.set(140, yL + 0.2, D - T / 2); gG.add(fl2);
-  var fl3 = box(W, 12, 0.3, flM); fl3.position.set(140, yL - 5, zB - 0.25); gG.add(fl3);
-  addPart(gG, 6);
   // 8-10: láminas con tornillos
   SHEETS.forEach(function (sh, k) {
     var g = new THREE.Group();
@@ -419,7 +467,7 @@ function build() {
         s.position.set(x, ySheet(z) + AMP + (sh.kind === "pc" ? 1.4 : 0.8), z); s.rotation.x = ANG; g.add(s);
       });
     });
-    addPart(g, 7 + k);
+    addPart(g, 8 + k);
   });
   // 11: tiras y cinta
   var gF = new THREE.Group();
@@ -427,7 +475,7 @@ function build() {
   var t2 = box(W, 0.3, 12, flM); t2.position.set(140, ySheet(6) + AMP + 1.2, 6); t2.rotation.x = ANG; gF.add(t2);
   var tapeM = mat("#c8cdd1", { metalness: 0.5, roughness: 0.5 });
   [1.5, W - 1.5].forEach(function (x) { var tp = box(3, 1, zEnd, tapeM); tp.position.set(x, ySheet(zEnd / 2) + AMP + 1.2, zEnd / 2); tp.rotation.x = ANG; gF.add(tp); });
-  addPart(gF, 10);
+  addPart(gF, 11);
 
   // fondo del 3D arriba, el patio se ve de arriba
   onResize(); window.addEventListener("resize", onResize);
@@ -531,36 +579,78 @@ function frame(now) {
 function svgEl(tag, a, parent) { var e = document.createElementNS("http://www.w3.org/2000/svg", tag); for (var k in a) e.setAttribute(k, a[k]); if (parent) parent.appendChild(e); return e; }
 function txt(p, x, y, s, size, anchor, color) { var t = svgEl("text", { x: x, y: y, "font-size": size || 9, "text-anchor": anchor || "start" }, p); if (color) t.setAttribute("style", "fill:" + color); t.textContent = s; return t; }
 function drawCorte() {
-  var S = 2.4, ox = 40, oy = 20, top = 290, sv = svgEl("svg", { viewBox: "0 0 600 300", class: "plano", role: "img", "aria-label": "Corte de lado del techo" });
+  var S = 2.4, ox = 40, oy = 16, top = 285, sv = svgEl("svg", { viewBox: "0 0 600 320", class: "plano", role: "img", "aria-label": "Corte de lado del techo" });
   function X(z) { return ox + z * S; } function Y(y) { return oy + (top - y) * S; }
-  var wall = "#8b7375", wood = "#c9995a", green = "#5fae86", sheet = "#6f7b85", dim = tok("--dim") || "#c0261b";
+  function pts(a) { return a.map(function (p) { return X(p[0]) + "," + Y(p[1]); }).join(" "); }
+  var wall = "#8b7375", wood = "#c9995a", wood2 = "#b9884c", green = "#5fae86", sheet = "#6f7b85", dim = tok("--dim") || "#c0261b";
+  var yAB = yArm - H4, cOut = MBR / Math.SQRT2, aIn = cOut - H4 * Math.SQRT2, zc = D - T;
   svgEl("rect", { x: X(-12), y: Y(BAND1), width: 12 * S, height: (BAND1 - BAND0) * S, fill: green }, sv);
-  svgEl("rect", { x: X(D), y: Y(top), width: 10 * S, height: (top - 180) * S, fill: wall, opacity: 0.6 }, sv);
+  svgEl("rect", { x: X(D), y: Y(BAND0), width: 10 * S, height: (BAND0 - 168) * S, fill: wall, opacity: 0.6 }, sv);
+  // viga alta, ménsula y viga baja
   svgEl("rect", { x: X(0), y: Y(yH), width: T * S, height: H4 * S, fill: wood }, sv);
+  svgEl("rect", { x: X(zc), y: Y(yAB), width: T * S, height: MUP * S, fill: wood }, sv);
+  svgEl("rect", { x: X(D - MARM), y: Y(yArm), width: MARM * S, height: H4 * S, fill: wood }, sv);
+  svgEl("polygon", { points: pts([[zc, yAB - aIn], [zc - aIn, yAB], [zc - cOut, yAB], [zc, yAB - cOut]]), fill: wood2 }, sv);
+  [5, 33].forEach(function (d) { svgEl("line", { x1: X(zc) - 4, y1: Y(yAB - d), x2: X(D) + 8, y2: Y(yAB - d), stroke: "#2f5874", "stroke-width": 2.5 }, sv); });
   svgEl("rect", { x: X(zB), y: Y(yL), width: T * S, height: H4 * S, fill: wood }, sv);
-  svgEl("polygon", { points: [X(zA) + "," + Y(yH), X(zB) + "," + Y(yL), X(zB) + "," + Y(yL - H4 * K), X(zA) + "," + Y(yH - H4 * K)].join(" "), fill: wood, opacity: 0.75 }, sv);
+  // cuartón, reglas, lámina y canal
+  svgEl("polygon", { points: pts([[zA, yH], [zB, yL], [zB, yL - H4 * K], [zA, yH - H4 * K]]), fill: wood, opacity: 0.75 }, sv);
   ZP.forEach(function (z) { svgEl("rect", { x: X(z - T / 2), y: Y(yRaf(z) + T), width: T * S, height: T * S, fill: "#d8b075", stroke: "#8a6a3a", "stroke-width": 0.6 }, sv); });
   svgEl("line", { x1: X(0), y1: Y(ySheet(0) + 0.8), x2: X(zEnd), y2: Y(ySheet(zEnd) + 0.8), stroke: sheet, "stroke-width": 3 }, sv);
   svgEl("path", { d: "M" + X(gZ - GR) + "," + Y(gTop) + " A" + GR * S + "," + GR * S + " 0 0 0 " + X(gZ + GR) + "," + Y(gTop), fill: "none", stroke: "#9a978d", "stroke-width": 2.5 }, sv);
-  svgEl("polyline", { points: [X(D) + "," + Y(yL + 10), X(D) + "," + Y(yL), X(zB) + "," + Y(yL), X(zB) + "," + Y(yL - 12)].join(" "), fill: "none", stroke: "#7d8a94", "stroke-width": 1.4 }, sv);
   // cotas
-  svgEl("line", { x1: X(0), y1: Y(180), x2: X(D), y2: Y(180), stroke: dim, "stroke-width": 1 }, sv);
-  txt(sv, X(D / 2), Y(180) + 12, "170 de pared a pared", 10, "middle", dim);
-  svgEl("line", { x1: X(D) + 30, y1: Y(yH), x2: X(D) + 30, y2: Y(yL), stroke: dim, "stroke-width": 1 }, sv);
-  svgEl("line", { x1: X(0), y1: Y(yH), x2: X(D) + 34, y2: Y(yH), stroke: dim, "stroke-width": 0.6, "stroke-dasharray": "3 3" }, sv);
-  txt(sv, X(D) + 34, (Y(yH) + Y(yL)) / 2, f1(yH - yL) + " de caída", 10, "start", dim);
-  txt(sv, X(D) + 34, (Y(yH) + Y(yL)) / 2 + 12, "(30%)", 10, "start", dim);
+  svgEl("line", { x1: X(0), y1: Y(170), x2: X(D), y2: Y(170), stroke: dim, "stroke-width": 1 }, sv);
+  txt(sv, X(D / 2), Y(170) + 12, "170 de la franja verde a la pared del fondo", 10, "middle", dim);
+  var xd = X(D) + 34;
+  svgEl("line", { x1: X(0), y1: Y(yH), x2: xd + 4, y2: Y(yH), stroke: dim, "stroke-width": 0.6, "stroke-dasharray": "3 3" }, sv);
+  svgEl("line", { x1: X(D - MARM), y1: Y(yArm), x2: xd + 4, y2: Y(yArm), stroke: dim, "stroke-width": 0.6, "stroke-dasharray": "3 3" }, sv);
+  svgEl("line", { x1: xd, y1: Y(yH), x2: xd, y2: Y(yArm), stroke: dim, "stroke-width": 1 }, sv);
+  txt(sv, xd + 6, (Y(yH) + Y(yArm)) / 2 - 4, (yH - yArm).toFixed(1) + " cm", 12, "start", dim);
+  txt(sv, xd + 6, (Y(yH) + Y(yArm)) / 2 + 9, "de la línea alta", 9, "start", dim);
+  txt(sv, xd + 6, (Y(yH) + Y(yArm)) / 2 + 20, "al brazo", 9, "start", dim);
   txt(sv, X(-12), Y(BAND1) - 5, "franja verde", 9);
-  txt(sv, X(D) - 4, Y(top) + 12, "pared del fondo", 9, "end");
+  txt(sv, X(D) - 4, Y(BAND0) - 5, "pared del fondo", 9, "end");
   txt(sv, X(4), Y(yH - H4) + 12, "viga alta", 9);
-  txt(sv, X(zB) - 4, Y(yL - H4) + 22, "viga baja y canal", 9, "end");
-  txt(sv, X(zEnd / 2), Y(ySheet(zEnd / 2)) - 12, "lámina de 1.70 m", 10, "middle");
-  ZP.forEach(function (z, i) { txt(sv, X(z), Y(yRaf(z) + T) + 16 + (i % 2) * 9, ["4", "55", "105", "156"][i], 8, "middle", dim); });
-  txt(sv, X(zEnd), Y(ySheet(zEnd)) - 6, "7 cm libres", 8, "end", dim);
+  txt(sv, X(D - MARM) - 4, Y(yArm) + 1, "viga baja", 9, "end");
+  svgEl("line", { x1: X(D - MARM) - 2, y1: Y(yArm) - 3, x2: X(zB) - 1, y2: Y(yL - H4 / 2), stroke: "#4c473d", "stroke-width": 0.6 }, sv);
+  txt(sv, X(D - MARM) - 4, Y(yArm - H4) + 2, "ménsula", 9, "end");
+  txt(sv, X(zEnd / 2), Y(ySheet(zEnd / 2)) - 12, "lámina de 1.70 m, 20% de caída", 10, "middle");
+  ZP.forEach(function (z, i) { if (i < 3) txt(sv, X(z), Y(yRaf(z) + T) + 16 + (i % 2) * 9, ["4", "54.5", "105"][i], 8, "middle", dim); });
+  txt(sv, X(D) - 2, Y(ySheet(zEnd)) - 12, f1(D - zEnd) + " libres", 8, "end", dim);
   document.getElementById("corte").appendChild(sv);
   var p = document.createElement("p"); p.className = "note";
-  p.textContent = "Los números chicos son el centro de cada regla, medido sobre el cuartón desde su punta de arriba. La viga baja queda " + f1(yH - yL) + " cm más abajo que la alta. Las alturas son supuestas: lo que importa es la diferencia.";
+  p.textContent = "La viga baja va parada en el brazo de la ménsula, con la cara de atrás a 12 cm de la pared; en esos 12 cm va la canal, sentada en los brazos. Las rayas azules son las 2 anclas de la ménsula. Los números chicos son el centro de cada regla, medido sobre el cuartón desde su punta de arriba; la cuarta va sobre la viga baja. Las alturas desde el piso son supuestas: lo que importa son las diferencias.";
   document.getElementById("corte").appendChild(p);
+}
+function drawPared() {
+  var S = 1.75, ox = 30, oy = 14, top = 258, sv = svgEl("svg", { viewBox: "0 0 560 236", class: "plano", role: "img", "aria-label": "Pared del fondo vista de frente, con las 3 ménsulas" });
+  function X(x) { return ox + (W - x) * S; } function Y(y) { return oy + (top - y) * S; }
+  var wallC = "#8b7375", wood = "#c9995a", wood2 = "#b9884c", dim = tok("--dim") || "#c0261b";
+  var yAB = yArm - H4, cOut = MBR / Math.SQRT2, yBot = 150;
+  svgEl("rect", { x: X(W), y: Y(BAND0), width: W * S, height: (BAND0 - yBot) * S, fill: wallC, opacity: 0.3 }, sv);
+  svgEl("line", { x1: X(W), y1: Y(BAND0), x2: X(0), y2: Y(BAND0), stroke: wallC, "stroke-width": 2 }, sv);
+  txt(sv, X(W) + 4, Y(BAND0) + 12, "lado de la casa", 9, "start");
+  txt(sv, X(0) - 4, Y(BAND0) + 12, "pared alta", 9, "end");
+  svgEl("rect", { x: X(W), y: Y(yL), width: W * S, height: H4 * S, fill: wood, opacity: 0.45 }, sv);
+  txt(sv, X(140), Y(yL) - 4, "viga baja, encima de los brazos", 9, "middle");
+  svgEl("line", { x1: X(W), y1: Y(yArm), x2: X(0), y2: Y(yArm), stroke: dim, "stroke-width": 0.8, "stroke-dasharray": "4 3" }, sv);
+  svgEl("rect", { x: X(XDOWN + 4.4), y: Y(yArm), width: 8.8 * S, height: (yArm - yBot) * S, fill: "#e8e6df", stroke: "#9a978d", "stroke-width": 0.8 }, sv);
+  txt(sv, X(XDOWN) + 10, Y(165), "bajante", 9, "start");
+  XM.forEach(function (x) {
+    svgEl("rect", { x: X(x + H4 / 2), y: Y(yAB), width: H4 * S, height: MUP * S, fill: wood, stroke: "#8a6a3a", "stroke-width": 0.6 }, sv);
+    svgEl("rect", { x: X(x + T / 2), y: Y(yAB), width: T * S, height: cOut * S, fill: wood2 }, sv);
+    svgEl("rect", { x: X(x + T / 2), y: Y(yArm), width: T * S, height: H4 * S, fill: wood2, stroke: "#8a6a3a", "stroke-width": 0.6 }, sv);
+    [5, 33].forEach(function (d) { svgEl("circle", { cx: X(x), cy: Y(yAB - d), r: 2.6, fill: "#2f5874" }, sv); });
+    txt(sv, X(x), Y(yAB - MUP) + 13, x + " cm", 11, "middle", dim);
+  });
+  var yDim = Y(yBot) + 2;
+  [0, 25, 140, 255, 280].forEach(function (x) { svgEl("line", { x1: X(x), y1: yDim - 5, x2: X(x), y2: yDim + 5, stroke: dim, "stroke-width": 1 }, sv); });
+  svgEl("line", { x1: X(0), y1: yDim, x2: X(W), y2: yDim, stroke: dim, "stroke-width": 1 }, sv);
+  [[12.5, "25"], [82.5, "115"], [197.5, "115"], [267.5, "25"]].forEach(function (d) { txt(sv, X(d[0]), yDim + 14, d[1], 10, "middle", dim); });
+  document.getElementById("pared").appendChild(sv);
+  var p = document.createElement("p"); p.className = "note";
+  p.textContent = "La pared del fondo vista de frente desde el patio, con la pared alta a la derecha. El número de cada ménsula es la distancia de la pared alta a su centro. Los puntos azules son sus 2 anclas, a 5 y a 33 cm debajo del brazo. La raya roja es la línea de los brazos, " + (yH - yArm).toFixed(1) + " cm abajo de la línea alta.";
+  document.getElementById("pared").appendChild(p);
 }
 function drawMapa() {
   var S = 1.7, ox = 14, oy = 26, sv = svgEl("svg", { viewBox: "0 0 545 340", class: "plano", role: "img", "aria-label": "Mapa de tornillos visto desde arriba" });
@@ -589,7 +679,7 @@ function drawMapa() {
   document.getElementById("mapa").appendChild(p);
 }
 
-drawCorte(); drawMapa();
+drawCorte(); drawPared(); drawMapa();
 if (hasGL) { build(); go(0); var c0 = camFromStep(0); cam.th = c0.th; cam.ph = c0.ph; cam.r = c0.r; cam.tgt.copy(c0.tgt); requestAnimationFrame(frame); }
 else { document.getElementById("fallback").hidden = false; go(0); }
 })();
